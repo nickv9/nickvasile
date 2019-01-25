@@ -1,6 +1,8 @@
 ---
-date: "2016-05-05T21:48:51-07:00"
+date: "2019-01-25T20:48:51-05:00"
 title: About
 ---
+![](/content/about_files/tuna_cropped.jpg)
+Hey, I'm Nick Vasile. I'm a Senior Marketing Analyst at [Citrix](http://www.citrix.com).
 
-This is a "hello world" example website for the [**blogdown**](https://github.com/rstudio/blogdown) package. The theme was forked from [@jrutheiser/hugo-lithium-theme](https://github.com/jrutheiser/hugo-lithium-theme) and modified by [Yihui Xie](https://github.com/yihui/hugo-lithium).
+I love my family, fishing, good music and R.
