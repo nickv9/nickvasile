@@ -1,4 +1,4 @@
-baseurl = "/"
+baseurl = "http://www.nickvasile.com/"
 languageCode = "en-us"
 title = "Nick Vasile"
 theme = "hugo-lithium"
