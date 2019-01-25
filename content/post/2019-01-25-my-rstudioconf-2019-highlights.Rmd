@@ -3,7 +3,6 @@ title: My rstudioconf 2019 highlights
 author: Nick Vasile
 date: '2019-01-25'
 slug: my-rstudioconf-2019-highlights
-output: html_document
 categories: []
 tags: []
 ---
