@@ -1,0 +1,10 @@
+---
+title: another markdown test
+author: testing
+date: '2019-01-25'
+slug: another-markdown-test
+categories: []
+tags: []
+---
+
+blah blah blah this probably wont show up either!
