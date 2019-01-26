@@ -1,0 +1,60 @@
+---
+title: My rstudioconf 2019 highlights
+author: Nick Vasile
+date: '2019-01-25'
+slug: my-rstudioconf-2019-highlights
+categories: []
+tags: []
+---
+
+
+
+<div id="event-details" class="section level2">
+<h2>Event details</h2>
+<p>. January 15-18th. Austin, TX. Combination of 2 day workshops and 2 days of conference.</p>
+<p><strong>The RStudio official repo with abstracts for every session, workshop, and e-poster: <a href="https://github.com/rstudio/rstudio-conf/tree/master/2019" class="uri">https://github.com/rstudio/rstudio-conf/tree/master/2019</a> </strong></p>
+<p><strong>All the conference session recordings: <a href="https://resources.rstudio.com/rstudio-conf-2019" class="uri">https://resources.rstudio.com/rstudio-conf-2019</a> </strong></p>
+</div>
+<div id="overall-thoughts" class="section level2">
+<h2>Overall thoughts</h2>
+<p>This was my second RStudioconf.</p>
+<p>My biggest motivator continued to be getting exposed to different applications of R and the RStudio tool set.</p>
+<p>I met people from all kinds of areas including financial, educational admin, insurance, life sciences, other technology companies and on and on. It was a VERY diverse group of attendees.</p>
+<p>Attendance was around 1700 and seems to have grown by at least 50% since last year based on a chart shown during the opening keynote.</p>
+<p>The community is my favorite part of working with R and attending this conference. Everyone knew more than me but was extremely approachable and willing to help answer some of my questions.</p>
+<p>It definitely felt like there were more and more people trying to figure out how and where to move R into production.</p>
+<p>I do think the bulk of the value comes from the 2 day course - workshop attendance is now large enough where you can meet a ton of people on break and during the socials. The break out sessions during the conference are 20m quick overviews, which are useful, but can be viewed online.</p>
+<p>That being said, I did purchase a, “super early bird,” pass for next year’s conference in San Francisco.</p>
+</div>
+<div id="applied-machine-learning-course" class="section level2">
+<h2>Applied Machine Learning Course</h2>
+<p><strong>All content (slides and code) available here: <a href="https://github.com/topepo/rstudio-conf-2019" class="uri">https://github.com/topepo/rstudio-conf-2019</a> </strong></p>
+<p>I took the Applied Machine Learning course, led by Max Kuhn - led by the author of <a href="https://www.amazon.com/Applied-Predictive-Modeling-Max-Kuhn/dp/1461468485">Applied Predictive Modeling</a></p>
+<p>I just bought this book because contrary to much of the material out there, it appears that it spends much more time on practical aspects of the overall modeling process - and not just the FUN parts (analysis and visualization).</p>
+<p>Max has a background in applying statistical analysis in the pharmaceutical, medical and manufacturing spaces.</p>
+<p>Max now works for RStudio and is focused on creating packages to make modeling better and easier.</p>
+<p>While a significant portion of the course went faster than I could absorb it was a great use of time because I was exposed to a brand new set of tools and concepts to experiment with. Most of these are part of, or related to, the <a href="https://github.com/tidymodels">tidymodels suite of packages</a></p>
+<ul>
+<li><p>The <a href="https://tidymodels.github.io/parsnip/">parsnip package</a>: One issue that makes using R cumbersome in general is that different functions that do the same thing often have different interfaces and arguments. Parsnip standardizes this for modeling related functions and this should significantly reduce the amount of syntactical minutia that needs to be memorized.</p></li>
+<li><p>The <a href="https://github.com/edgararuiz/tidypredict">tidypredict package</a>: Run predictive models in SQL from R.</p></li>
+<li><p>Multivariate adaptive regression splines (MARS) modeling: allows you to apply linear models to non-linear data. Linear models are usually the easiest to understand explain to stakeholders but are constrained in that they assume the thing you are modeling is linear. MARS gets around that constraint. MARS is implemented in the earth R package.</p></li>
+<li><p>The <a href="https://tidymodels.github.io/rsample/">rsample package</a>: Makes it easy to bootstrap and resample (test and training sets)</p></li>
+<li><p>the <a href="https://tidymodels.github.io/recipes/">recipes package</a>: I wasn’t quite ready for this but from what I learned it makes it easier to reuse work done to pre-process data for future models. I expect to learn more about this when I advance my learning of feature engineering.</p></li>
+<li><p><strong>Max is working on a new book focused on the concept of feature engineering</strong>. One of the ways this would be applied is if a model is created and none of the predictors are especially effective at predicting the outcome. Applying transformations (log, exponential, etc.) to the predictors may improve predictive performance. The WIP version is available for FREE here: <a href="http://www.feat.engineering/">Feature Engineering and Selection: A Practical Approach for Predictive Models</a></p></li>
+</ul>
+</div>
+<div id="my-conference-highlights" class="section level2">
+<h2>My conference highlights</h2>
+<ul>
+<li><p>Relatively new packages for modeling time series data <a href="https://github.com/tidyverts/tsibble">tsibble</a> and <a href="https://github.com/tidyverts/fable">fable</a>. slides here: <a href="https://slides.earo.me/rstudioconf19/#1" class="uri">https://slides.earo.me/rstudioconf19/#1</a></p></li>
+<li><p><a href="https://github.com/edgararuiz/databases-w-r">Databases using R: The latest</a></p></li>
+<li><p><a href="https://nolisllc.com/assets/presentations/r-tensorflow-api.pdf">Push straight to prod: API development with R and Tensorflow at T-Mobile</a></p></li>
+<li><p><a href="https://github.com/sol-eng/plumber-model">Democratizing R with Plumber APIs</a></p></li>
+<li><p><a href="https://www.slideshare.net/secret/Ba52FYuH2FoWE">Building an A/B testing analytic system with R and Shiny</a></p></li>
+<li><p><a href="https://docs.google.com/presentation/d/1zMuBSADaxdFnosOPWJNA10DaxGEheW6gDxqEPYAuado/edit">Visualizing uncertainty with hypothetical outcomes plots</a></p></li>
+<li><p><a href="https://haozhu233.github.io/rstudioconf2019_addin_talk/#1">Empowering a data team with RStudio addins</a></p></li>
+<li><p><a href="https://github.com/angelabassa/rstudioconf-2019">Data science as a team sport</a></p></li>
+<li><p><a href="https://www.dropbox.com/s/jk7216yr30ztpdp/DavidRobinson-RStudio-2019.pdf?dl=0">The unreasonable effectiveness of public work</a></p></li>
+<li><p>search #rstudioconf on twitter</p></li>
+</ul>
+</div>
