@@ -2,7 +2,7 @@ baseurl = "http://www.nickvasile.com/"
 languageCode = "en-us"
 title = "Nick Vasile"
 theme = "hugo-lithium"
-googleAnalytics = ""
+googleAnalytics = "UA-133313674-1"
 disqusShortname = ""
 ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
 
