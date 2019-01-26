@@ -8,3 +8,8 @@ tags: []
 ---
 
 this is a stupid test!
+
+```{r}
+sessionInfo()
+```
+
