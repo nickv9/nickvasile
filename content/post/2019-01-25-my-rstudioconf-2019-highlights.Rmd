@@ -7,7 +7,7 @@ categories: []
 tags: []
 ---
 ## Event details
-.
+
 January 15-18th.
 Austin, TX.
 Combination of 2 day workshops and 2 days of conference.
