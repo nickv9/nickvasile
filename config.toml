@@ -12,7 +12,7 @@ ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
 [[menu.main]]
     name = "About"
     url = "/about/"
-[[cheat.sheet]]
+[[menu.main]]
   name = "R Cheat Sheet"
   url = "/cheat/"
 [[menu.main]]
