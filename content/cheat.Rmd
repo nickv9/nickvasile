@@ -65,7 +65,7 @@ head(mtcars[!is.na(mtcars[,"cyl"]),])
 
 # subset all rows with select  columns
 # dataframe[, c("column1", "column2")]
-mtcars[, c("mpg", "carb")]
+head(mtcars[, c("mpg", "carb")])
 
 # subset all rows where attribute matches
 # dataframe[dataframe$attribute =="value", ] 
@@ -96,7 +96,7 @@ read.csv(file = "my_file.csv", fileEncoding = "UTF-8-BOM")
 
 ###List functions exported by a loaded package
 ```{r}
-head(ls("package:base"), n = 100)
+head(ls("package:base"))
 ```
 
 ###Count occurrences of unique values

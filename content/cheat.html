@@ -101,40 +101,14 @@ head(mtcars[!is.na(mtcars[,&quot;cyl&quot;]),])
 
 # subset all rows with select  columns
 # dataframe[, c(&quot;column1&quot;, &quot;column2&quot;)]
-mtcars[, c(&quot;mpg&quot;, &quot;carb&quot;)]
-#&gt;                      mpg carb
-#&gt; Mazda RX4           21.0    4
-#&gt; Mazda RX4 Wag       21.0    4
-#&gt; Datsun 710          22.8    1
-#&gt; Hornet 4 Drive      21.4    1
-#&gt; Hornet Sportabout   18.7    2
-#&gt; Valiant             18.1    1
-#&gt; Duster 360          14.3    4
-#&gt; Merc 240D           24.4    2
-#&gt; Merc 230            22.8    2
-#&gt; Merc 280            19.2    4
-#&gt; Merc 280C           17.8    4
-#&gt; Merc 450SE          16.4    3
-#&gt; Merc 450SL          17.3    3
-#&gt; Merc 450SLC         15.2    3
-#&gt; Cadillac Fleetwood  10.4    4
-#&gt; Lincoln Continental 10.4    4
-#&gt; Chrysler Imperial   14.7    4
-#&gt; Fiat 128            32.4    1
-#&gt; Honda Civic         30.4    2
-#&gt; Toyota Corolla      33.9    1
-#&gt; Toyota Corona       21.5    1
-#&gt; Dodge Challenger    15.5    2
-#&gt; AMC Javelin         15.2    2
-#&gt; Camaro Z28          13.3    4
-#&gt; Pontiac Firebird    19.2    2
-#&gt; Fiat X1-9           27.3    1
-#&gt; Porsche 914-2       26.0    2
-#&gt; Lotus Europa        30.4    2
-#&gt; Ford Pantera L      15.8    4
-#&gt; Ferrari Dino        19.7    6
-#&gt; Maserati Bora       15.0    8
-#&gt; Volvo 142E          21.4    2
+head(mtcars[, c(&quot;mpg&quot;, &quot;carb&quot;)])
+#&gt;                    mpg carb
+#&gt; Mazda RX4         21.0    4
+#&gt; Mazda RX4 Wag     21.0    4
+#&gt; Datsun 710        22.8    1
+#&gt; Hornet 4 Drive    21.4    1
+#&gt; Hornet Sportabout 18.7    2
+#&gt; Valiant           18.1    1
 
 # subset all rows where attribute matches
 # dataframe[dataframe$attribute ==&quot;value&quot;, ] 
@@ -220,41 +194,8 @@ read.csv(file = &quot;my_file.csv&quot;, fileEncoding = &quot;UTF-8-BOM&quot;)</
 </div>
 <div id="list-functions-exported-by-a-loaded-package" class="section level3">
 <h3>List functions exported by a loaded package</h3>
-<pre class="r"><code>head(ls(&quot;package:base&quot;), n = 100)
-#&gt;   [1] &quot;-&quot;                    &quot;-.Date&quot;               &quot;-.POSIXt&quot;            
-#&gt;   [4] &quot;!&quot;                    &quot;!.hexmode&quot;            &quot;!.octmode&quot;           
-#&gt;   [7] &quot;!=&quot;                   &quot;$&quot;                    &quot;$.data.frame&quot;        
-#&gt;  [10] &quot;$.DLLInfo&quot;            &quot;$.package_version&quot;    &quot;$&lt;-&quot;                 
-#&gt;  [13] &quot;$&lt;-.data.frame&quot;       &quot;%%&quot;                   &quot;%*%&quot;                 
-#&gt;  [16] &quot;%/%&quot;                  &quot;%in%&quot;                 &quot;%o%&quot;                 
-#&gt;  [19] &quot;%x%&quot;                  &quot;&amp;&quot;                    &quot;&amp;&amp;&quot;                  
-#&gt;  [22] &quot;&amp;.hexmode&quot;            &quot;&amp;.octmode&quot;            &quot;(&quot;                   
-#&gt;  [25] &quot;*&quot;                    &quot;*.difftime&quot;           &quot;/&quot;                   
-#&gt;  [28] &quot;/.difftime&quot;           &quot;:&quot;                    &quot;::&quot;                  
-#&gt;  [31] &quot;:::&quot;                  &quot;@&quot;                    &quot;@&lt;-&quot;                 
-#&gt;  [34] &quot;[&quot;                    &quot;[.AsIs&quot;               &quot;[.data.frame&quot;        
-#&gt;  [37] &quot;[.Date&quot;               &quot;[.difftime&quot;           &quot;[.Dlist&quot;             
-#&gt;  [40] &quot;[.DLLInfoList&quot;        &quot;[.factor&quot;             &quot;[.hexmode&quot;           
-#&gt;  [43] &quot;[.listof&quot;             &quot;[.noquote&quot;            &quot;[.numeric_version&quot;   
-#&gt;  [46] &quot;[.octmode&quot;            &quot;[.POSIXct&quot;            &quot;[.POSIXlt&quot;           
-#&gt;  [49] &quot;[.simple.list&quot;        &quot;[.table&quot;              &quot;[.warnings&quot;          
-#&gt;  [52] &quot;[[&quot;                   &quot;[[.data.frame&quot;        &quot;[[.Date&quot;             
-#&gt;  [55] &quot;[[.factor&quot;            &quot;[[.numeric_version&quot;   &quot;[[.POSIXct&quot;          
-#&gt;  [58] &quot;[[.POSIXlt&quot;           &quot;[[&lt;-&quot;                 &quot;[[&lt;-.data.frame&quot;     
-#&gt;  [61] &quot;[[&lt;-.factor&quot;          &quot;[[&lt;-.numeric_version&quot; &quot;[&lt;-&quot;                 
-#&gt;  [64] &quot;[&lt;-.data.frame&quot;       &quot;[&lt;-.Date&quot;             &quot;[&lt;-.factor&quot;          
-#&gt;  [67] &quot;[&lt;-.numeric_version&quot;  &quot;[&lt;-.POSIXct&quot;          &quot;[&lt;-.POSIXlt&quot;         
-#&gt;  [70] &quot;^&quot;                    &quot;{&quot;                    &quot;|&quot;                   
-#&gt;  [73] &quot;|.hexmode&quot;            &quot;|.octmode&quot;            &quot;||&quot;                  
-#&gt;  [76] &quot;~&quot;                    &quot;+&quot;                    &quot;+.Date&quot;              
-#&gt;  [79] &quot;+.POSIXt&quot;             &quot;&lt;&quot;                    &quot;&lt;-&quot;                  
-#&gt;  [82] &quot;&lt;&lt;-&quot;                  &quot;&lt;=&quot;                   &quot;=&quot;                   
-#&gt;  [85] &quot;==&quot;                   &quot;&gt;&quot;                    &quot;&gt;=&quot;                  
-#&gt;  [88] &quot;abbreviate&quot;           &quot;abs&quot;                  &quot;acos&quot;                
-#&gt;  [91] &quot;acosh&quot;                &quot;addNA&quot;                &quot;addTaskCallback&quot;     
-#&gt;  [94] &quot;agrep&quot;                &quot;agrepl&quot;               &quot;alist&quot;               
-#&gt;  [97] &quot;all&quot;                  &quot;all.equal&quot;            &quot;all.equal.character&quot; 
-#&gt; [100] &quot;all.equal.default&quot;</code></pre>
+<pre class="r"><code>head(ls(&quot;package:base&quot;))
+#&gt; [1] &quot;-&quot;         &quot;-.Date&quot;    &quot;-.POSIXt&quot;  &quot;!&quot;         &quot;!.hexmode&quot; &quot;!.octmode&quot;</code></pre>
 </div>
 <div id="count-occurrences-of-unique-values" class="section level3">
 <h3>Count occurrences of unique values</h3>
