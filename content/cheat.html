@@ -433,6 +433,28 @@ nycflights13::weather %&gt;%
 #&gt;  [6] &quot;temp&quot;       &quot;dewp&quot;       &quot;humid&quot;      &quot;wind.dir&quot;   &quot;wind.speed&quot;
 #&gt; [11] &quot;wind.gust&quot;  &quot;precip&quot;     &quot;pressure&quot;   &quot;visib&quot;      &quot;time.hour&quot;</code></pre>
 </div>
+<div id="string-filtering-when-using-a-database-and-dbplyr" class="section level3">
+<h3>String filtering when using a database and dbplyr</h3>
+<p>The previous mentions won’t always work when filtering against data in a database. Reference: <a href="https://github.com/tidyverse/dplyr/issues/3090" class="uri">https://github.com/tidyverse/dplyr/issues/3090</a></p>
+<p>Solution from: <a href="https://stackoverflow.com/questions/38962585/pass-sql-functions-in-dplyr-filter-function-on-database/47198795#47198795" class="uri">https://stackoverflow.com/questions/38962585/pass-sql-functions-in-dplyr-filter-function-on-database/47198795#47198795</a></p>
+<pre class="r"><code>#load some data into a temp database
+con &lt;- DBI::dbConnect(RSQLite::SQLite(), path = &quot;:memory:&quot;)
+DBI::dbWriteTable(con, &quot;airports&quot;, nycflights13::airports)
+
+#query the data - name contains &quot;Island&quot; - this is case sensitive
+dplyr::tbl(con, &quot;airports&quot;) %&gt;% 
+  dplyr::filter(name %like% &quot;%Island%&quot;) %&gt;% 
+  head(5)
+#&gt; # Source:   lazy query [?? x 8]
+#&gt; # Database: sqlite 3.22.0 []
+#&gt;   faa   name                      lat    lon   alt    tz dst   tzone       
+#&gt;   &lt;chr&gt; &lt;chr&gt;                   &lt;dbl&gt;  &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;       
+#&gt; 1 09J   Jekyll Island Airport    31.1  -81.4    11    -5 A     America/New~
+#&gt; 2 2B2   Plum Island Airport      42.8  -70.8    11    -5 A     America/New~
+#&gt; 3 ANN   Annette Island           55.0 -132.    119    -9 A     America/Anc~
+#&gt; 4 BID   Block Island State Air~  41.2  -71.6   108    -5 A     America/New~
+#&gt; 5 BRO   Brownsville South Padr~  25.9  -97.4    22    -6 A     America/Chi~</code></pre>
+</div>
 <div id="create-permutations-of-items-from-multple-vectors" class="section level3">
 <h3>Create permutations of items from multple vectors</h3>
 <pre class="r"><code>expand.grid(
@@ -613,7 +635,7 @@ purrr::map_df(my_list, magrittr::extract)
 <div id="scatterplot-of-all-pairs" class="section level3">
 <h3>Scatterplot of all pairs</h3>
 <pre class="r"><code>pairs(mtcars)</code></pre>
-<p><img src="/cheat_files/figure-html/unnamed-chunk-24-1.png" width="672" /></p>
+<p><img src="/cheat_files/figure-html/unnamed-chunk-25-1.png" width="672" /></p>
 </div>
 <div id="interactively-explore-plots" class="section level3">
 <h3>Interactively explore plots</h3>
@@ -624,11 +646,11 @@ purrr::map_df(my_list, magrittr::extract)
 <pre class="r"><code>nycflights13::flights %&gt;% 
     ggplot2::ggplot(ggplot2::aes(x=forcats::fct_infreq(carrier))) +
     ggplot2::geom_bar()</code></pre>
-<p><img src="/cheat_files/figure-html/unnamed-chunk-26-1.png" width="672" /></p>
+<p><img src="/cheat_files/figure-html/unnamed-chunk-27-1.png" width="672" /></p>
 <div id="color-coded-correlation-table" class="section level3">
 <h3>Color coded correlation table</h3>
 <pre class="r"><code>M &lt;- cor(mtcars)
 corrplot::corrplot(M, method=&quot;color&quot;)</code></pre>
-<p><img src="/cheat_files/figure-html/unnamed-chunk-27-1.png" width="672" /></p>
+<p><img src="/cheat_files/figure-html/unnamed-chunk-28-1.png" width="672" /></p>
 </div>
 </div>

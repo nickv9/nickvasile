@@ -175,6 +175,22 @@ nycflights13::weather %>%
   names()
 ```
 
+### String filtering when using a database and dbplyr
+The previous mentions won't always work when  filtering against data in a database.
+Reference: https://github.com/tidyverse/dplyr/issues/3090 
+
+Solution from: https://stackoverflow.com/questions/38962585/pass-sql-functions-in-dplyr-filter-function-on-database/47198795#47198795
+```{r}
+#load some data into a temp database
+con <- DBI::dbConnect(RSQLite::SQLite(), path = ":memory:")
+DBI::dbWriteTable(con, "airports", nycflights13::airports)
+
+#query the data - name contains "Island" - this is case sensitive
+dplyr::tbl(con, "airports") %>% 
+  dplyr::filter(name %like% "%Island%") %>% 
+  head(5)
+```
+
 ###Create permutations of items from multple vectors
 ```{r}
 expand.grid(
