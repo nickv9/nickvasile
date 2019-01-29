@@ -191,6 +191,20 @@ dplyr::tbl(con, "airports") %>%
   head(5)
 ```
 
+This works when I test against a Microsoft SQL database but not SQLite. Returns error:
+`Error in stri_detect_regex(string, pattern, opts_regex = opts(pattern)) : object 'name' not found`
+
+```{r, eval = FALSE}
+#load some data into a temp database
+con <- DBI::dbConnect(RSQLite::SQLite(), path = ":memory:")
+DBI::dbWriteTable(con, "airports", nycflights13::airports)
+
+#query the data - name contains "Island" - this is case sensitive
+dplyr::tbl(con, "airports") %>% 
+  dplyr::filter(stringr::str_detect(name, "Island")) %>% 
+  head(5)
+```
+
 ###Create permutations of items from multple vectors
 ```{r}
 expand.grid(
