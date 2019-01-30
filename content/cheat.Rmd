@@ -222,10 +222,16 @@ mtcars %>% dplyr::as_tibble() %>% print(n=15, width = Inf)
 ```
 
 
-###Search all objects in global environment for string
+###Search all objects, including functions, in global environment for string
 ```{r}
 apropos("cars")
 ```
+
+###Search key words or phrases in help pages, vignettes or task views
+```{r, eval=FALSE}
+RSiteSearch("Microsoft AND SQL")
+```
+
 
 ###Update packages after updating R
 ```{r, eval = FALSE}

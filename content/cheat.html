@@ -1,7 +1,7 @@
 ---
 title: "Nick's R Cheat Sheet"
 author: "Nicholas Vasile"
-date: "2019-01-29"
+date: "2019-01-30"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Vignette Title}
@@ -452,10 +452,14 @@ dplyr::tbl(con, &quot;airports&quot;) %&gt;%
 #&gt; 15  10.4     8  472    205  2.93  5.25  18.0     0     0     3     4
 #&gt; # ... with 17 more rows</code></pre>
 </div>
-<div id="search-all-objects-in-global-environment-for-string" class="section level3">
-<h3>Search all objects in global environment for string</h3>
+<div id="search-all-objects-including-functions-in-global-environment-for-string" class="section level3">
+<h3>Search all objects, including functions, in global environment for string</h3>
 <pre class="r"><code>apropos(&quot;cars&quot;)
 #&gt; [1] &quot;cars&quot;   &quot;mtcars&quot;</code></pre>
+</div>
+<div id="search-key-words-or-phrases-in-help-pages-vignettes-or-task-views" class="section level3">
+<h3>Search key words or phrases in help pages, vignettes or task views</h3>
+<pre class="r"><code>RSiteSearch(&quot;Microsoft AND SQL&quot;)</code></pre>
 </div>
 <div id="update-packages-after-updating-r" class="section level3">
 <h3>Update packages after updating R</h3>
@@ -585,7 +589,7 @@ purrr::map_df(my_list, magrittr::extract)
 <div id="scatterplot-of-all-pairs" class="section level3">
 <h3>Scatterplot of all pairs</h3>
 <pre class="r"><code>pairs(mtcars)</code></pre>
-<p><img src="/cheat_files/figure-html/unnamed-chunk-26-1.png" width="672" /></p>
+<p><img src="/cheat_files/figure-html/unnamed-chunk-27-1.png" width="672" /></p>
 </div>
 <div id="interactively-explore-plots" class="section level3">
 <h3>Interactively explore plots</h3>
@@ -596,11 +600,11 @@ purrr::map_df(my_list, magrittr::extract)
 <pre class="r"><code>nycflights13::flights %&gt;% 
     ggplot2::ggplot(ggplot2::aes(x=forcats::fct_infreq(carrier))) +
     ggplot2::geom_bar()</code></pre>
-<p><img src="/cheat_files/figure-html/unnamed-chunk-28-1.png" width="672" /></p>
+<p><img src="/cheat_files/figure-html/unnamed-chunk-29-1.png" width="672" /></p>
 <div id="color-coded-correlation-table" class="section level3">
 <h3>Color coded correlation table</h3>
 <pre class="r"><code>M &lt;- cor(mtcars)
 corrplot::corrplot(M, method=&quot;color&quot;)</code></pre>
-<p><img src="/cheat_files/figure-html/unnamed-chunk-29-1.png" width="672" /></p>
+<p><img src="/cheat_files/figure-html/unnamed-chunk-30-1.png" width="672" /></p>
 </div>
 </div>
