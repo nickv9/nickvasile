@@ -71,6 +71,14 @@ head(mtcars[, c("mpg", "carb")])
 # dataframe[dataframe$attribute =="value", ] 
 mtcars[mtcars$cyl==4,]
 
+
+# select all rows and all columns except for a few others
+# in this example remove mpg and disp, the first and third columns
+mtcars[,-c(1,3)]
+
+#alternate - if all rows you want to remove are next to each other
+mtcars[,-(1:3)]
+
 ```
 
 ###Filtering / extracting / subsetting data frames based on attribute value
