@@ -341,3 +341,15 @@ nycflights13::flights %>%
 M <- cor(mtcars)
 corrplot::corrplot(M, method="color")
 ```
+
+### plot distribution of all variables
+
+```{r}
+mtcars %>%
+    purrr::keep(is.numeric) %>% 
+    tidyr::gather() %>% 
+    ggplot2::ggplot(ggplot2::aes(value)) + 
+    ggplot2::facet_wrap(~key, scales = "free") + 
+    ggplot2::geom_histogram()
+```
+

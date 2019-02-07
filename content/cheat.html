@@ -1,7 +1,7 @@
 ---
 title: "Nick's R Cheat Sheet"
 author: "Nicholas Vasile"
-date: "2019-02-04"
+date: "2019-02-07"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Vignette Title}
@@ -680,5 +680,16 @@ purrr::map_df(my_list, magrittr::extract)
 <pre class="r"><code>M &lt;- cor(mtcars)
 corrplot::corrplot(M, method=&quot;color&quot;)</code></pre>
 <p><img src="/cheat_files/figure-html/unnamed-chunk-30-1.png" width="672" /></p>
+</div>
+<div id="plot-distribution-of-all-variables" class="section level3">
+<h3>plot distribution of all variables</h3>
+<pre class="r"><code>mtcars %&gt;%
+    purrr::keep(is.numeric) %&gt;% 
+    tidyr::gather() %&gt;% 
+    ggplot2::ggplot(ggplot2::aes(value)) + 
+    ggplot2::facet_wrap(~key, scales = &quot;free&quot;) + 
+    ggplot2::geom_histogram()
+#&gt; `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+<p><img src="/cheat_files/figure-html/unnamed-chunk-31-1.png" width="672" /></p>
 </div>
 </div>
