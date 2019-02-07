@@ -720,6 +720,9 @@ purrr::map_df(my_list, magrittr::extract)
 <pre class="r"><code>M &lt;- cor(mtcars)
 corrplot::corrplot(M, method=&quot;color&quot;)</code></pre>
 <p><img src="/cheat_files/figure-html/unnamed-chunk-30-1.png" width="672" /></p>
+<p>with clustering</p>
+<pre class="r"><code>corrplot::corrplot(M, order = &quot;hclust&quot;)</code></pre>
+<p><img src="/cheat_files/figure-html/unnamed-chunk-31-1.png" width="672" /></p>
 </div>
 <div id="plot-distribution-of-all-variables" class="section level3">
 <h3>plot distribution of all variables</h3>
@@ -731,5 +734,5 @@ corrplot::corrplot(M, method=&quot;color&quot;)</code></pre>
     ggplot2::facet_wrap(~key, scales = &quot;free&quot;) + 
     ggplot2::geom_histogram()
 #&gt; `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
-<p><img src="/cheat_files/figure-html/unnamed-chunk-31-1.png" width="672" /></p>
+<p><img src="/cheat_files/figure-html/unnamed-chunk-32-1.png" width="672" /></p>
 </div>

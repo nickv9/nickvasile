@@ -345,6 +345,13 @@ M <- cor(mtcars)
 corrplot::corrplot(M, method="color")
 ```
 
+with clustering
+
+```{r}
+corrplot::corrplot(M, order = "hclust")
+```
+
+
 ### plot distribution of all variables
 
 SOURCE: (https://drsimonj.svbtle.com/quick-plot-of-all-variables)
