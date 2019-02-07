@@ -347,6 +347,8 @@ corrplot::corrplot(M, method="color")
 
 ### plot distribution of all variables
 
+SOURCE: (https://drsimonj.svbtle.com/quick-plot-of-all-variables)
+
 ```{r}
 mtcars %>%
     purrr::keep(is.numeric) %>% 

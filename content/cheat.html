@@ -723,6 +723,7 @@ corrplot::corrplot(M, method=&quot;color&quot;)</code></pre>
 </div>
 <div id="plot-distribution-of-all-variables" class="section level3">
 <h3>plot distribution of all variables</h3>
+<p>SOURCE: (<a href="https://drsimonj.svbtle.com/quick-plot-of-all-variables" class="uri">https://drsimonj.svbtle.com/quick-plot-of-all-variables</a>)</p>
 <pre class="r"><code>mtcars %&gt;%
     purrr::keep(is.numeric) %&gt;% 
     tidyr::gather() %&gt;% 
