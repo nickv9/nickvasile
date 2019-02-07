@@ -2,7 +2,9 @@
 title: "Nick's R Cheat Sheet"
 author: "Nicholas Vasile"
 date: "2019-02-07"
-output: rmarkdown::html_vignette
+output: 
+  rmarkdown::html_vignette:
+    toc: true
 vignette: >
   %\VignetteIndexEntry{Vignette Title}
   %\VignetteEngine{knitr::rmarkdown}
@@ -11,7 +13,7 @@ vignette: >
 
 
 
-<p><a href="https://github.com/startupjing/Tech_Notes/blob/master/R/R_language.md">Another R cheat sheet</a></p>
+<p><a href="http://info.rstudio.com/G5X0Nw20UEEoN0YS0000JCn">PDF of many of Rstudio’s cheat sheets</a> <a href="https://github.com/startupjing/Tech_Notes/blob/master/R/R_language.md">Another R cheat sheet I found useful</a></p>
 <div id="selecting-attributes-from-a-data-frame" class="section level3">
 <h3>Selecting attributes from a data frame</h3>
 <pre class="r"><code># data [row, attribute_name]
@@ -669,12 +671,13 @@ purrr::map_df(my_list, magrittr::extract)
 <h3>Interactively explore plots</h3>
 <pre class="r"><code>identify(mtcars$hp, mtcars$mpg, mtcars$mpg)</code></pre>
 </div>
-<div id="sort-bar-plot-by-counts" class="section level2">
-<h2>Sort bar plot by counts</h2>
+<div id="sort-bar-plot-by-counts" class="section level3">
+<h3>Sort bar plot by counts</h3>
 <pre class="r"><code>nycflights13::flights %&gt;% 
     ggplot2::ggplot(ggplot2::aes(x=forcats::fct_infreq(carrier))) +
     ggplot2::geom_bar()</code></pre>
 <p><img src="/cheat_files/figure-html/unnamed-chunk-29-1.png" width="672" /></p>
+</div>
 <div id="color-coded-correlation-table" class="section level3">
 <h3>Color coded correlation table</h3>
 <pre class="r"><code>M &lt;- cor(mtcars)
@@ -691,5 +694,4 @@ corrplot::corrplot(M, method=&quot;color&quot;)</code></pre>
     ggplot2::geom_histogram()
 #&gt; `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
 <p><img src="/cheat_files/figure-html/unnamed-chunk-31-1.png" width="672" /></p>
-</div>
 </div>
