@@ -3,7 +3,7 @@ title: "Nick's R Cheat Sheet"
 author: "Nicholas Vasile"
 date: "`r Sys.Date()`"
 output: 
-  rmarkdown::html_vignette:
+  blogdown::html_page:
     toc: true
 vignette: >
   %\VignetteIndexEntry{Vignette Title}
