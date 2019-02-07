@@ -19,6 +19,7 @@ knitr::opts_chunk$set(
 library(magrittr) #for pipe
 ```
 [PDF of many of Rstudio's cheat sheets](http://info.rstudio.com/G5X0Nw20UEEoN0YS0000JCn)
+
 [Another R cheat sheet I found useful](https://github.com/startupjing/Tech_Notes/blob/master/R/R_language.md)
 
 ###Selecting attributes from a data frame
