@@ -1,7 +1,7 @@
 ---
 title: "Nick's R Cheat Sheet"
 author: "Nicholas Vasile"
-date: "2019-02-07"
+date: "2019-02-12"
 output: 
   blogdown::html_page:
     toc: true
@@ -45,6 +45,7 @@ vignette: >
 <li><a href="#interactively-explore-plots">Interactively explore plots</a></li>
 <li><a href="#sort-bar-plot-by-counts">Sort bar plot by counts</a></li>
 <li><a href="#color-coded-correlation-table">Color coded correlation table</a></li>
+<li><a href="#filter-correlations-at-a-cutoff-value">filter correlations at a cutoff value</a></li>
 <li><a href="#plot-distribution-of-all-variables">plot distribution of all variables</a></li>
 </ul>
 </div>
@@ -724,6 +725,46 @@ corrplot::corrplot(M, method=&quot;color&quot;)</code></pre>
 <pre class="r"><code>corrplot::corrplot(M, order = &quot;hclust&quot;)</code></pre>
 <p><img src="/cheat_files/figure-html/unnamed-chunk-31-1.png" width="672" /></p>
 </div>
+<div id="filter-correlations-at-a-cutoff-value" class="section level3">
+<h3>filter correlations at a cutoff value</h3>
+<pre class="r"><code>caret::findCorrelation(M, cutoff = 0.2, verbose = TRUE, names = TRUE)
+#&gt; Compare row 2  and column  3 with corr  0.902 
+#&gt;   Means:  0.701 vs 0.546 so flagging column 2 
+#&gt; Compare row 3  and column  1 with corr  0.848 
+#&gt;   Means:  0.658 vs 0.513 so flagging column 3 
+#&gt; Compare row 1  and column  6 with corr  0.868 
+#&gt;   Means:  0.63 vs 0.483 so flagging column 1 
+#&gt; Compare row 6  and column  4 with corr  0.659 
+#&gt;   Means:  0.543 vs 0.446 so flagging column 6 
+#&gt; Compare row 4  and column  8 with corr  0.723 
+#&gt;   Means:  0.5 vs 0.418 so flagging column 4 
+#&gt; Compare row 8  and column  5 with corr  0.44 
+#&gt;   Means:  0.426 vs 0.394 so flagging column 8 
+#&gt; Compare row 5  and column  9 with corr  0.713 
+#&gt;   Means:  0.399 vs 0.365 so flagging column 5 
+#&gt; Compare row 9  and column  10 with corr  0.794 
+#&gt;   Means:  0.36 vs 0.352 so flagging column 9 
+#&gt; Compare row 10  and column  11 with corr  0.274 
+#&gt;   Means:  0.243 vs 0.339 so flagging column 11 
+#&gt; Compare row 10  and column  7 with corr  0.213 
+#&gt;   Means:  0.213 vs 0.213 so flagging column 7 
+#&gt; All correlations &lt;= 0.2
+#&gt;  [1] &quot;cyl&quot;  &quot;disp&quot; &quot;mpg&quot;  &quot;wt&quot;   &quot;hp&quot;   &quot;vs&quot;   &quot;drat&quot; &quot;am&quot;   &quot;carb&quot; &quot;qsec&quot;</code></pre>
+<p>I dont really like the formatting here - too hard to match columns - let’s find a better way.</p>
+<p>There is <code>corrr::correlations()</code> but not available on CRAN and there is also an open issue with the newest version of dplyr.</p>
+<p>Using deprecrated <code>reshape2</code> package because tidyr doesn’t handle matrixs. This is fine for now.</p>
+<pre class="r"><code>reshape2::melt(M) %&gt;%
+  dplyr::filter(value &gt; 0.2, Var1 != Var2) %&gt;%
+  dplyr::arrange(desc(value)) %&gt;%
+  head()
+#&gt;   Var1 Var2     value
+#&gt; 1 disp  cyl 0.9020329
+#&gt; 2  cyl disp 0.9020329
+#&gt; 3   wt disp 0.8879799
+#&gt; 4 disp   wt 0.8879799
+#&gt; 5   hp  cyl 0.8324475
+#&gt; 6  cyl   hp 0.8324475</code></pre>
+</div>
 <div id="plot-distribution-of-all-variables" class="section level3">
 <h3>plot distribution of all variables</h3>
 <p>SOURCE: (<a href="https://drsimonj.svbtle.com/quick-plot-of-all-variables" class="uri">https://drsimonj.svbtle.com/quick-plot-of-all-variables</a>)</p>
@@ -734,5 +775,5 @@ corrplot::corrplot(M, method=&quot;color&quot;)</code></pre>
     ggplot2::facet_wrap(~key, scales = &quot;free&quot;) + 
     ggplot2::geom_histogram()
 #&gt; `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
-<p><img src="/cheat_files/figure-html/unnamed-chunk-32-1.png" width="672" /></p>
+<p><img src="/cheat_files/figure-html/unnamed-chunk-34-1.png" width="672" /></p>
 </div>

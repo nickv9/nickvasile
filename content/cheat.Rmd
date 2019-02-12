@@ -351,6 +351,24 @@ with clustering
 corrplot::corrplot(M, order = "hclust")
 ```
 
+### filter correlations at a cutoff value
+
+```{r}
+caret::findCorrelation(M, cutoff = 0.2, verbose = TRUE, names = TRUE)
+```
+
+I dont really like the formatting here - too hard to match columns - let's find a better way.
+
+There is `corrr::correlations()` but not available on CRAN and there is also an open issue with the newest version of dplyr.
+
+Using deprecrated `reshape2` package because tidyr doesn't handle matrixs. This is fine for now.
+
+```{r}
+reshape2::melt(M) %>%
+  dplyr::filter(value > 0.2, Var1 != Var2) %>%
+  dplyr::arrange(desc(value)) %>%
+  head()
+```
 
 ### plot distribution of all variables
 
