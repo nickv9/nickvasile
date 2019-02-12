@@ -33,6 +33,7 @@ vignette: >
 <li><a href="#update-packages-after-updating-r">Update packages after updating R</a></li>
 <li><a href="#timezone-stuff">Timezone stuff</a></li>
 <li><a href="#calculate-minutes-between-two-times">Calculate minutes between two times</a></li>
+<li><a href="#filter-for-records-within-last-n-years">filter for records within last n years</a></li>
 <li><a href="#view-data-exported-by-a-package">View data exported by a package</a></li>
 <li><a href="#browse-vignettes-for-a-given-package">Browse vignettes for a given package</a></li>
 <li><a href="#open-function-documentation-from-win-rstudio">Open function documentation from w/in RStudio</a></li>
@@ -601,6 +602,31 @@ OlsonNames() %&gt;% head()
 ymd_hms(&quot;2018-10-25 12:00:00&quot;) %--% ymd_hms(&quot;2018-10-25 13:00:00&quot;) / dminutes(1)
 #&gt; [1] 60</code></pre>
 </div>
+<div id="filter-for-records-within-last-n-years" class="section level3">
+<h3>filter for records within last n years</h3>
+<p>works with dbplyr too this is not a great example but I wanted it to work for at least a few more years.</p>
+<pre class="r"><code>hundred_years_ago &lt;- lubridate::today() - lubridate::years(100)
+
+nycflights13::flights %&gt;% 
+  dplyr::filter(time_hour &gt;= hundred_years_ago)
+#&gt; # A tibble: 336,776 x 19
+#&gt;     year month   day dep_time sched_dep_time dep_delay arr_time
+#&gt;    &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;
+#&gt;  1  2013     1     1      517            515         2      830
+#&gt;  2  2013     1     1      533            529         4      850
+#&gt;  3  2013     1     1      542            540         2      923
+#&gt;  4  2013     1     1      544            545        -1     1004
+#&gt;  5  2013     1     1      554            600        -6      812
+#&gt;  6  2013     1     1      554            558        -4      740
+#&gt;  7  2013     1     1      555            600        -5      913
+#&gt;  8  2013     1     1      557            600        -3      709
+#&gt;  9  2013     1     1      557            600        -3      838
+#&gt; 10  2013     1     1      558            600        -2      753
+#&gt; # ... with 336,766 more rows, and 12 more variables: sched_arr_time &lt;int&gt;,
+#&gt; #   arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;, flight &lt;int&gt;, tailnum &lt;chr&gt;,
+#&gt; #   origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;, hour &lt;dbl&gt;,
+#&gt; #   minute &lt;dbl&gt;, time_hour &lt;dttm&gt;</code></pre>
+</div>
 <div id="view-data-exported-by-a-package" class="section level3">
 <h3>View data exported by a package</h3>
 <pre class="r"><code>data(package = &quot;ggplot2&quot;)</code></pre>
@@ -703,7 +729,7 @@ purrr::map_df(my_list, magrittr::extract)
 <div id="scatterplot-of-all-pairs" class="section level3">
 <h3>Scatterplot of all pairs</h3>
 <pre class="r"><code>pairs(mtcars)</code></pre>
-<p><img src="/cheat_files/figure-html/unnamed-chunk-27-1.png" width="672" /></p>
+<p><img src="/cheat_files/figure-html/unnamed-chunk-28-1.png" width="672" /></p>
 </div>
 <div id="interactively-explore-plots" class="section level3">
 <h3>Interactively explore plots</h3>
@@ -714,16 +740,16 @@ purrr::map_df(my_list, magrittr::extract)
 <pre class="r"><code>nycflights13::flights %&gt;% 
     ggplot2::ggplot(ggplot2::aes(x=forcats::fct_infreq(carrier))) +
     ggplot2::geom_bar()</code></pre>
-<p><img src="/cheat_files/figure-html/unnamed-chunk-29-1.png" width="672" /></p>
+<p><img src="/cheat_files/figure-html/unnamed-chunk-30-1.png" width="672" /></p>
 </div>
 <div id="color-coded-correlation-table" class="section level3">
 <h3>Color coded correlation table</h3>
 <pre class="r"><code>M &lt;- cor(mtcars)
 corrplot::corrplot(M, method=&quot;color&quot;)</code></pre>
-<p><img src="/cheat_files/figure-html/unnamed-chunk-30-1.png" width="672" /></p>
+<p><img src="/cheat_files/figure-html/unnamed-chunk-31-1.png" width="672" /></p>
 <p>with clustering</p>
 <pre class="r"><code>corrplot::corrplot(M, order = &quot;hclust&quot;)</code></pre>
-<p><img src="/cheat_files/figure-html/unnamed-chunk-31-1.png" width="672" /></p>
+<p><img src="/cheat_files/figure-html/unnamed-chunk-32-1.png" width="672" /></p>
 </div>
 <div id="filter-correlations-at-a-cutoff-value" class="section level3">
 <h3>filter correlations at a cutoff value</h3>
@@ -775,5 +801,5 @@ corrplot::corrplot(M, method=&quot;color&quot;)</code></pre>
     ggplot2::facet_wrap(~key, scales = &quot;free&quot;) + 
     ggplot2::geom_histogram()
 #&gt; `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
-<p><img src="/cheat_files/figure-html/unnamed-chunk-34-1.png" width="672" /></p>
+<p><img src="/cheat_files/figure-html/unnamed-chunk-35-1.png" width="672" /></p>
 </div>

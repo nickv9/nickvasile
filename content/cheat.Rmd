@@ -265,6 +265,18 @@ library(lubridate)
 ymd_hms("2018-10-25 12:00:00") %--% ymd_hms("2018-10-25 13:00:00") / dminutes(1)
 ```
 
+### filter for records within last n years
+
+works with dbplyr too
+this is not a great example but I wanted it to work for at least a few more years.
+
+```{r}
+hundred_years_ago <- lubridate::today() - lubridate::years(100)
+
+nycflights13::flights %>% 
+  dplyr::filter(time_hour >= hundred_years_ago)
+```
+
 
 ###View data exported by a package
 ```{r, eval = FALSE}
