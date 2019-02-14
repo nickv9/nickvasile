@@ -23,13 +23,16 @@ corrplot::corrplot(corrs, order = "hclust")
 
 ![](/images/correlation_table_duh.png)
 
-Why do I need to be reminded that each predictor is perfectly correlated with itself?
+I don't need to be reminded that each predictor is perfectly correlated with itself.
 
-I guess these data points are useful because they warn me that I am about to see information for the second time.
+I guess this could be useful because it warns me that I am about to see the same exact information for the second time.
 
 Which brings me to...
 
-## Correlation tables duplicate information 
+## Correlation tables duplicate information
+
+![](/images/correlation_table_repeat.png)
+
 
 
 
