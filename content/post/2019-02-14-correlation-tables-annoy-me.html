@@ -1,0 +1,32 @@
+---
+title: Correlation tables annoy me
+author: Nick Vasile
+date: '2019-02-14'
+slug: correlation-tables-annoy-me
+categories: []
+tags: []
+---
+
+
+
+<div id="im-lazy" class="section level2">
+<h2>I’m lazy</h2>
+<p>And so are most people.</p>
+<p>I like to focus on as few things as possible at any given moment and correlation tables get in the way of that.</p>
+</div>
+<div id="correlation-tables-contain-useless-data" class="section level2">
+<h2>Correlation tables contain useless data</h2>
+<pre class="r"><code>corrs &lt;- cor(mtcars)
+
+corrplot::corrplot(corrs, order = &quot;hclust&quot;)</code></pre>
+<div class="figure">
+<img src="/post/2019-02-14-correlation-tables-annoy-me_files/correlation_table_duh.png" />
+
+</div>
+<p>Why do I need to be reminded that each predictor is perfectly correlated with itself?</p>
+<p>I guess these data points are useful because they warn me that I am about to see information for the second time.</p>
+<p>Which brings me to…</p>
+</div>
+<div id="correlation-tables-duplicate-information" class="section level2">
+<h2>Correlation tables duplicate information</h2>
+</div>

@@ -1,0 +1,35 @@
+---
+title: Correlation tables annoy me
+author: Nick Vasile
+date: '2019-02-14'
+slug: correlation-tables-annoy-me
+categories: []
+tags: []
+---
+
+## I'm lazy
+
+And so are most people.
+
+I like to focus on as few things as possible at any given moment and correlation tables get in the way of that.
+
+## Correlation tables contain useless data
+
+```{r, eval = FALSE}
+corrs <- cor(mtcars)
+
+corrplot::corrplot(corrs, order = "hclust")
+```
+
+![](/post/2019-02-14-correlation-tables-annoy-me_files/correlation_table_duh.png)
+
+Why do I need to be reminded that each predictor is perfectly correlated with itself?
+
+I guess these data points are useful because they warn me that I am about to see information for the second time.
+
+Which brings me to...
+
+## Correlation tables duplicate information 
+
+
+
