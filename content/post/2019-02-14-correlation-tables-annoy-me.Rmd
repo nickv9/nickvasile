@@ -77,5 +77,5 @@ correlated %>%
     dplyr::select(-combo)
 ```
 
-I arrived at this solution after finding this ![stackoverflow post](https://stackoverflow.com/a/25595218)
+I arrived at this solution after finding this [stackoverflow post](https://stackoverflow.com/a/25595218)
 
