@@ -28,7 +28,7 @@ corrplot::corrplot(corrs, order = "hclust")
 
 I don't need to be reminded that each predictor is perfectly correlated with itself.
 
-I guess this could be useful because it warns me that I am about to see the same exact information for the second time.
+I guess this could be useful because the border it forms warns me that I am about to see the same exact information for the second time.
 
 Which brings me to...
 
@@ -38,9 +38,9 @@ Which brings me to...
 
 ## A solution part 1: Eliminate the obvious
 
-After taking a quick look at the table (just the first half :) )to get an idea as to the largest correlation values I establish a cut-off point to look at the pairs with the strongest values.
+After taking a quick look at the table (just the first half :) )to get an idea of the largest correlation values I establish a cut-off point to look at the pairs with the strongest values.
 
-While I am at it I remove values for a predictor correlated with itself.
+I also remove values where a predictor is correlated with itself.
 
 ```{r, eval = TRUE}
 
@@ -48,7 +48,8 @@ cut_off <- 0.8
 
 corrs <- cor(mtcars)
 
-# probably *shouldn't* be using melt() here b/c reshape2 is depreciated but it 
+# probably *shouldn't* be using melt() here b/c reshape2 is
+# depreciated but it 
 # is easy and I like easy because I am lazy
 correlated <- reshape2::melt(corrs) %>% 
     dplyr::filter(value > cut_off,
@@ -67,7 +68,7 @@ Notice each successive pair of rows is a pairwise duplicate.
 correlated %>% 
     dplyr::mutate(
         combo = dplyr::if_else(
-            # > and < comparison doesnt work with factors so convert to char
+            # > and < comparison doesnt work with factors
             as.character(Var1) > as.character(Var2), #if
                                stringr::str_c(Var1, Var2), #then 
                                stringr::str_c(Var2, Var1) #else
@@ -77,5 +78,11 @@ correlated %>%
     dplyr::select(-combo)
 ```
 
+There you have it - only the unique predictor pairs!
+
 I arrived at this solution after finding this [stackoverflow post](https://stackoverflow.com/a/25595218)
+
+## If you found this useful
+
+You may like [my cheat sheet](https://www.nickvasile.com/cheat/).
 

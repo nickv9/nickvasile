@@ -24,7 +24,7 @@ corrplot::corrplot(corrs, order = &quot;hclust&quot;)</code></pre>
 
 </div>
 <p>I don’t need to be reminded that each predictor is perfectly correlated with itself.</p>
-<p>I guess this could be useful because it warns me that I am about to see the same exact information for the second time.</p>
+<p>I guess this could be useful because the border it forms warns me that I am about to see the same exact information for the second time.</p>
 <p>Which brings me to…</p>
 </div>
 <div id="correlation-tables-duplicate-information" class="section level2">
@@ -36,13 +36,14 @@ corrplot::corrplot(corrs, order = &quot;hclust&quot;)</code></pre>
 </div>
 <div id="a-solution-part-1-eliminate-the-obvious" class="section level2">
 <h2>A solution part 1: Eliminate the obvious</h2>
-<p>After taking a quick look at the table (just the first half :) )to get an idea as to the largest correlation values I establish a cut-off point to look at the pairs with the strongest values.</p>
-<p>While I am at it I remove values for a predictor correlated with itself.</p>
+<p>After taking a quick look at the table (just the first half :) )to get an idea of the largest correlation values I establish a cut-off point to look at the pairs with the strongest values.</p>
+<p>I also remove values where a predictor is correlated with itself.</p>
 <pre class="r"><code>cut_off &lt;- 0.8
 
 corrs &lt;- cor(mtcars)
 
-# probably *shouldn&#39;t* be using melt() here b/c reshape2 is depreciated but it 
+# probably *shouldn&#39;t* be using melt() here b/c reshape2 is
+# depreciated but it 
 # is easy and I like easy because I am lazy
 correlated &lt;- reshape2::melt(corrs) %&gt;% 
     dplyr::filter(value &gt; cut_off,
@@ -65,7 +66,7 @@ correlated</code></pre>
 <pre class="r"><code>correlated %&gt;% 
     dplyr::mutate(
         combo = dplyr::if_else(
-            # &gt; and &lt; comparison doesnt work with factors so convert to char
+            # &gt; and &lt; comparison doesnt work with factors
             as.character(Var1) &gt; as.character(Var2), #if
                                stringr::str_c(Var1, Var2), #then 
                                stringr::str_c(Var2, Var1) #else
@@ -77,5 +78,10 @@ correlated</code></pre>
 ## 1 disp  cyl 0.9020329
 ## 2   wt disp 0.8879799
 ## 3   hp  cyl 0.8324475</code></pre>
+<p>There you have it - only the unique predictor pairs!</p>
 <p>I arrived at this solution after finding this <a href="https://stackoverflow.com/a/25595218">stackoverflow post</a></p>
+</div>
+<div id="if-you-found-this-useful" class="section level2">
+<h2>If you found this useful</h2>
+<p>You may like <a href="https://www.nickvasile.com/cheat/">my cheat sheet</a>.</p>
 </div>
