@@ -6,6 +6,9 @@ slug: correlation-tables-annoy-me
 categories: []
 tags: []
 ---
+```{r, echo=FALSE}
+library(magrittr) # for the pipe
+```
 
 ## I'm lazy
 
@@ -33,18 +36,46 @@ Which brings me to...
 
 ![](/images/correlation_table_repeat.png)
 
-## My solution
+## A solution part 1: Eliminate the obvious
 
-After taking a quick look at the table (just the first half :smile: ) to get an ideas
+After taking a quick look at the table (just the first half :) )to get an idea as to the largest correlation values I establish a cut-off point to look at the pairs with the strongest values.
 
-```{r, eval = FALSE}
-correlated <- reshape2::melt(glass_corr) %>% 
-    filter(value > cut_off,
+While I am at it I remove values for a predictor correlated with itself.
+
+```{r, eval = TRUE}
+
+cut_off <- 0.8
+
+corrs <- cor(mtcars)
+
+# probably *shouldn't* be using melt() here b/c reshape2 is depreciated but it 
+# is easy and I like easy because I am lazy
+correlated <- reshape2::melt(corrs) %>% 
+    dplyr::filter(value > cut_off,
            #remove entries for a variable correlated to itself
            Var1 != Var2) %>% 
-    arrange(desc(value)) #not necessary just sorting to easily see pairwise dups
+    dplyr::arrange(desc(value)) #not necessary just sorting to demo pairwise dups
+
+correlated
 ```
 
+Notice each successive pair of rows is a pairwise duplicate.
 
+## A solution part 2: Eliminate the duplicates
+```{r}
 
+correlated %>% 
+    dplyr::mutate(
+        combo = dplyr::if_else(
+            # > and < comparison doesnt work with factors so convert to char
+            as.character(Var1) > as.character(Var2), #if
+                               stringr::str_c(Var1, Var2), #then 
+                               stringr::str_c(Var2, Var1) #else
+        )
+    ) %>% 
+    dplyr::distinct(combo, .keep_all= TRUE) %>% 
+    dplyr::select(-combo)
+```
+
+I arrived at this solution after finding this ![stackoverflow post](https://stackoverflow.com/a/25595218)
 

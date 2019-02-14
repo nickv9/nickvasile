@@ -34,12 +34,48 @@ corrplot::corrplot(corrs, order = &quot;hclust&quot;)</code></pre>
 
 </div>
 </div>
-<div id="my-solution" class="section level2">
-<h2>My solution</h2>
-<p>After taking a quick look at the table (just the first half :smile: ) to get an ideas</p>
-<pre class="r"><code>correlated &lt;- reshape2::melt(glass_corr) %&gt;% 
-    filter(value &gt; cut_off,
+<div id="a-solution-part-1-eliminate-the-obvious" class="section level2">
+<h2>A solution part 1: Eliminate the obvious</h2>
+<p>After taking a quick look at the table (just the first half :) )to get an idea as to the largest correlation values I establish a cut-off point to look at the pairs with the strongest values.</p>
+<p>While I am at it I remove values for a predictor correlated with itself.</p>
+<pre class="r"><code>cut_off &lt;- 0.8
+
+corrs &lt;- cor(mtcars)
+
+# probably *shouldn&#39;t* be using melt() here b/c reshape2 is depreciated but it 
+# is easy and I like easy because I am lazy
+correlated &lt;- reshape2::melt(corrs) %&gt;% 
+    dplyr::filter(value &gt; cut_off,
            #remove entries for a variable correlated to itself
            Var1 != Var2) %&gt;% 
-    arrange(desc(value)) #not necessary just sorting to easily see pairwise dups</code></pre>
+    dplyr::arrange(desc(value)) #not necessary just sorting to demo pairwise dups
+
+correlated</code></pre>
+<pre><code>##   Var1 Var2     value
+## 1 disp  cyl 0.9020329
+## 2  cyl disp 0.9020329
+## 3   wt disp 0.8879799
+## 4 disp   wt 0.8879799
+## 5   hp  cyl 0.8324475
+## 6  cyl   hp 0.8324475</code></pre>
+<p>Notice each successive pair of rows is a pairwise duplicate.</p>
+</div>
+<div id="a-solution-part-2-eliminate-the-duplicates" class="section level2">
+<h2>A solution part 2: Eliminate the duplicates</h2>
+<pre class="r"><code>correlated %&gt;% 
+    dplyr::mutate(
+        combo = dplyr::if_else(
+            # &gt; and &lt; comparison doesnt work with factors so convert to char
+            as.character(Var1) &gt; as.character(Var2), #if
+                               stringr::str_c(Var1, Var2), #then 
+                               stringr::str_c(Var2, Var1) #else
+        )
+    ) %&gt;% 
+    dplyr::distinct(combo, .keep_all= TRUE) %&gt;% 
+    dplyr::select(-combo)</code></pre>
+<pre><code>##   Var1 Var2     value
+## 1 disp  cyl 0.9020329
+## 2   wt disp 0.8879799
+## 3   hp  cyl 0.8324475</code></pre>
+<p>I arrived at this solution after finding this <img src="https://stackoverflow.com/a/25595218" alt="stackoverflow post" /></p>
 </div>
