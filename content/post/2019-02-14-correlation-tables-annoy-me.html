@@ -34,3 +34,12 @@ corrplot::corrplot(corrs, order = &quot;hclust&quot;)</code></pre>
 
 </div>
 </div>
+<div id="my-solution" class="section level2">
+<h2>My solution</h2>
+<p>After taking a quick look at the table (just the first half :smile: ) to get an ideas</p>
+<pre class="r"><code>correlated &lt;- reshape2::melt(glass_corr) %&gt;% 
+    filter(value &gt; cut_off,
+           #remove entries for a variable correlated to itself
+           Var1 != Var2) %&gt;% 
+    arrange(desc(value)) #not necessary just sorting to easily see pairwise dups</code></pre>
+</div>

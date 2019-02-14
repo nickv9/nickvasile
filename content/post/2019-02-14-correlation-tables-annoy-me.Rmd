@@ -33,6 +33,18 @@ Which brings me to...
 
 ![](/images/correlation_table_repeat.png)
 
+## My solution
+
+After taking a quick look at the table (just the first half :smile: ) to get an ideas
+
+```{r, eval = FALSE}
+correlated <- reshape2::melt(glass_corr) %>% 
+    filter(value > cut_off,
+           #remove entries for a variable correlated to itself
+           Var1 != Var2) %>% 
+    arrange(desc(value)) #not necessary just sorting to easily see pairwise dups
+```
+
 
 
 
