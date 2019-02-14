@@ -21,7 +21,7 @@ corrs <- cor(mtcars)
 corrplot::corrplot(corrs, order = "hclust")
 ```
 
-![](/post/2019-02-14-correlation-tables-annoy-me_files/correlation_table_duh.png)
+![](/images/correlation_table_duh.png)
 
 Why do I need to be reminded that each predictor is perfectly correlated with itself?
 
