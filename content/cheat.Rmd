@@ -377,8 +377,8 @@ Using deprecrated `reshape2` package because tidyr doesn't handle matrixs. This 
 
 ```{r}
 reshape2::melt(M) %>%
-  dplyr::filter(value > 0.2, Var1 != Var2) %>%
-  dplyr::arrange(desc(value)) %>%
+  dplyr::filter(abs(value) > 0.2, Var1 != Var2) %>%
+  dplyr::arrange(desc(abs(value))) %>%
   head()
 ```
 

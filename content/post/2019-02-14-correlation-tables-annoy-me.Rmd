@@ -52,10 +52,10 @@ corrs <- cor(mtcars)
 # depreciated but it 
 # is easy and I like easy because I am lazy
 correlated <- reshape2::melt(corrs) %>% 
-    dplyr::filter(value > cut_off,
+    dplyr::filter(abs(value) > cut_off,
            #remove entries for a variable correlated to itself
            Var1 != Var2) %>% 
-    dplyr::arrange(desc(value)) #not necessary just sorting to demo pairwise dups
+    dplyr::arrange(desc(abs(value))) #not necessary just sorting to demo pairwise dups
 
 correlated
 ```

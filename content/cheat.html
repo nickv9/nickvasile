@@ -1,7 +1,7 @@
 ---
 title: "Nick's R Cheat Sheet"
 author: "Nicholas Vasile"
-date: "2019-02-14"
+date: "2019-02-19"
 output: 
   blogdown::html_page:
     toc: true
@@ -485,6 +485,15 @@ nycflights13::weather %&gt;%
     dplyr::vars(dplyr::contains(&#39;_&#39;)), dplyr::funs(stringr::str_replace(., &quot;_&quot;, &quot;\\.&quot;))
     ) %&gt;% 
   names()
+#&gt; Warning: funs() is soft deprecated as of dplyr 0.8.0
+#&gt; please use list() instead
+#&gt; 
+#&gt; # Before:
+#&gt; funs(name = f(.)
+#&gt; 
+#&gt; # After: 
+#&gt; list(name = ~f(.))
+#&gt; This warning is displayed once per session.
 #&gt;  [1] &quot;origin&quot;     &quot;year&quot;       &quot;month&quot;      &quot;day&quot;        &quot;hour&quot;      
 #&gt;  [6] &quot;temp&quot;       &quot;dewp&quot;       &quot;humid&quot;      &quot;wind.dir&quot;   &quot;wind.speed&quot;
 #&gt; [11] &quot;wind.gust&quot;  &quot;precip&quot;     &quot;pressure&quot;   &quot;visib&quot;      &quot;time.hour&quot;</code></pre>
@@ -780,16 +789,16 @@ corrplot::corrplot(M, method=&quot;color&quot;)</code></pre>
 <p>There is <code>corrr::correlations()</code> but not available on CRAN and there is also an open issue with the newest version of dplyr.</p>
 <p>Using deprecrated <code>reshape2</code> package because tidyr doesn’t handle matrixs. This is fine for now.</p>
 <pre class="r"><code>reshape2::melt(M) %&gt;%
-  dplyr::filter(value &gt; 0.2, Var1 != Var2) %&gt;%
-  dplyr::arrange(desc(value)) %&gt;%
+  dplyr::filter(abs(value) &gt; 0.2, Var1 != Var2) %&gt;%
+  dplyr::arrange(desc(abs(value))) %&gt;%
   head()
-#&gt;   Var1 Var2     value
-#&gt; 1 disp  cyl 0.9020329
-#&gt; 2  cyl disp 0.9020329
-#&gt; 3   wt disp 0.8879799
-#&gt; 4 disp   wt 0.8879799
-#&gt; 5   hp  cyl 0.8324475
-#&gt; 6  cyl   hp 0.8324475</code></pre>
+#&gt;   Var1 Var2      value
+#&gt; 1 disp  cyl  0.9020329
+#&gt; 2  cyl disp  0.9020329
+#&gt; 3   wt disp  0.8879799
+#&gt; 4 disp   wt  0.8879799
+#&gt; 5   wt  mpg -0.8676594
+#&gt; 6  mpg   wt -0.8676594</code></pre>
 </div>
 <div id="plot-distribution-of-all-variables" class="section level3">
 <h3>plot distribution of all variables</h3>

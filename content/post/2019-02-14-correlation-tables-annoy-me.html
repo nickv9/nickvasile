@@ -46,19 +46,27 @@ corrs &lt;- cor(mtcars)
 # depreciated but it 
 # is easy and I like easy because I am lazy
 correlated &lt;- reshape2::melt(corrs) %&gt;% 
-    dplyr::filter(value &gt; cut_off,
+    dplyr::filter(abs(value) &gt; cut_off,
            #remove entries for a variable correlated to itself
            Var1 != Var2) %&gt;% 
-    dplyr::arrange(desc(value)) #not necessary just sorting to demo pairwise dups
+    dplyr::arrange(desc(abs(value))) #not necessary just sorting to demo pairwise dups
 
 correlated</code></pre>
-<pre><code>##   Var1 Var2     value
-## 1 disp  cyl 0.9020329
-## 2  cyl disp 0.9020329
-## 3   wt disp 0.8879799
-## 4 disp   wt 0.8879799
-## 5   hp  cyl 0.8324475
-## 6  cyl   hp 0.8324475</code></pre>
+<pre><code>##    Var1 Var2      value
+## 1  disp  cyl  0.9020329
+## 2   cyl disp  0.9020329
+## 3    wt disp  0.8879799
+## 4  disp   wt  0.8879799
+## 5    wt  mpg -0.8676594
+## 6   mpg   wt -0.8676594
+## 7   cyl  mpg -0.8521620
+## 8   mpg  cyl -0.8521620
+## 9  disp  mpg -0.8475514
+## 10  mpg disp -0.8475514
+## 11   hp  cyl  0.8324475
+## 12  cyl   hp  0.8324475
+## 13   vs  cyl -0.8108118
+## 14  cyl   vs -0.8108118</code></pre>
 <p>Notice each successive pair of rows is a pairwise duplicate.</p>
 </div>
 <div id="a-solution-part-2-eliminate-the-duplicates" class="section level2">
@@ -74,10 +82,14 @@ correlated</code></pre>
     ) %&gt;% 
     dplyr::distinct(combo, .keep_all= TRUE) %&gt;% 
     dplyr::select(-combo)</code></pre>
-<pre><code>##   Var1 Var2     value
-## 1 disp  cyl 0.9020329
-## 2   wt disp 0.8879799
-## 3   hp  cyl 0.8324475</code></pre>
+<pre><code>##   Var1 Var2      value
+## 1 disp  cyl  0.9020329
+## 2   wt disp  0.8879799
+## 3   wt  mpg -0.8676594
+## 4  cyl  mpg -0.8521620
+## 5 disp  mpg -0.8475514
+## 6   hp  cyl  0.8324475
+## 7   vs  cyl -0.8108118</code></pre>
 <p>There you have it - only the unique predictor pairs!</p>
 <p>I arrived at this solution after finding this <a href="https://stackoverflow.com/a/25595218">stackoverflow post</a></p>
 </div>
