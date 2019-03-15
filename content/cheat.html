@@ -1,7 +1,7 @@
 ---
 title: "Nick's R Cheat Sheet"
 author: "Nicholas Vasile"
-date: "2019-02-19"
+date: "2019-03-15"
 output: 
   blogdown::html_page:
     toc: true
@@ -48,6 +48,7 @@ vignette: >
 <li><a href="#color-coded-correlation-table">Color coded correlation table</a></li>
 <li><a href="#filter-correlations-at-a-cutoff-value">filter correlations at a cutoff value</a></li>
 <li><a href="#plot-distribution-of-all-variables">plot distribution of all variables</a></li>
+<li><a href="#rmarkdown-insert-date-document-was-knitted">RMarkdown: insert date document was knitted</a></li>
 </ul>
 </div>
 
@@ -811,4 +812,10 @@ corrplot::corrplot(M, method=&quot;color&quot;)</code></pre>
     ggplot2::geom_histogram()
 #&gt; `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
 <p><img src="/cheat_files/figure-html/unnamed-chunk-35-1.png" width="672" /></p>
+</div>
+<div id="rmarkdown-insert-date-document-was-knitted" class="section level3">
+<h3>RMarkdown: insert date document was knitted</h3>
+<p>add this to the header:</p>
+<p><code>date: &quot;March 15, 2019&quot;</code></p>
+<p>SOURCE: (<a href="https://stackoverflow.com/questions/23449319/yaml-current-date-in-rmarkdown" class="uri">https://stackoverflow.com/questions/23449319/yaml-current-date-in-rmarkdown</a>)</p>
 </div>
