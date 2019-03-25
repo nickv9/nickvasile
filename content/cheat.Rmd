@@ -404,7 +404,7 @@ nycflights13::planes[,c(4,9)] %>%
   ggplot2::ggplot(ggplot2::aes(value)) + 
   ggplot2::facet_wrap(~key, scales = "free") + 
   ggplot2::geom_bar(stat = "count") + 
-  coord_flip ()
+  ggplot2::coord_flip ()
 ```
 
 

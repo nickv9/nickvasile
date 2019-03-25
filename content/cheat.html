@@ -1,7 +1,7 @@
 ---
 title: "Nick's R Cheat Sheet"
 author: "Nicholas Vasile"
-date: "2019-03-15"
+date: "2019-03-25"
 output: 
   blogdown::html_page:
     toc: true
@@ -803,6 +803,8 @@ corrplot::corrplot(M, method=&quot;color&quot;)</code></pre>
 </div>
 <div id="plot-distribution-of-all-variables" class="section level3">
 <h3>plot distribution of all variables</h3>
+<div id="just-the-numeric-variables" class="section level4">
+<h4>Just the numeric variables</h4>
 <p>SOURCE: (<a href="https://drsimonj.svbtle.com/quick-plot-of-all-variables" class="uri">https://drsimonj.svbtle.com/quick-plot-of-all-variables</a>)</p>
 <pre class="r"><code>mtcars %&gt;%
     purrr::keep(is.numeric) %&gt;% 
@@ -812,6 +814,17 @@ corrplot::corrplot(M, method=&quot;color&quot;)</code></pre>
     ggplot2::geom_histogram()
 #&gt; `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
 <p><img src="/cheat_files/figure-html/unnamed-chunk-35-1.png" width="672" /></p>
+</div>
+<div id="all-variables" class="section level4">
+<h4>all variables</h4>
+<pre class="r"><code>nycflights13::planes[,c(4,9)] %&gt;%
+  tidyr::gather() %&gt;% 
+  ggplot2::ggplot(ggplot2::aes(value)) + 
+  ggplot2::facet_wrap(~key, scales = &quot;free&quot;) + 
+  ggplot2::geom_bar(stat = &quot;count&quot;) + 
+  ggplot2::coord_flip ()</code></pre>
+<p><img src="/cheat_files/figure-html/unnamed-chunk-36-1.png" width="672" /></p>
+</div>
 </div>
 <div id="rmarkdown-insert-date-document-was-knitted" class="section level3">
 <h3>RMarkdown: insert date document was knitted</h3>
