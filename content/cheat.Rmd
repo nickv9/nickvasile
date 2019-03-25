@@ -384,6 +384,8 @@ reshape2::melt(M) %>%
 
 ### plot distribution of all variables
 
+#### Just the numeric variables
+
 SOURCE: (https://drsimonj.svbtle.com/quick-plot-of-all-variables)
 
 ```{r}
@@ -394,6 +396,17 @@ mtcars %>%
     ggplot2::facet_wrap(~key, scales = "free") + 
     ggplot2::geom_histogram()
 ```
+
+#### all variables
+```{r}
+nycflights13::planes[,c(4,9)] %>%
+  tidyr::gather() %>% 
+  ggplot2::ggplot(ggplot2::aes(value)) + 
+  ggplot2::facet_wrap(~key, scales = "free") + 
+  ggplot2::geom_bar(stat = "count") + 
+  coord_flip ()
+```
+
 
 ### RMarkdown: insert date document was knitted
 
