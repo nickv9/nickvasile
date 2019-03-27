@@ -414,3 +414,76 @@ add this to the header:
 
 SOURCE: (https://stackoverflow.com/questions/23449319/yaml-current-date-in-rmarkdown)
 
+### Plot percentage of attributes that are NA for each outcome
+
+```{r}
+data(Soybean, package = "mlbench")
+
+# the first column is the outcome variable so we remove it
+na_rates <- rowMeans(is.na(Soybean[,-1]))
+
+soybean <- Soybean %>% 
+  tibble::add_column(na_rate = na_rates)
+
+soybean %>% 
+    dplyr::group_by(Class) %>% 
+    dplyr::summarize(mean_na_rate = mean(na_rate)) %>% 
+    ggplot2::ggplot(ggplot2::aes(x=Class, y = mean_na_rate, fill = Class)) +
+    ggplot2::geom_bar(stat = "identity") +
+    ggplot2::coord_flip() +
+    ggplot2::theme(legend.position = "none")
+```
+
+### Plot the pecentage of rows that has at least 1 NA attribute, by outcome
+
+```{r}
+data(Soybean, package = "mlbench")
+
+na_rates <- rowMeans(is.na(Soybean[,-1]))
+
+soybean <- Soybean %>%
+    tibble::add_column(na_rates = na_rates) %>% 
+    dplyr::mutate(has_nas = na_rates != 0 )
+
+soybean %>% 
+    dplyr::group_by(Class) %>% 
+    dplyr::summarize(mean_has_nas = mean(has_nas)) %>% 
+    ggplot2::ggplot(ggplot2::aes(x=Class, y = mean_has_nas, fill = Class)) +
+    ggplot2::geom_bar(stat = "identity") +
+    ggplot2::coord_flip() +
+    ggplot2::theme(legend.position = "none")
+```
+
+## Plot the attributes (predictors) that are most likely to be missing
+
+```{r}
+data(Soybean, package = "mlbench")
+
+predictor_na_rate <- data.frame(colMeans(is.na(Soybean[,-1]))) %>% 
+    tibble::rownames_to_column(var = "predictor") %>% 
+    dplyr::rename( na_rate = 2)
+
+predictor_na_rate %>% ggplot2::ggplot(ggplot2::aes(x = predictor, y = na_rate,
+                                                   fill = predictor )) +
+  ggplot2::geom_bar(stat = "identity") +
+  ggplot2::coord_flip() +
+  ggplot2::theme(legend.position = "none")
+```
+
+## Plot the attributes (predictors) that are most likely to be missing, by outcome
+
+```{r}
+data(Soybean, package = "mlbench")
+
+soybean_l <- Soybean %>% 
+  tidyr::gather(-Class, key = "predictor",value = "value")
+
+soybean_l %>% dplyr::group_by(Class, predictor) %>% 
+  dplyr::summarize(na_rate = mean(is.na(value))) %>% 
+  ggplot2::ggplot(ggplot2::aes(x=predictor, y = na_rate, fill = predictor)) +
+  ggplot2::geom_bar(stat = "identity") +
+  ggplot2::coord_flip() +
+  ggplot2::facet_wrap(~Class, scales = "free") +
+  ggplot2::theme(legend.position = "none")
+```
+

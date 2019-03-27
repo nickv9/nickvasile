@@ -1,7 +1,7 @@
 ---
 title: "Nick's R Cheat Sheet"
 author: "Nicholas Vasile"
-date: "2019-03-25"
+date: "2019-03-27"
 output: 
   blogdown::html_page:
     toc: true
@@ -49,6 +49,10 @@ vignette: >
 <li><a href="#filter-correlations-at-a-cutoff-value">filter correlations at a cutoff value</a></li>
 <li><a href="#plot-distribution-of-all-variables">plot distribution of all variables</a></li>
 <li><a href="#rmarkdown-insert-date-document-was-knitted">RMarkdown: insert date document was knitted</a></li>
+<li><a href="#plot-percentage-of-attributes-that-are-na-for-each-outcome">Plot percentage of attributes that are NA for each outcome</a></li>
+<li><a href="#plot-the-pecentage-of-rows-that-has-at-least-1-na-attribute-by-outcome">Plot the pecentage of rows that has at least 1 NA attribute, by outcome</a></li>
+<li><a href="#plot-the-attributes-predictors-that-are-most-likely-to-be-missing">Plot the attributes (predictors) that are most likely to be missing</a></li>
+<li><a href="#plot-the-attributes-predictors-that-are-most-likely-to-be-missing-by-outcome">Plot the attributes (predictors) that are most likely to be missing, by outcome</a></li>
 </ul>
 </div>
 
@@ -830,4 +834,75 @@ corrplot::corrplot(M, method=&quot;color&quot;)</code></pre>
 <h3>RMarkdown: insert date document was knitted</h3>
 <p>add this to the header:</p>
 <p>SOURCE: (<a href="https://stackoverflow.com/questions/23449319/yaml-current-date-in-rmarkdown" class="uri">https://stackoverflow.com/questions/23449319/yaml-current-date-in-rmarkdown</a>)</p>
+</div>
+<div id="plot-percentage-of-attributes-that-are-na-for-each-outcome" class="section level3">
+<h3>Plot percentage of attributes that are NA for each outcome</h3>
+<pre class="r"><code>data(Soybean, package = &quot;mlbench&quot;)
+
+# the first column is the outcome variable so we remove it
+na_rates &lt;- rowMeans(is.na(Soybean[,-1]))
+
+soybean &lt;- Soybean %&gt;% 
+  tibble::add_column(na_rate = na_rates)
+
+soybean %&gt;% 
+    dplyr::group_by(Class) %&gt;% 
+    dplyr::summarize(mean_na_rate = mean(na_rate)) %&gt;% 
+    ggplot2::ggplot(ggplot2::aes(x=Class, y = mean_na_rate, fill = Class)) +
+    ggplot2::geom_bar(stat = &quot;identity&quot;) +
+    ggplot2::coord_flip() +
+    ggplot2::theme(legend.position = &quot;none&quot;)</code></pre>
+<p><img src="/cheat_files/figure-html/unnamed-chunk-37-1.png" width="672" /></p>
+</div>
+<div id="plot-the-pecentage-of-rows-that-has-at-least-1-na-attribute-by-outcome" class="section level3">
+<h3>Plot the pecentage of rows that has at least 1 NA attribute, by outcome</h3>
+<pre class="r"><code>data(Soybean, package = &quot;mlbench&quot;)
+
+na_rates &lt;- rowMeans(is.na(Soybean[,-1]))
+
+soybean &lt;- Soybean %&gt;%
+    tibble::add_column(na_rates = na_rates) %&gt;% 
+    dplyr::mutate(has_nas = na_rates != 0 )
+
+soybean %&gt;% 
+    dplyr::group_by(Class) %&gt;% 
+    dplyr::summarize(mean_has_nas = mean(has_nas)) %&gt;% 
+    ggplot2::ggplot(ggplot2::aes(x=Class, y = mean_has_nas, fill = Class)) +
+    ggplot2::geom_bar(stat = &quot;identity&quot;) +
+    ggplot2::coord_flip() +
+    ggplot2::theme(legend.position = &quot;none&quot;)</code></pre>
+<p><img src="/cheat_files/figure-html/unnamed-chunk-38-1.png" width="672" /></p>
+</div>
+<div id="plot-the-attributes-predictors-that-are-most-likely-to-be-missing" class="section level2">
+<h2>Plot the attributes (predictors) that are most likely to be missing</h2>
+<pre class="r"><code>data(Soybean, package = &quot;mlbench&quot;)
+
+predictor_na_rate &lt;- data.frame(colMeans(is.na(Soybean[,-1]))) %&gt;% 
+    tibble::rownames_to_column(var = &quot;predictor&quot;) %&gt;% 
+    dplyr::rename( na_rate = 2)
+
+predictor_na_rate %&gt;% ggplot2::ggplot(ggplot2::aes(x = predictor, y = na_rate,
+                                                   fill = predictor )) +
+  ggplot2::geom_bar(stat = &quot;identity&quot;) +
+  ggplot2::coord_flip() +
+  ggplot2::theme(legend.position = &quot;none&quot;)</code></pre>
+<p><img src="/cheat_files/figure-html/unnamed-chunk-39-1.png" width="672" /></p>
+</div>
+<div id="plot-the-attributes-predictors-that-are-most-likely-to-be-missing-by-outcome" class="section level2">
+<h2>Plot the attributes (predictors) that are most likely to be missing, by outcome</h2>
+<pre class="r"><code>data(Soybean, package = &quot;mlbench&quot;)
+
+soybean_l &lt;- Soybean %&gt;% 
+  tidyr::gather(-Class, key = &quot;predictor&quot;,value = &quot;value&quot;)
+#&gt; Warning: attributes are not identical across measure variables;
+#&gt; they will be dropped
+
+soybean_l %&gt;% dplyr::group_by(Class, predictor) %&gt;% 
+  dplyr::summarize(na_rate = mean(is.na(value))) %&gt;% 
+  ggplot2::ggplot(ggplot2::aes(x=predictor, y = na_rate, fill = predictor)) +
+  ggplot2::geom_bar(stat = &quot;identity&quot;) +
+  ggplot2::coord_flip() +
+  ggplot2::facet_wrap(~Class, scales = &quot;free&quot;) +
+  ggplot2::theme(legend.position = &quot;none&quot;)</code></pre>
+<p><img src="/cheat_files/figure-html/unnamed-chunk-40-1.png" width="672" /></p>
 </div>
