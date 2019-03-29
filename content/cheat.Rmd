@@ -351,6 +351,22 @@ nycflights13::flights %>%
     ggplot2::geom_bar()
 ```
 
+###Sort bar plot by counts - when using stat = "identity"
+
+```{r}
+avg_delay_by_carrier <- nycflights13::flights %>% 
+  dplyr::group_by(carrier) %>% 
+  dplyr::summarize(mean_delay = mean(dep_delay, na.rm = TRUE))
+
+avg_delay_by_carrier %>% 
+  ggplot2::ggplot(ggplot2::aes(x=reorder(carrier, -mean_delay),
+                               y = mean_delay)) +
+  ggplot2::geom_bar(stat="identity") +
+  ggplot2::labs(x = "carrier") # if you want to set x-axis to original attribute
+```
+
+
+
 ###Color coded correlation table
 ```{r}
 M <- cor(mtcars)
