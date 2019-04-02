@@ -503,3 +503,15 @@ soybean_l %>% dplyr::group_by(Class, predictor) %>%
   ggplot2::theme(legend.position = "none")
 ```
 
+## Create a matrix that shows whether or not a particular combination of values is in the data
+SOURCE: https://stackoverflow.com/a/37897416 
+```{r}
+mtcars %>% 
+  tibble::rownames_to_column("name") %>% 
+  dplyr::distinct(cyl, gear, has_gear = !is.na(name)) %>% 
+  tidyr::complete( cyl, gear) %>% 
+  dplyr::mutate(has_gear = dplyr::if_else(is.na(has_gear),FALSE, TRUE)) %>% 
+  ggplot2::ggplot(ggplot2::aes(x=cyl, y =gear )) +
+  ggplot2::geom_tile(ggplot2::aes(fill = has_gear),color = "white")
+```
+

@@ -1,7 +1,7 @@
 ---
 title: "Nick's R Cheat Sheet"
 author: "Nicholas Vasile"
-date: "2019-03-29"
+date: "2019-04-01"
 output: 
   blogdown::html_page:
     toc: true
@@ -54,6 +54,7 @@ vignette: >
 <li><a href="#plot-the-pecentage-of-rows-that-has-at-least-1-na-attribute-by-outcome">Plot the pecentage of rows that has at least 1 NA attribute, by outcome</a></li>
 <li><a href="#plot-the-attributes-predictors-that-are-most-likely-to-be-missing">Plot the attributes (predictors) that are most likely to be missing</a></li>
 <li><a href="#plot-the-attributes-predictors-that-are-most-likely-to-be-missing-by-outcome">Plot the attributes (predictors) that are most likely to be missing, by outcome</a></li>
+<li><a href="#create-a-matrix-that-shows-whether-or-not-a-particular-combination-of-values-is-in-the-data">Create a matrix that shows whether or not a particular combination of values is in the data</a></li>
 </ul>
 </div>
 
@@ -919,4 +920,16 @@ soybean_l %&gt;% dplyr::group_by(Class, predictor) %&gt;%
   ggplot2::facet_wrap(~Class, scales = &quot;free&quot;) +
   ggplot2::theme(legend.position = &quot;none&quot;)</code></pre>
 <p><img src="/cheat_files/figure-html/unnamed-chunk-41-1.png" width="672" /></p>
+</div>
+<div id="create-a-matrix-that-shows-whether-or-not-a-particular-combination-of-values-is-in-the-data" class="section level2">
+<h2>Create a matrix that shows whether or not a particular combination of values is in the data</h2>
+<p>SOURCE: <a href="https://stackoverflow.com/a/37897416" class="uri">https://stackoverflow.com/a/37897416</a></p>
+<pre class="r"><code>mtcars %&gt;% 
+  tibble::rownames_to_column(&quot;name&quot;) %&gt;% 
+  dplyr::distinct(cyl, gear, has_gear = !is.na(name)) %&gt;% 
+  tidyr::complete( cyl, gear) %&gt;% 
+  dplyr::mutate(has_gear = dplyr::if_else(is.na(has_gear),FALSE, TRUE)) %&gt;% 
+  ggplot2::ggplot(ggplot2::aes(x=cyl, y =gear )) +
+  ggplot2::geom_tile(ggplot2::aes(fill = has_gear),color = &quot;white&quot;)</code></pre>
+<p><img src="/cheat_files/figure-html/unnamed-chunk-42-1.png" width="672" /></p>
 </div>
