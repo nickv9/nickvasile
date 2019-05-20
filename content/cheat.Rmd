@@ -515,3 +515,11 @@ mtcars %>%
   ggplot2::geom_tile(ggplot2::aes(fill = has_gear),color = "white")
 ```
 
+## Convert unix style epoch time to human readable time
+
+```{r}
+epoch_time <- 1505249866329
+
+lubridate::as_datetime(epoch_time/1000)
+```
+

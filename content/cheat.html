@@ -1,7 +1,7 @@
 ---
 title: "Nick's R Cheat Sheet"
 author: "Nicholas Vasile"
-date: "2019-04-01"
+date: "2019-05-20"
 output: 
   blogdown::html_page:
     toc: true
@@ -14,39 +14,8 @@ vignette: >
 
 <div id="TOC">
 <ul>
-<li><a href="#selecting-attributes-from-a-data-frame">Selecting attributes from a data frame</a></li>
-<li><a href="#subsetting-rows">subsetting rows</a></li>
-<li><a href="#filtering-extracting-subsetting-data-frames-based-on-attribute-value">Filtering / extracting / subsetting data frames based on attribute value</a></li>
-<li><a href="#exploring-data">Exploring data</a></li>
-<li><a href="#prevent-garbage-characters-when-using-read.csv-on-data-exported-from-sql">Prevent garbage characters when using read.csv on data exported from SQL</a></li>
-<li><a href="#list-functions-exported-by-a-loaded-package">List functions exported by a loaded package</a></li>
-<li><a href="#count-occurrences-of-unique-values">Count occurrences of unique values</a></li>
-<li><a href="#check-for-duplicate-values">Check for duplicate values</a></li>
-<li><a href="#build-and-install-vignettes">Build and install vignettes</a></li>
-<li><a href="#string-filtering">String filtering</a></li>
 <li><a href="#string-filtering-when-using-a-database-and-dbplyr">String filtering when using a database and dbplyr</a></li>
-<li><a href="#create-permutations-of-items-from-multple-vectors">Create permutations of items from multple vectors</a></li>
-<li><a href="#get-class-names-of-items-in-a-dataframevector">Get class names of items in a dataframe/vector</a></li>
-<li><a href="#printing-more-than-default-rowscolumns-from-a-table">Printing more than default rows/columns from a table</a></li>
-<li><a href="#search-all-objects-including-functions-in-global-environment-for-string">Search all objects, including functions, in global environment for string</a></li>
-<li><a href="#search-key-words-or-phrases-in-help-pages-vignettes-or-task-views">Search key words or phrases in help pages, vignettes or task views</a></li>
-<li><a href="#update-packages-after-updating-r">Update packages after updating R</a></li>
-<li><a href="#timezone-stuff">Timezone stuff</a></li>
-<li><a href="#calculate-minutes-between-two-times">Calculate minutes between two times</a></li>
 <li><a href="#filter-for-records-within-last-n-years">filter for records within last n years</a></li>
-<li><a href="#view-data-exported-by-a-package">View data exported by a package</a></li>
-<li><a href="#browse-vignettes-for-a-given-package">Browse vignettes for a given package</a></li>
-<li><a href="#open-function-documentation-from-win-rstudio">Open function documentation from w/in RStudio</a></li>
-<li><a href="#create-a-dataframe-with-random-data">Create a dataframe with random data</a></li>
-<li><a href="#details-about-built-in-data-sets">Details about built-in data sets</a></li>
-<li><a href="#use-github-to-search-for-packages-using-a-particular-function">Use Github to search for packages using a particular function</a></li>
-<li><a href="#conditional-mutate">Conditional mutate</a></li>
-<li><a href="#extracting-nested-list-into-a-tibble">extracting nested list into a tibble</a></li>
-<li><a href="#scatterplot-of-all-pairs">Scatterplot of all pairs</a></li>
-<li><a href="#interactively-explore-plots">Interactively explore plots</a></li>
-<li><a href="#sort-bar-plot-by-counts">Sort bar plot by counts</a></li>
-<li><a href="#sort-bar-plot-by-counts---when-using-stat-identity">Sort bar plot by counts - when using stat = “identity”</a></li>
-<li><a href="#color-coded-correlation-table">Color coded correlation table</a></li>
 <li><a href="#filter-correlations-at-a-cutoff-value">filter correlations at a cutoff value</a></li>
 <li><a href="#plot-distribution-of-all-variables">plot distribution of all variables</a></li>
 <li><a href="#rmarkdown-insert-date-document-was-knitted">RMarkdown: insert date document was knitted</a></li>
@@ -55,13 +24,13 @@ vignette: >
 <li><a href="#plot-the-attributes-predictors-that-are-most-likely-to-be-missing">Plot the attributes (predictors) that are most likely to be missing</a></li>
 <li><a href="#plot-the-attributes-predictors-that-are-most-likely-to-be-missing-by-outcome">Plot the attributes (predictors) that are most likely to be missing, by outcome</a></li>
 <li><a href="#create-a-matrix-that-shows-whether-or-not-a-particular-combination-of-values-is-in-the-data">Create a matrix that shows whether or not a particular combination of values is in the data</a></li>
+<li><a href="#convert-unix-style-epoch-time-to-human-readable-time">Convert unix style epoch time to human readable time</a></li>
 </ul>
 </div>
 
 <p><a href="http://info.rstudio.com/G5X0Nw20UEEoN0YS0000JCn">PDF of many of Rstudio’s cheat sheets</a></p>
 <p><a href="https://github.com/startupjing/Tech_Notes/blob/master/R/R_language.md">Another R cheat sheet I found useful</a></p>
-<div id="selecting-attributes-from-a-data-frame" class="section level3">
-<h3>Selecting attributes from a data frame</h3>
+<p>###Selecting attributes from a data frame</p>
 <pre class="r"><code># data [row, attribute_name]
 iris[ 1, &quot;Species&quot;] 
 #&gt; [1] setosa
@@ -96,9 +65,7 @@ ggplot2::diamonds %&gt;%
   head()
 #&gt; [1] Ideal     Premium   Good      Premium   Good      Very Good
 #&gt; Levels: Fair &lt; Good &lt; Very Good &lt; Premium &lt; Ideal</code></pre>
-</div>
-<div id="subsetting-rows" class="section level3">
-<h3>subsetting rows</h3>
+<p>###subsetting rows</p>
 <pre class="r"><code># approach 1: use exact row references
 # dataframe[rows, columns]
 mtcars[20:22,]
@@ -247,16 +214,12 @@ mtcars[,-(1:3)]
 #&gt; Ferrari Dino        175 3.62 2.770 15.50  0  1    5    6
 #&gt; Maserati Bora       335 3.54 3.570 14.60  0  1    5    8
 #&gt; Volvo 142E          109 4.11 2.780 18.60  1  1    4    2</code></pre>
-</div>
-<div id="filtering-extracting-subsetting-data-frames-based-on-attribute-value" class="section level3">
-<h3>Filtering / extracting / subsetting data frames based on attribute value</h3>
+<p>###Filtering / extracting / subsetting data frames based on attribute value</p>
 <pre class="r"><code>mtcars[which(mtcars$cyl == 4), &quot;mpg&quot;]
 #&gt;  [1] 22.8 24.4 22.8 32.4 30.4 33.9 21.5 27.3 26.0 30.4 21.4
 subset(mtcars$mpg, mtcars$cyl == 4)
 #&gt;  [1] 22.8 24.4 22.8 32.4 30.4 33.9 21.5 27.3 26.0 30.4 21.4</code></pre>
-</div>
-<div id="exploring-data" class="section level3">
-<h3>Exploring data</h3>
+<p>###Exploring data</p>
 <pre class="r"><code>#summary stats from pastecs package
 pastecs::stat.desc(mtcars)
 #&gt;                      mpg         cyl         disp           hp
@@ -308,19 +271,13 @@ pastecs::stat.desc(mtcars)
 #Counting NULL values in column
 sum(is.na(mtcars$cyl))
 #&gt; [1] 0</code></pre>
-</div>
-<div id="prevent-garbage-characters-when-using-read.csv-on-data-exported-from-sql" class="section level3">
-<h3>Prevent garbage characters when using read.csv on data exported from SQL</h3>
+<p>###Prevent garbage characters when using read.csv on data exported from SQL</p>
 <pre class="r"><code>#SOURCE: http://stackoverflow.com/questions/24568056/rs-read-csv-prepending-1st-column-name-with-junk-text
 read.csv(file = &quot;my_file.csv&quot;, fileEncoding = &quot;UTF-8-BOM&quot;)</code></pre>
-</div>
-<div id="list-functions-exported-by-a-loaded-package" class="section level3">
-<h3>List functions exported by a loaded package</h3>
+<p>###List functions exported by a loaded package</p>
 <pre class="r"><code>head(ls(&quot;package:base&quot;))
 #&gt; [1] &quot;-&quot;         &quot;-.Date&quot;    &quot;-.POSIXt&quot;  &quot;!&quot;         &quot;!.hexmode&quot; &quot;!.octmode&quot;</code></pre>
-</div>
-<div id="count-occurrences-of-unique-values" class="section level3">
-<h3>Count occurrences of unique values</h3>
+<p>###Count occurrences of unique values</p>
 <pre class="r"><code>table(mtcars$cyl)
 #&gt; 
 #&gt;  4  6  8 
@@ -367,9 +324,7 @@ addmargins(sort(prop.table(table(mtcars$cyl,useNA = &quot;always&quot;))))
 #&gt; 
 #&gt;    &lt;NA&gt;       6       4       8     Sum 
 #&gt; 0.00000 0.21875 0.34375 0.43750 1.00000</code></pre>
-</div>
-<div id="check-for-duplicate-values" class="section level3">
-<h3>Check for duplicate values</h3>
+<p>###Check for duplicate values</p>
 <pre class="r"><code>length(unique(nps$email))==nrow(nps)
 
 #pull duplicate values
@@ -380,13 +335,9 @@ nycflights13::planes %&gt;%
 nycflights13::weather %&gt;%
         dplyr::count(year, month, day, hour, origin) %&gt;%
         filter(n &gt; 1)</code></pre>
-</div>
-<div id="build-and-install-vignettes" class="section level3">
-<h3>Build and install vignettes</h3>
+<p>###Build and install vignettes</p>
 <pre class="r"><code>devtools::install(build_vignettes = TRUE)</code></pre>
-</div>
-<div id="string-filtering" class="section level3">
-<h3>String filtering</h3>
+<p>###String filtering</p>
 <pre class="r"><code>#filter output of names - or any other character vector
 row.names(mtcars)[grepl(&quot;Merc&quot;,row.names(mtcars))]
 #&gt; [1] &quot;Merc 240D&quot;   &quot;Merc 230&quot;    &quot;Merc 280&quot;    &quot;Merc 280C&quot;   &quot;Merc 450SE&quot; 
@@ -504,10 +455,10 @@ nycflights13::weather %&gt;%
 #&gt;  [1] &quot;origin&quot;     &quot;year&quot;       &quot;month&quot;      &quot;day&quot;        &quot;hour&quot;      
 #&gt;  [6] &quot;temp&quot;       &quot;dewp&quot;       &quot;humid&quot;      &quot;wind.dir&quot;   &quot;wind.speed&quot;
 #&gt; [11] &quot;wind.gust&quot;  &quot;precip&quot;     &quot;pressure&quot;   &quot;visib&quot;      &quot;time.hour&quot;</code></pre>
-</div>
 <div id="string-filtering-when-using-a-database-and-dbplyr" class="section level3">
 <h3>String filtering when using a database and dbplyr</h3>
-<p>The previous mentions won’t always work when filtering against data in a database. Reference: <a href="https://github.com/tidyverse/dplyr/issues/3090" class="uri">https://github.com/tidyverse/dplyr/issues/3090</a></p>
+<p>The previous mentions won’t always work when filtering against data in a database.
+Reference: <a href="https://github.com/tidyverse/dplyr/issues/3090" class="uri">https://github.com/tidyverse/dplyr/issues/3090</a></p>
 <p>Solution from: <a href="https://stackoverflow.com/questions/38962585/pass-sql-functions-in-dplyr-filter-function-on-database/47198795#47198795" class="uri">https://stackoverflow.com/questions/38962585/pass-sql-functions-in-dplyr-filter-function-on-database/47198795#47198795</a></p>
 <pre class="r"><code>#load some data into a temp database
 con &lt;- DBI::dbConnect(RSQLite::SQLite(), path = &quot;:memory:&quot;)
@@ -526,7 +477,8 @@ dplyr::tbl(con, &quot;airports&quot;) %&gt;%
 #&gt; 3 ANN   Annette Island           55.0 -132.    119    -9 A     America/Anc~
 #&gt; 4 BID   Block Island State Air~  41.2  -71.6   108    -5 A     America/New~
 #&gt; 5 BRO   Brownsville South Padr~  25.9  -97.4    22    -6 A     America/Chi~</code></pre>
-<p>This works when I test against a Microsoft SQL database but not SQLite. Returns error: <code>Error in stri_detect_regex(string, pattern, opts_regex = opts(pattern)) : object 'name' not found</code></p>
+<p>This works when I test against a Microsoft SQL database but not SQLite. Returns error:
+<code>Error in stri_detect_regex(string, pattern, opts_regex = opts(pattern)) : object 'name' not found</code></p>
 <pre class="r"><code>#load some data into a temp database
 con &lt;- DBI::dbConnect(RSQLite::SQLite(), path = &quot;:memory:&quot;)
 DBI::dbWriteTable(con, &quot;airports&quot;, nycflights13::airports)
@@ -535,9 +487,7 @@ DBI::dbWriteTable(con, &quot;airports&quot;, nycflights13::airports)
 dplyr::tbl(con, &quot;airports&quot;) %&gt;% 
   dplyr::filter(stringr::str_detect(name, &quot;Island&quot;)) %&gt;% 
   head(5)</code></pre>
-</div>
-<div id="create-permutations-of-items-from-multple-vectors" class="section level3">
-<h3>Create permutations of items from multple vectors</h3>
+<p>###Create permutations of items from multple vectors</p>
 <pre class="r"><code>expand.grid(
     c(1, 2),
     c(3, 4),
@@ -551,17 +501,13 @@ dplyr::tbl(con, &quot;airports&quot;) %&gt;%
 #&gt; 6    2    3    3
 #&gt; 7    1    4    3
 #&gt; 8    2    4    3</code></pre>
-</div>
-<div id="get-class-names-of-items-in-a-dataframevector" class="section level3">
-<h3>Get class names of items in a dataframe/vector</h3>
+<p>###Get class names of items in a dataframe/vector</p>
 <pre class="r"><code>sapply(mtcars, class)
 #&gt;       mpg       cyl      disp        hp      drat        wt      qsec 
 #&gt; &quot;numeric&quot; &quot;numeric&quot; &quot;numeric&quot; &quot;numeric&quot; &quot;numeric&quot; &quot;numeric&quot; &quot;numeric&quot; 
 #&gt;        vs        am      gear      carb 
 #&gt; &quot;numeric&quot; &quot;numeric&quot; &quot;numeric&quot; &quot;numeric&quot;</code></pre>
-</div>
-<div id="printing-more-than-default-rowscolumns-from-a-table" class="section level3">
-<h3>Printing more than default rows/columns from a table</h3>
+<p>###Printing more than default rows/columns from a table</p>
 <pre class="r"><code>mtcars %&gt;% dplyr::as_tibble() %&gt;% print(n=15, width = Inf)
 #&gt; # A tibble: 32 x 11
 #&gt;      mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb
@@ -582,22 +528,14 @@ dplyr::tbl(con, &quot;airports&quot;) %&gt;%
 #&gt; 14  15.2     8  276.   180  3.07  3.78  18       0     0     3     3
 #&gt; 15  10.4     8  472    205  2.93  5.25  18.0     0     0     3     4
 #&gt; # ... with 17 more rows</code></pre>
-</div>
-<div id="search-all-objects-including-functions-in-global-environment-for-string" class="section level3">
-<h3>Search all objects, including functions, in global environment for string</h3>
+<p>###Search all objects, including functions, in global environment for string</p>
 <pre class="r"><code>apropos(&quot;cars&quot;)
 #&gt; [1] &quot;cars&quot;   &quot;mtcars&quot;</code></pre>
-</div>
-<div id="search-key-words-or-phrases-in-help-pages-vignettes-or-task-views" class="section level3">
-<h3>Search key words or phrases in help pages, vignettes or task views</h3>
+<p>###Search key words or phrases in help pages, vignettes or task views</p>
 <pre class="r"><code>RSiteSearch(&quot;Microsoft AND SQL&quot;)</code></pre>
-</div>
-<div id="update-packages-after-updating-r" class="section level3">
-<h3>Update packages after updating R</h3>
+<p>###Update packages after updating R</p>
 <pre class="r"><code>update.packages(ask = FALSE, checkBuilt = TRUE)</code></pre>
-</div>
-<div id="timezone-stuff" class="section level3">
-<h3>Timezone stuff</h3>
+<p>###Timezone stuff</p>
 <pre class="r"><code>#Get timezone
 Sys.timezone()
 #&gt; [1] &quot;America/New_York&quot;
@@ -606,9 +544,7 @@ Sys.timezone()
 OlsonNames() %&gt;% head()
 #&gt; [1] &quot;Africa/Abidjan&quot;     &quot;Africa/Accra&quot;       &quot;Africa/Addis_Ababa&quot;
 #&gt; [4] &quot;Africa/Algiers&quot;     &quot;Africa/Asmara&quot;      &quot;Africa/Asmera&quot;</code></pre>
-</div>
-<div id="calculate-minutes-between-two-times" class="section level3">
-<h3>Calculate minutes between two times</h3>
+<p>###Calculate minutes between two times</p>
 <pre class="r"><code>library(lubridate)
 #&gt; 
 #&gt; Attaching package: &#39;lubridate&#39;
@@ -620,7 +556,8 @@ ymd_hms(&quot;2018-10-25 12:00:00&quot;) %--% ymd_hms(&quot;2018-10-25 13:00:00&
 </div>
 <div id="filter-for-records-within-last-n-years" class="section level3">
 <h3>filter for records within last n years</h3>
-<p>works with dbplyr too this is not a great example but I wanted it to work for at least a few more years.</p>
+<p>works with dbplyr too
+this is not a great example but I wanted it to work for at least a few more years.</p>
 <pre class="r"><code>hundred_years_ago &lt;- lubridate::today() - lubridate::years(100)
 
 nycflights13::flights %&gt;% 
@@ -642,21 +579,13 @@ nycflights13::flights %&gt;%
 #&gt; #   arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;, flight &lt;int&gt;, tailnum &lt;chr&gt;,
 #&gt; #   origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;, hour &lt;dbl&gt;,
 #&gt; #   minute &lt;dbl&gt;, time_hour &lt;dttm&gt;</code></pre>
-</div>
-<div id="view-data-exported-by-a-package" class="section level3">
-<h3>View data exported by a package</h3>
+<p>###View data exported by a package</p>
 <pre class="r"><code>data(package = &quot;ggplot2&quot;)</code></pre>
-</div>
-<div id="browse-vignettes-for-a-given-package" class="section level3">
-<h3>Browse vignettes for a given package</h3>
+<p>###Browse vignettes for a given package</p>
 <pre class="r"><code>browseVignettes(package = &quot;dplyr&quot;)</code></pre>
-</div>
-<div id="open-function-documentation-from-win-rstudio" class="section level3">
-<h3>Open function documentation from w/in RStudio</h3>
-<p>Use F2</p>
-</div>
-<div id="create-a-dataframe-with-random-data" class="section level3">
-<h3>Create a dataframe with random data</h3>
+<p>###Open function documentation from w/in RStudio
+Use F2</p>
+<p>###Create a dataframe with random data</p>
 <pre class="r"><code>#the call to set.seed ensures anyone who runs the code will get the same random number stream. 
 set.seed(1)
 data.frame(x = rnorm(4), y = rnorm(4), z = sample(LETTERS, 4))
@@ -665,20 +594,14 @@ data.frame(x = rnorm(4), y = rnorm(4), z = sample(LETTERS, 4))
 #&gt; 2  0.1836433 -0.8204684 Y
 #&gt; 3 -0.8356286  0.4874291 J
 #&gt; 4  1.5952808  0.7383247 R</code></pre>
-</div>
-<div id="details-about-built-in-data-sets" class="section level3">
-<h3>Details about built-in data sets</h3>
+<p>###Details about built-in data sets</p>
 <pre class="r"><code>library(help = &quot;datasets&quot;)
 data()</code></pre>
-</div>
-<div id="use-github-to-search-for-packages-using-a-particular-function" class="section level3">
-<h3>Use Github to search for packages using a particular function</h3>
-<p>Put this into the GitHub search box to see how packages on CRAN use the llply() function from plyr</p>
+<p>###Use Github to search for packages using a particular function
+Put this into the GitHub search box to see how packages on CRAN use the llply() function from plyr</p>
 <pre><code> &quot;llply&quot; user:cran language:R</code></pre>
-</div>
-<div id="conditional-mutate" class="section level3">
-<h3>Conditional mutate</h3>
-<p>NOTE: should probably also look at recode here</p>
+<p>###Conditional mutate
+NOTE: should probably also look at recode here</p>
 <pre class="r"><code>nycflights13::airlines %&gt;%
     dplyr::mutate(
         name = dplyr::case_when(
@@ -704,10 +627,8 @@ data()</code></pre>
 #&gt; 14 VX      Alaska Airlines Inc.       
 #&gt; 15 WN      Southwest Airlines Co.     
 #&gt; 16 YV      Mesa Airlines Inc.</code></pre>
-</div>
-<div id="extracting-nested-list-into-a-tibble" class="section level3">
-<h3>extracting nested list into a tibble</h3>
-<p>SOURCE: <a href="https://cfss.uchicago.edu/webdata004_simplifying_lists.html" class="uri">https://cfss.uchicago.edu/webdata004_simplifying_lists.html</a></p>
+<p>###extracting nested list into a tibble
+SOURCE: <a href="https://cfss.uchicago.edu/webdata004_simplifying_lists.html" class="uri">https://cfss.uchicago.edu/webdata004_simplifying_lists.html</a></p>
 <pre class="r"><code>my_list &lt;- list(
     list(first = &quot;nick&quot;, last = &quot;vasile&quot;, weight = 170),
     list(first = &quot;bob&quot;, last = &quot;smith&quot;, weight = 150)
@@ -741,25 +662,17 @@ purrr::map_df(my_list, magrittr::extract)
 #&gt;   &lt;chr&gt; &lt;chr&gt;   &lt;dbl&gt;
 #&gt; 1 nick  vasile    170
 #&gt; 2 bob   smith     150</code></pre>
-</div>
-<div id="scatterplot-of-all-pairs" class="section level3">
-<h3>Scatterplot of all pairs</h3>
+<p>###Scatterplot of all pairs</p>
 <pre class="r"><code>pairs(mtcars)</code></pre>
 <p><img src="/cheat_files/figure-html/unnamed-chunk-28-1.png" width="672" /></p>
-</div>
-<div id="interactively-explore-plots" class="section level3">
-<h3>Interactively explore plots</h3>
+<p>###Interactively explore plots</p>
 <pre class="r"><code>identify(mtcars$hp, mtcars$mpg, mtcars$mpg)</code></pre>
-</div>
-<div id="sort-bar-plot-by-counts" class="section level3">
-<h3>Sort bar plot by counts</h3>
+<p>###Sort bar plot by counts</p>
 <pre class="r"><code>nycflights13::flights %&gt;% 
     ggplot2::ggplot(ggplot2::aes(x=forcats::fct_infreq(carrier))) +
     ggplot2::geom_bar()</code></pre>
 <p><img src="/cheat_files/figure-html/unnamed-chunk-30-1.png" width="672" /></p>
-</div>
-<div id="sort-bar-plot-by-counts---when-using-stat-identity" class="section level3">
-<h3>Sort bar plot by counts - when using stat = “identity”</h3>
+<p>###Sort bar plot by counts - when using stat = “identity”</p>
 <pre class="r"><code>avg_delay_by_carrier &lt;- nycflights13::flights %&gt;% 
   dplyr::group_by(carrier) %&gt;% 
   dplyr::summarize(mean_delay = mean(dep_delay, na.rm = TRUE))
@@ -770,9 +683,7 @@ avg_delay_by_carrier %&gt;%
   ggplot2::geom_bar(stat=&quot;identity&quot;) +
   ggplot2::labs(x = &quot;carrier&quot;) # if you want to set x-axis to original attribute</code></pre>
 <p><img src="/cheat_files/figure-html/unnamed-chunk-31-1.png" width="672" /></p>
-</div>
-<div id="color-coded-correlation-table" class="section level3">
-<h3>Color coded correlation table</h3>
+<p>###Color coded correlation table</p>
 <pre class="r"><code>M &lt;- cor(mtcars)
 corrplot::corrplot(M, method=&quot;color&quot;)</code></pre>
 <p><img src="/cheat_files/figure-html/unnamed-chunk-32-1.png" width="672" /></p>
@@ -932,4 +843,11 @@ soybean_l %&gt;% dplyr::group_by(Class, predictor) %&gt;%
   ggplot2::ggplot(ggplot2::aes(x=cyl, y =gear )) +
   ggplot2::geom_tile(ggplot2::aes(fill = has_gear),color = &quot;white&quot;)</code></pre>
 <p><img src="/cheat_files/figure-html/unnamed-chunk-42-1.png" width="672" /></p>
+</div>
+<div id="convert-unix-style-epoch-time-to-human-readable-time" class="section level2">
+<h2>Convert unix style epoch time to human readable time</h2>
+<pre class="r"><code>epoch_time &lt;- 1505249866329
+
+lubridate::as_datetime(epoch_time/1000)
+#&gt; [1] &quot;2017-09-12 20:57:46 UTC&quot;</code></pre>
 </div>
