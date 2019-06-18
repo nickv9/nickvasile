@@ -22,7 +22,7 @@ library(magrittr) #for pipe
 
 [Another R cheat sheet I found useful](https://github.com/startupjing/Tech_Notes/blob/master/R/R_language.md)
 
-###Selecting attributes from a data frame
+### Selecting attributes from a data frame
 ```{r}
 # data [row, attribute_name]
 iris[ 1, "Species"] 
@@ -48,7 +48,7 @@ ggplot2::diamonds %>%
   head()
 ```
 
-###subsetting rows
+### subsetting rows
 ```{r}
 # approach 1: use exact row references
 # dataframe[rows, columns]
@@ -84,13 +84,13 @@ mtcars[,-(1:3)]
 
 ```
 
-###Filtering / extracting / subsetting data frames based on attribute value
+### Filtering / extracting / subsetting data frames based on attribute value
 ```{r}
 mtcars[which(mtcars$cyl == 4), "mpg"]
 subset(mtcars$mpg, mtcars$cyl == 4)
 ```
 
-###Exploring data
+### Exploring data
 ```{r}
 #summary stats from pastecs package
 pastecs::stat.desc(mtcars)
@@ -99,18 +99,18 @@ pastecs::stat.desc(mtcars)
 sum(is.na(mtcars$cyl))
 ```
 
-###Prevent garbage characters when using read.csv on data exported from SQL
+### Prevent garbage characters when using read.csv on data exported from SQL
 ```{r, eval = FALSE}
 #SOURCE: http://stackoverflow.com/questions/24568056/rs-read-csv-prepending-1st-column-name-with-junk-text
 read.csv(file = "my_file.csv", fileEncoding = "UTF-8-BOM")
 ```
 
-###List functions exported by a loaded package
+### List functions exported by a loaded package
 ```{r}
 head(ls("package:base"))
 ```
 
-###Count occurrences of unique values
+### Count occurrences of unique values
 ```{r}
 table(mtcars$cyl)
 dplyr::count(mtcars, cyl)
@@ -125,7 +125,7 @@ addmargins(table(mtcars$cyl,useNA = "always"))
 addmargins(sort(prop.table(table(mtcars$cyl,useNA = "always"))))
 ```
 
-###Check for duplicate values
+### Check for duplicate values
 ```{r, eval = FALSE}
 length(unique(nps$email))==nrow(nps)
 
@@ -139,12 +139,12 @@ nycflights13::weather %>%
         filter(n > 1)
 ```
 
-###Build and install vignettes
+### Build and install vignettes
 ```{r, eval = FALSE}
 devtools::install(build_vignettes = TRUE)
 ```
 
-###String filtering
+### String filtering
 ```{r}
 #filter output of names - or any other character vector
 row.names(mtcars)[grepl("Merc",row.names(mtcars))]
@@ -216,40 +216,40 @@ dplyr::tbl(con, "airports") %>%
   head(5)
 ```
 
-###Create permutations of items from multple vectors
+### Create permutations of items from multple vectors
 ```{r}
 expand.grid(
     c(1, 2),
     c(3, 4),
     c(2, 3))
 ```
-###Get class names of items in a dataframe/vector
+### Get class names of items in a dataframe/vector
 ```{r}
 sapply(mtcars, class)
 ```
-###Printing more than default rows/columns from a table
+### Printing more than default rows/columns from a table
 ```{r}
 mtcars %>% dplyr::as_tibble() %>% print(n=15, width = Inf)
 ```
 
 
-###Search all objects, including functions, in global environment for string
+### Search all objects, including functions, in global environment for string
 ```{r}
 apropos("cars")
 ```
 
-###Search key words or phrases in help pages, vignettes or task views
+### Search key words or phrases in help pages, vignettes or task views
 ```{r, eval=FALSE}
 RSiteSearch("Microsoft AND SQL")
 ```
 
 
-###Update packages after updating R
+### Update packages after updating R
 ```{r, eval = FALSE}
 update.packages(ask = FALSE, checkBuilt = TRUE)
 ```
 
-###Timezone stuff
+### Timezone stuff
 ```{r}
 #Get timezone
 Sys.timezone()
@@ -258,7 +258,7 @@ Sys.timezone()
 OlsonNames() %>% head()
 ```
 
-###Calculate minutes between two times
+### Calculate minutes between two times
 
 ```{r}
 library(lubridate)
@@ -278,39 +278,39 @@ nycflights13::flights %>%
 ```
 
 
-###View data exported by a package
+### View data exported by a package
 ```{r, eval = FALSE}
 data(package = "ggplot2")
 ```
 
-###Browse vignettes for a given package
+### Browse vignettes for a given package
 ```{r, eval = FALSE}
 browseVignettes(package = "dplyr")
 ```
 
-###Open function documentation from w/in RStudio
+### Open function documentation from w/in RStudio
 Use F2
 
-###Create a dataframe with random data
+### Create a dataframe with random data
 ```{r}
 #the call to set.seed ensures anyone who runs the code will get the same random number stream. 
 set.seed(1)
 data.frame(x = rnorm(4), y = rnorm(4), z = sample(LETTERS, 4))
 ```
 
-###Details about built-in data sets
+### Details about built-in data sets
 ```{r, eval = FALSE}
 library(help = "datasets")
 data()
 ```
 
-###Use Github to search for packages using a particular function
+### Use Github to search for packages using a particular function
 Put this into the GitHub search box to see how packages on CRAN use the llply() function from plyr
 ```
  "llply" user:cran language:R
 ```
 
-###Conditional mutate
+### Conditional mutate
 NOTE: should probably also look at recode here
 ```{r}
 nycflights13::airlines %>%
@@ -321,7 +321,7 @@ nycflights13::airlines %>%
     )
 ```
 
-###extracting nested list into a tibble
+### extracting nested list into a tibble
 SOURCE: https://cfss.uchicago.edu/webdata004_simplifying_lists.html 
 ```{r}
 my_list <- list(
@@ -334,24 +334,24 @@ my_list
 purrr::map_df(my_list, magrittr::extract)
 ```
 
-###Scatterplot of all pairs
+### Scatterplot of all pairs
 ```{r}
 pairs(mtcars)
 ```
 
-###Interactively explore plots
+### Interactively explore plots
 ```{r,eval=FALSE}
 identify(mtcars$hp, mtcars$mpg, mtcars$mpg)
 ```
 
-###Sort bar plot by counts
+### Sort bar plot by counts
 ```{r}
 nycflights13::flights %>% 
     ggplot2::ggplot(ggplot2::aes(x=forcats::fct_infreq(carrier))) +
     ggplot2::geom_bar()
 ```
 
-###Sort bar plot by counts - when using stat = "identity"
+### Sort bar plot by counts - when using stat = "identity"
 
 ```{r}
 avg_delay_by_carrier <- nycflights13::flights %>% 
@@ -367,7 +367,7 @@ avg_delay_by_carrier %>%
 
 
 
-###Color coded correlation table
+### Color coded correlation table
 ```{r}
 M <- cor(mtcars)
 corrplot::corrplot(M, method="color")
