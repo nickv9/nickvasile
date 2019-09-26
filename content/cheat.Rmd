@@ -531,6 +531,7 @@ df <-data.frame(col_1 = c(NA, 1, 2, 3),
                 col_2 = c(NA, NA, NA, NA),
                 col_3 = c(1, 2, 3, 4)) 
   
+df
   
 case_missing_rate <- data.frame(colMeans(is.na(df))) %>%
         tibble::rownames_to_column(var = "column") %>%

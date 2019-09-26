@@ -955,6 +955,12 @@ df &lt;-data.frame(col_1 = c(NA, 1, 2, 3),
                 col_2 = c(NA, NA, NA, NA),
                 col_3 = c(1, 2, 3, 4)) 
   
+df
+#&gt;   col_1 col_2 col_3
+#&gt; 1    NA    NA     1
+#&gt; 2     1    NA     2
+#&gt; 3     2    NA     3
+#&gt; 4     3    NA     4
   
 case_missing_rate &lt;- data.frame(colMeans(is.na(df))) %&gt;%
         tibble::rownames_to_column(var = &quot;column&quot;) %&gt;%
