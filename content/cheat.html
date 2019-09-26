@@ -1,7 +1,7 @@
 ---
 title: "Nick's R Cheat Sheet"
 author: "Nicholas Vasile"
-date: "2019-06-18"
+date: "2019-09-26"
 output: 
   blogdown::html_page:
     toc: true
@@ -56,6 +56,7 @@ vignette: >
 <li><a href="#plot-the-attributes-predictors-that-are-most-likely-to-be-missing-by-outcome">Plot the attributes (predictors) that are most likely to be missing, by outcome</a></li>
 <li><a href="#create-a-matrix-that-shows-whether-or-not-a-particular-combination-of-values-is-in-the-data">Create a matrix that shows whether or not a particular combination of values is in the data</a></li>
 <li><a href="#convert-unix-style-epoch-time-to-human-readable-time">Convert unix style epoch time to human readable time</a></li>
+<li><a href="#clean-data-remove-columns-where-no-rows-contain-a-value">Clean Data: remove columns where no rows contain a value</a></li>
 </ul>
 </div>
 
@@ -494,13 +495,16 @@ nycflights13::weather %&gt;%
     ) %&gt;% 
   names()
 #&gt; Warning: funs() is soft deprecated as of dplyr 0.8.0
-#&gt; please use list() instead
+#&gt; Please use a list of either functions or lambdas: 
 #&gt; 
-#&gt; # Before:
-#&gt; funs(name = f(.)
+#&gt;   # Simple named list: 
+#&gt;   list(mean = mean, median = median)
 #&gt; 
-#&gt; # After: 
-#&gt; list(name = ~f(.))
+#&gt;   # Auto named with `tibble::lst()`: 
+#&gt;   tibble::lst(mean, median)
+#&gt; 
+#&gt;   # Using lambdas
+#&gt;   list(~ mean(., trim = .2), ~ median(., na.rm = TRUE))
 #&gt; This warning is displayed once per session.
 #&gt;  [1] &quot;origin&quot;     &quot;year&quot;       &quot;month&quot;      &quot;day&quot;        &quot;hour&quot;      
 #&gt;  [6] &quot;temp&quot;       &quot;dewp&quot;       &quot;humid&quot;      &quot;wind.dir&quot;   &quot;wind.speed&quot;
@@ -520,7 +524,7 @@ dplyr::tbl(con, &quot;airports&quot;) %&gt;%
   dplyr::filter(name %like% &quot;%Island%&quot;) %&gt;% 
   head(5)
 #&gt; # Source:   lazy query [?? x 8]
-#&gt; # Database: sqlite 3.22.0 []
+#&gt; # Database: sqlite 3.29.0 []
 #&gt;   faa   name                      lat    lon   alt    tz dst   tzone       
 #&gt;   &lt;chr&gt; &lt;chr&gt;                   &lt;dbl&gt;  &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;       
 #&gt; 1 09J   Jekyll Island Airport    31.1  -81.4    11    -5 A     America/New~
@@ -943,4 +947,28 @@ soybean_l %&gt;% dplyr::group_by(Class, predictor) %&gt;%
 
 lubridate::as_datetime(epoch_time/1000)
 #&gt; [1] &quot;2017-09-12 20:57:46 UTC&quot;</code></pre>
+</div>
+<div id="clean-data-remove-columns-where-no-rows-contain-a-value" class="section level2">
+<h2>Clean Data: remove columns where no rows contain a value</h2>
+<pre class="r"><code>
+df &lt;-data.frame(col_1 = c(NA, 1, 2, 3),
+                col_2 = c(NA, NA, NA, NA),
+                col_3 = c(1, 2, 3, 4)) 
+  
+  
+case_missing_rate &lt;- data.frame(colMeans(is.na(df))) %&gt;%
+        tibble::rownames_to_column(var = &quot;column&quot;) %&gt;%
+        dplyr::rename(missing_rate = 2)
+
+    all_missing_cols &lt;- case_missing_rate %&gt;%
+        dplyr::filter(missing_rate == 1.0) %&gt;%
+        dplyr::pull(column)
+
+    df %&gt;%
+        dplyr::select(-all_missing_cols)
+#&gt;   col_1 col_3
+#&gt; 1    NA     1
+#&gt; 2     1     2
+#&gt; 3     2     3
+#&gt; 4     3     4</code></pre>
 </div>
