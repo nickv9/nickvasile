@@ -1,7 +1,7 @@
 ---
 title: "Nick's R Cheat Sheet"
 author: "Nicholas Vasile"
-date: "2019-09-26"
+date: "2019-10-07"
 output: 
   blogdown::html_page:
     toc: true
@@ -57,6 +57,7 @@ vignette: >
 <li><a href="#create-a-matrix-that-shows-whether-or-not-a-particular-combination-of-values-is-in-the-data">Create a matrix that shows whether or not a particular combination of values is in the data</a></li>
 <li><a href="#convert-unix-style-epoch-time-to-human-readable-time">Convert unix style epoch time to human readable time</a></li>
 <li><a href="#clean-data-remove-columns-where-no-rows-contain-a-value">Clean Data: remove columns where no rows contain a value</a></li>
+<li><a href="#print-one-plot-for-each-data-frame-in-a-list-column">Print one plot for each data frame in a list column</a></li>
 </ul>
 </div>
 
@@ -765,6 +766,12 @@ purrr::map_df(my_list, magrittr::extract)
     ggplot2::ggplot(ggplot2::aes(x=forcats::fct_infreq(carrier))) +
     ggplot2::geom_bar()</code></pre>
 <p><img src="/cheat_files/figure-html/unnamed-chunk-30-1.png" width="672" /></p>
+<pre class="r"><code>nycflights13::flights %&gt;%
+  ggplot2::ggplot(ggplot2::aes(x=forcats::fct_rev(
+    forcats::fct_infreq(carrier)))) +
+  ggplot2::geom_bar() +
+  ggplot2::coord_flip()</code></pre>
+<p><img src="/cheat_files/figure-html/unnamed-chunk-31-1.png" width="672" /></p>
 </div>
 <div id="sort-bar-plot-by-counts---when-using-stat-identity" class="section level3">
 <h3>Sort bar plot by counts - when using stat = “identity”</h3>
@@ -777,16 +784,26 @@ avg_delay_by_carrier %&gt;%
                                y = mean_delay)) +
   ggplot2::geom_bar(stat=&quot;identity&quot;) +
   ggplot2::labs(x = &quot;carrier&quot;) # if you want to set x-axis to original attribute</code></pre>
-<p><img src="/cheat_files/figure-html/unnamed-chunk-31-1.png" width="672" /></p>
+<p><img src="/cheat_files/figure-html/unnamed-chunk-32-1.png" width="672" /></p>
+<pre class="r"><code>avg_delay_by_carrier &lt;- nycflights13::flights %&gt;% 
+  dplyr::group_by(carrier) %&gt;% 
+  dplyr::summarize(mean_delay = mean(dep_delay, na.rm = TRUE))
+
+avg_delay_by_carrier %&gt;% 
+  ggplot2::ggplot(ggplot2::aes(x=reorder(carrier, mean_delay),
+                               y = mean_delay)) +
+  ggplot2::geom_bar(stat=&quot;identity&quot;) +
+  ggplot2::coord_flip()</code></pre>
+<p><img src="/cheat_files/figure-html/unnamed-chunk-33-1.png" width="672" /></p>
 </div>
 <div id="color-coded-correlation-table" class="section level3">
 <h3>Color coded correlation table</h3>
 <pre class="r"><code>M &lt;- cor(mtcars)
 corrplot::corrplot(M, method=&quot;color&quot;)</code></pre>
-<p><img src="/cheat_files/figure-html/unnamed-chunk-32-1.png" width="672" /></p>
+<p><img src="/cheat_files/figure-html/unnamed-chunk-34-1.png" width="672" /></p>
 <p>with clustering</p>
 <pre class="r"><code>corrplot::corrplot(M, order = &quot;hclust&quot;)</code></pre>
-<p><img src="/cheat_files/figure-html/unnamed-chunk-33-1.png" width="672" /></p>
+<p><img src="/cheat_files/figure-html/unnamed-chunk-35-1.png" width="672" /></p>
 </div>
 <div id="filter-correlations-at-a-cutoff-value" class="section level3">
 <h3>filter correlations at a cutoff value</h3>
@@ -840,7 +857,7 @@ corrplot::corrplot(M, method=&quot;color&quot;)</code></pre>
     ggplot2::facet_wrap(~key, scales = &quot;free&quot;) + 
     ggplot2::geom_histogram()
 #&gt; `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
-<p><img src="/cheat_files/figure-html/unnamed-chunk-36-1.png" width="672" /></p>
+<p><img src="/cheat_files/figure-html/unnamed-chunk-38-1.png" width="672" /></p>
 </div>
 <div id="all-variables" class="section level4">
 <h4>all variables</h4>
@@ -850,7 +867,7 @@ corrplot::corrplot(M, method=&quot;color&quot;)</code></pre>
   ggplot2::facet_wrap(~key, scales = &quot;free&quot;) + 
   ggplot2::geom_bar(stat = &quot;count&quot;) + 
   ggplot2::coord_flip ()</code></pre>
-<p><img src="/cheat_files/figure-html/unnamed-chunk-37-1.png" width="672" /></p>
+<p><img src="/cheat_files/figure-html/unnamed-chunk-39-1.png" width="672" /></p>
 </div>
 </div>
 <div id="rmarkdown-insert-date-document-was-knitted" class="section level3">
@@ -875,7 +892,7 @@ soybean %&gt;%
     ggplot2::geom_bar(stat = &quot;identity&quot;) +
     ggplot2::coord_flip() +
     ggplot2::theme(legend.position = &quot;none&quot;)</code></pre>
-<p><img src="/cheat_files/figure-html/unnamed-chunk-38-1.png" width="672" /></p>
+<p><img src="/cheat_files/figure-html/unnamed-chunk-40-1.png" width="672" /></p>
 </div>
 <div id="plot-the-pecentage-of-rows-that-has-at-least-1-na-attribute-by-outcome" class="section level3">
 <h3>Plot the pecentage of rows that has at least 1 NA attribute, by outcome</h3>
@@ -894,7 +911,7 @@ soybean %&gt;%
     ggplot2::geom_bar(stat = &quot;identity&quot;) +
     ggplot2::coord_flip() +
     ggplot2::theme(legend.position = &quot;none&quot;)</code></pre>
-<p><img src="/cheat_files/figure-html/unnamed-chunk-39-1.png" width="672" /></p>
+<p><img src="/cheat_files/figure-html/unnamed-chunk-41-1.png" width="672" /></p>
 </div>
 <div id="plot-the-attributes-predictors-that-are-most-likely-to-be-missing" class="section level2">
 <h2>Plot the attributes (predictors) that are most likely to be missing</h2>
@@ -909,7 +926,7 @@ predictor_na_rate %&gt;% ggplot2::ggplot(ggplot2::aes(x = predictor, y = na_rate
   ggplot2::geom_bar(stat = &quot;identity&quot;) +
   ggplot2::coord_flip() +
   ggplot2::theme(legend.position = &quot;none&quot;)</code></pre>
-<p><img src="/cheat_files/figure-html/unnamed-chunk-40-1.png" width="672" /></p>
+<p><img src="/cheat_files/figure-html/unnamed-chunk-42-1.png" width="672" /></p>
 </div>
 <div id="plot-the-attributes-predictors-that-are-most-likely-to-be-missing-by-outcome" class="section level2">
 <h2>Plot the attributes (predictors) that are most likely to be missing, by outcome</h2>
@@ -927,7 +944,7 @@ soybean_l %&gt;% dplyr::group_by(Class, predictor) %&gt;%
   ggplot2::coord_flip() +
   ggplot2::facet_wrap(~Class, scales = &quot;free&quot;) +
   ggplot2::theme(legend.position = &quot;none&quot;)</code></pre>
-<p><img src="/cheat_files/figure-html/unnamed-chunk-41-1.png" width="672" /></p>
+<p><img src="/cheat_files/figure-html/unnamed-chunk-43-1.png" width="672" /></p>
 </div>
 <div id="create-a-matrix-that-shows-whether-or-not-a-particular-combination-of-values-is-in-the-data" class="section level2">
 <h2>Create a matrix that shows whether or not a particular combination of values is in the data</h2>
@@ -939,7 +956,7 @@ soybean_l %&gt;% dplyr::group_by(Class, predictor) %&gt;%
   dplyr::mutate(has_gear = dplyr::if_else(is.na(has_gear),FALSE, TRUE)) %&gt;% 
   ggplot2::ggplot(ggplot2::aes(x=cyl, y =gear )) +
   ggplot2::geom_tile(ggplot2::aes(fill = has_gear),color = &quot;white&quot;)</code></pre>
-<p><img src="/cheat_files/figure-html/unnamed-chunk-42-1.png" width="672" /></p>
+<p><img src="/cheat_files/figure-html/unnamed-chunk-44-1.png" width="672" /></p>
 </div>
 <div id="convert-unix-style-epoch-time-to-human-readable-time" class="section level2">
 <h2>Convert unix style epoch time to human readable time</h2>
@@ -977,4 +994,80 @@ case_missing_rate &lt;- data.frame(colMeans(is.na(df))) %&gt;%
 #&gt; 2     1     2
 #&gt; 3     2     3
 #&gt; 4     3     4</code></pre>
+</div>
+<div id="print-one-plot-for-each-data-frame-in-a-list-column" class="section level2">
+<h2>Print one plot for each data frame in a list column</h2>
+<p>There is probably a better way to meet the need.</p>
+<p>My goals was to only show the values that are present in a given group.</p>
+<p><code>ggplot2::facet_wrap()</code> shows all values present in any group in the plots for
+all groups.</p>
+<p>Step 1: make the list</p>
+<pre class="r"><code>n_mtcars &lt;- 
+  mtcars %&gt;%
+  dplyr::group_by(cyl) %&gt;% 
+  tidyr::nest()
+
+n_mtcars
+#&gt; # A tibble: 3 x 2
+#&gt;     cyl data              
+#&gt;   &lt;dbl&gt; &lt;list&gt;            
+#&gt; 1     6 &lt;tibble [7 x 10]&gt; 
+#&gt; 2     4 &lt;tibble [11 x 10]&gt;
+#&gt; 3     8 &lt;tibble [14 x 10]&gt;</code></pre>
+<p>Step 2: give the list members names</p>
+<pre class="r"><code>names(n_mtcars$data) &lt;- stringr::str_c(n_mtcars$cyl,&quot;_cyl&quot;)
+str(n_mtcars$data)
+#&gt; List of 3
+#&gt;  $ 6_cyl:Classes &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;:   7 obs. of  10 variables:
+#&gt;   ..$ mpg : num [1:7] 21 21 21.4 18.1 19.2 17.8 19.7
+#&gt;   ..$ disp: num [1:7] 160 160 258 225 168 ...
+#&gt;   ..$ hp  : num [1:7] 110 110 110 105 123 123 175
+#&gt;   ..$ drat: num [1:7] 3.9 3.9 3.08 2.76 3.92 3.92 3.62
+#&gt;   ..$ wt  : num [1:7] 2.62 2.88 3.21 3.46 3.44 ...
+#&gt;   ..$ qsec: num [1:7] 16.5 17 19.4 20.2 18.3 ...
+#&gt;   ..$ vs  : num [1:7] 0 0 1 1 1 1 0
+#&gt;   ..$ am  : num [1:7] 1 1 0 0 0 0 1
+#&gt;   ..$ gear: num [1:7] 4 4 3 3 4 4 5
+#&gt;   ..$ carb: num [1:7] 4 4 1 1 4 4 6
+#&gt;  $ 4_cyl:Classes &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;:   11 obs. of  10 variables:
+#&gt;   ..$ mpg : num [1:11] 22.8 24.4 22.8 32.4 30.4 33.9 21.5 27.3 26 30.4 ...
+#&gt;   ..$ disp: num [1:11] 108 146.7 140.8 78.7 75.7 ...
+#&gt;   ..$ hp  : num [1:11] 93 62 95 66 52 65 97 66 91 113 ...
+#&gt;   ..$ drat: num [1:11] 3.85 3.69 3.92 4.08 4.93 4.22 3.7 4.08 4.43 3.77 ...
+#&gt;   ..$ wt  : num [1:11] 2.32 3.19 3.15 2.2 1.61 ...
+#&gt;   ..$ qsec: num [1:11] 18.6 20 22.9 19.5 18.5 ...
+#&gt;   ..$ vs  : num [1:11] 1 1 1 1 1 1 1 1 0 1 ...
+#&gt;   ..$ am  : num [1:11] 1 0 0 1 1 1 0 1 1 1 ...
+#&gt;   ..$ gear: num [1:11] 4 4 4 4 4 4 3 4 5 5 ...
+#&gt;   ..$ carb: num [1:11] 1 2 2 1 2 1 1 1 2 2 ...
+#&gt;  $ 8_cyl:Classes &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;:   14 obs. of  10 variables:
+#&gt;   ..$ mpg : num [1:14] 18.7 14.3 16.4 17.3 15.2 10.4 10.4 14.7 15.5 15.2 ...
+#&gt;   ..$ disp: num [1:14] 360 360 276 276 276 ...
+#&gt;   ..$ hp  : num [1:14] 175 245 180 180 180 205 215 230 150 150 ...
+#&gt;   ..$ drat: num [1:14] 3.15 3.21 3.07 3.07 3.07 2.93 3 3.23 2.76 3.15 ...
+#&gt;   ..$ wt  : num [1:14] 3.44 3.57 4.07 3.73 3.78 ...
+#&gt;   ..$ qsec: num [1:14] 17 15.8 17.4 17.6 18 ...
+#&gt;   ..$ vs  : num [1:14] 0 0 0 0 0 0 0 0 0 0 ...
+#&gt;   ..$ am  : num [1:14] 0 0 0 0 0 0 0 0 0 0 ...
+#&gt;   ..$ gear: num [1:14] 3 3 3 3 3 3 3 3 3 3 ...
+#&gt;   ..$ carb: num [1:14] 2 4 3 3 3 4 4 4 2 2 ...</code></pre>
+<p>Step 3: Create plotting function</p>
+<pre class="r"><code>plot_issues_by_epic &lt;- function(df, item_name) {
+  df %&gt;% 
+    ggplot2::ggplot(ggplot2::aes(gear)) +
+    ggplot2::geom_bar() +
+    ggplot2::coord_flip() +
+    ggplot2::labs(title= item_name)
+}</code></pre>
+<p>Step 4: Use your plotting function to create the plots</p>
+<pre class="r"><code>purrr::map2(n_mtcars$data, names(n_mtcars$data),
+     plot_issues_by_epic)
+#&gt; $`6_cyl`</code></pre>
+<p><img src="/cheat_files/figure-html/unnamed-chunk-50-1.png" width="672" /></p>
+<pre><code>#&gt; 
+#&gt; $`4_cyl`</code></pre>
+<p><img src="/cheat_files/figure-html/unnamed-chunk-50-2.png" width="672" /></p>
+<pre><code>#&gt; 
+#&gt; $`8_cyl`</code></pre>
+<p><img src="/cheat_files/figure-html/unnamed-chunk-50-3.png" width="672" /></p>
 </div>

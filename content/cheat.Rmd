@@ -351,6 +351,16 @@ nycflights13::flights %>%
     ggplot2::geom_bar()
 ```
 
+
+```{r}
+nycflights13::flights %>%
+  ggplot2::ggplot(ggplot2::aes(x=forcats::fct_rev(
+    forcats::fct_infreq(carrier)))) +
+  ggplot2::geom_bar() +
+  ggplot2::coord_flip()
+```
+
+
 ### Sort bar plot by counts - when using stat = "identity"
 
 ```{r}
@@ -365,7 +375,17 @@ avg_delay_by_carrier %>%
   ggplot2::labs(x = "carrier") # if you want to set x-axis to original attribute
 ```
 
+```{r}
+avg_delay_by_carrier <- nycflights13::flights %>% 
+  dplyr::group_by(carrier) %>% 
+  dplyr::summarize(mean_delay = mean(dep_delay, na.rm = TRUE))
 
+avg_delay_by_carrier %>% 
+  ggplot2::ggplot(ggplot2::aes(x=reorder(carrier, mean_delay),
+                               y = mean_delay)) +
+  ggplot2::geom_bar(stat="identity") +
+  ggplot2::coord_flip()
+```
 
 ### Color coded correlation table
 ```{r}
@@ -543,5 +563,50 @@ case_missing_rate <- data.frame(colMeans(is.na(df))) %>%
 
     df %>%
         dplyr::select(-all_missing_cols)
+```
+
+
+## Print one plot for each data frame in a list column
+
+There is probably a better way to meet the need.
+
+My goals was to only show the values that are present in a given group.
+
+`ggplot2::facet_wrap()` shows all values present in any group in the plots for 
+all groups.
+
+Step 1: make the list
+```{r}
+n_mtcars <- 
+  mtcars %>%
+  dplyr::group_by(cyl) %>% 
+  tidyr::nest()
+
+n_mtcars
+```
+
+Step 2: give the list members names
+```{r}
+names(n_mtcars$data) <- stringr::str_c(n_mtcars$cyl,"_cyl")
+str(n_mtcars$data)
+```
+
+Step 3: Create plotting function
+
+```{r}
+plot_issues_by_epic <- function(df, item_name) {
+  df %>% 
+    ggplot2::ggplot(ggplot2::aes(gear)) +
+    ggplot2::geom_bar() +
+    ggplot2::coord_flip() +
+    ggplot2::labs(title= item_name)
+}
+```
+
+Step 4: Use your plotting function to create the plots
+
+```{r}
+purrr::map2(n_mtcars$data, names(n_mtcars$data),
+     plot_issues_by_epic)
 ```
 
