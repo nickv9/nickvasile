@@ -610,3 +610,15 @@ purrr::map2(n_mtcars$data, names(n_mtcars$data),
      plot_issues_by_epic)
 ```
 
+## One plot for each attribute in a data frame - different scale for each attribute
+
+```{r}
+datasets::airquality %>% 
+  dplyr::filter(Month == 5) %>% 
+  dplyr::select(-Month) %>% 
+  tidyr::pivot_longer(-Day, names_to = "attribute", values_to = "value") %>% 
+    ggplot2::ggplot(ggplot2::aes(Day, value)) +
+    ggplot2::geom_line() +
+    ggplot2::facet_grid(attribute ~ ., scales = "free")
+```
+
