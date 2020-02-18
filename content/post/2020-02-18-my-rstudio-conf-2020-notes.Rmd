@@ -19,7 +19,7 @@ As in prior years, combination of 2 day workshops and 2 days of conference.
 
 ## Overall thoughts
 
-This was my third rstudio::conf and I plan to attend my fourth, in Orlando next year.
+This was my third rstudio::conf and I plan to attend my fourth, in Orlando, next year.
 
 I really knew the conference had grown when I was told that breakfast would be served in the room closest to my workshop!
 
