@@ -1,0 +1,57 @@
+---
+title: My rstudio::conf 2020 highlights
+author: Nicholas Vasile
+date: '2020-02-18'
+slug: my-rstudio-conf-2020-notes
+categories: []
+tags: []
+---
+## Event details
+
+January 27 - 20, 2020
+San Francisco, CA  
+
+As in prior years, combination of 2 day workshops and 2 days of conference.
+
+**[The RStudio official repo with abstracts for every session, workshop, and e-poster.](https://github.com/rstudio/rstudio-conf/tree/master/2020)**
+
+**[All the conference session recordings.](https://resources.rstudio.com/rstudio-conf-2020)**
+
+## Overall thoughts
+
+This was my third rstudio::conf and I plan to attend my fourth, in Orlando next year.
+
+I really knew the conference had grown when I was told that breakfast would be served in the room closest to my workshop!
+
+The official numbers from Rstudio confirmed that a new attendance record was set.
+
+![](/post/2020-02-18-my-rstudio-conf-2020-notes_files/rstudioconf2020_attendance.jpg)
+
+Despite the increase in attendance the event was executed flawlessly, with the exception of a short-lived wifi hiccup the first day of the workshops.
+
+The welcoming, open and friendly community feeling was still very much present.
+
+The talk topics were diverse and interesting - I found myself often choosing between two talks I REALLY wanted to attend. Decisions were made easier through the knowledge that all talks would be recorded and shared online.
+
+## Text Mining with Tidy Data Principles Workshop
+
+This year I attended Julia Silge's text analysis workshop.
+
+She opened with a great example on how to do frequency analysis with just a few lines of code.
+
+I found her knowledge of trade-offs and constraints of different tools really informative.
+
+As with all the other content, [the Workshop content is available on GitHub.](https://github.com/rstudio-conf-2020/text-mining)
+
+## Talk favorites
+
+My three favorite talks:
+
+1. [J.J. Allaire's opening talk re: open source data science.](https://resources.rstudio.com/rstudio-conf-2020/rstudio-open-source-software-for-data-science-j-j-allaire]) This contained a bombshell. J.J. announced that RStudio has become a Public Benefit Corporation (PBC). I was aware of RStudio's mission statement - focused on creating open source data science tools. Becoming a PBC further ingrains this mission into the bones of the company. Really inspirational!
+
+2. [Eduardo Arino De La Rubia's talk on the evolution of the data scientist role.](https://resources.rstudio.com/rstudio-conf-2020/value-in-data-science-beyond-models-in-production-eduardo-arino-de-la-rubia) Eduardo presented a well-informed and concise perspective on what the future holds for the data scientist. In short, think back to what happened to the webmaster. The biggest, "aha," for me was his statement that just like Product Managers are commonly called, "the CEO of product," the Data Scientist will become, "the CFO of product."
+
+3. [Andrew Mangano's talk re: retention analytics.](https://resources.rstudio.com/rstudio-conf-2020/growth-hacking-with-r-product-analytics-at-scale-using-r-and-rstudio-andrew-mangano) I related to Andrew's story about how fell in love with R and how it transformed his career and life. His case study on using R to perform retention analysis at Salesforce was informative. I will have to look into survivor analysis.
+
+
+
