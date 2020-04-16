@@ -1,0 +1,74 @@
+---
+title: dplyr and Microsoft SQL Server
+author: Nicholas Vasile
+date: '2020-04-16'
+slug: dplyr-and-microsoft-sql-server
+categories: []
+tags: []
+---
+
+
+
+<p><strong>This post is a work in progress</strong></p>
+<div id="motivation" class="section level2">
+<h2>Motivation</h2>
+<p>I use R to access data held in Microsoft SQL Server databases on a daily basis. As a result of running into problems, I’ve realized I don’t have an understanding of the specific roles different components, notably dbplyr, odbc and dbi each play in the process. As a result, resolving or mitigrating issues is often an inefficient combination of Google searches and trial and error. Additionally, as I find or develop workarounds, I am unwilling to promote them with others because I don’t fully understand the cause of the issue and, as a result, I am not confident I have addressed the problem at the appropriate level.</p>
+<p>Specifically, this is most motivated by the, “Invalid descriptor index,” error documented <a href="https://github.com/r-dbi/odbc/issues/309">here</a>.</p>
+</div>
+<div id="scope" class="section level2">
+<h2>Scope</h2>
+<p>Given that the source of my motivation is encountering problems when working with data in Microsoft SQL Server databases, this investigation will be focused on how R interfaces with Microsoft SQL server.</p>
+<p>Additionally, I’m a relatively new R user and do all my R work in RStudio. I use the dplyr packageextensively so this will be centered on how dplyr interfaces with data held in a Microsoft SQL database.</p>
+</div>
+<div id="dplyr-and-dbplyr-packages" class="section level2">
+<h2>dplyr and dbplyr packages</h2>
+<p>dbplyr is the database back-end for dplyr - it does not need to be loaded explicitly, it is loaded by dplyr when working with data in a database.</p>
+<p>dbplyr translates dplyr code into vendor specific SQL.</p>
+<p>dbplyr has translations for the following database systems:</p>
+<ul>
+<li>Microsoft SQL Server</li>
+<li>Oracle</li>
+<li>Apache Hive</li>
+<li>Apache Impala</li>
+<li>PostgreSQL</li>
+<li>Amazon Redshift</li>
+</ul>
+<p>What, “translation,” means is that dplyr syntax can be used to retrieve data from a database system without the need to write SQL code.</p>
+<p>The DBI package is used by dplyr as an intermediary for connections with the database.</p>
+<p>Note that even if dbplyr does not contain translations for a specific database, DBI and odbc packages can be used to connect and the user can send raw SQL queries.</p>
+</div>
+<div id="dbi-package" class="section level2">
+<h2>DBI package</h2>
+<p>DBI package provides a consistent set of functions regardless of the database type being accessed.</p>
+<p>DBI is, “middle-ware,” between an interactive user, or other packages, and the database.</p>
+<p>DBI itself is actually segments the connectivity to the database into a, “front-end,” and a, “back-end.”</p>
+<p>DBI implements a standardized front-end, and other components provide the back-end.</p>
+<p>Example back-ends include:</p>
+<ul>
+<li>RPostgres</li>
+<li>RMariaDB</li>
+<li>RSQLite</li>
+<li>odbc</li>
+<li>bigrquery</li>
+</ul>
+<p>TODO: What front end functions does DBI provide?</p>
+</div>
+<div id="odbc-package" class="section level2">
+<h2>odbc package</h2>
+<p>The odbc package provides the DBI back-end to any odbc driver connection, including those for Microsoft SQL Server.</p>
+<p>TODO: what backend functions does odbc provide?</p>
+</div>
+<div id="q-and-a" class="section level1">
+<h1>Q and A</h1>
+<ul>
+<li>Q: What does is the implication of dbplyr having, or not having, translations for a specific database?
+<ul>
+<li>A: If dbplyr has the translation then data can be retrieved from a database using dplyr syntax, without the need to write SQL code. If dbplyr does not have translations, you will need to write the SQL code yourself and use DBI and odbc packages to send queries.</li>
+</ul></li>
+</ul>
+<p>Resources to read:</p>
+<p><a href="https://dbplyr.tidyverse.org/" class="uri">https://dbplyr.tidyverse.org/</a>
+<a href="https://dbi.r-dbi.org/" class="uri">https://dbi.r-dbi.org/</a></p>
+<p><a href="https://github.com/r-dbi/DBI" class="uri">https://github.com/r-dbi/DBI</a></p>
+<p>Continue reading <a href="https://db.rstudio.com/overview" class="uri">https://db.rstudio.com/overview</a> - connecting to database.</p>
+</div>
