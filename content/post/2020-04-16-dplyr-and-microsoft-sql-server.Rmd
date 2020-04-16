@@ -11,7 +11,7 @@ tags: []
 
 ## Motivation
 
-I use R to access data held in Microsoft SQL Server databases on a daily basis. As a result of running into problems, I've realized I don't have an understanding of the specific roles different components, notably dbplyr, odbc and dbi each play in the process. As a result, resolving or mitigrating issues is often an inefficient combination of Google searches and trial and error. Additionally, as I find or develop workarounds, I am unwilling to promote them with others because I don't fully understand the cause of the issue and, as a result, I am not confident I have addressed the problem at the appropriate level. 
+I use R to access data held in Microsoft SQL Server databases on a daily basis. As a result of running into problems, I've realized I don't have an understanding of the specific roles different components, notably dbplyr, odbc and dbi each play in the process. As a result, resolving or mitigating issues is often an inefficient combination of Google searches and trial and error. Additionally, as I find or develop workarounds, I am unwilling to promote them with others because I don't fully understand the cause of the issue and, as a result, I am not confident I have addressed the problem at the appropriate level. 
 
 Specifically, this is most motivated by the, "Invalid descriptor index," error documented [here](https://github.com/r-dbi/odbc/issues/309 ).
 
@@ -20,6 +20,8 @@ Specifically, this is most motivated by the, "Invalid descriptor index," error d
 Given that the source of my motivation is encountering problems when working with data in Microsoft SQL Server databases, this investigation will be focused on how R interfaces with Microsoft SQL server.
 
 Additionally, I'm a relatively new R user and do all my R work in RStudio. I use the dplyr packageextensively so this will be centered on how dplyr interfaces with data held in a Microsoft SQL database.
+
+
 
 ## dplyr and dbplyr packages
 
@@ -50,9 +52,9 @@ DBI is, "middle-ware," between an interactive user, or other packages, and the d
 
 DBI itself is actually segments the connectivity to the database into a, "front-end," and a, "back-end."
 
-DBI implements a standardized front-end, and other components provide the back-end.
+DBI implements a standardized front-end, and other components act as drivers to interface with the specific back-end.
 
-Example back-ends include: 
+Example back-end packages include: 
 
 * RPostgres
 * RMariaDB
@@ -60,20 +62,33 @@ Example back-ends include:
 * odbc
 * bigrquery
 
-TODO: What front end functions does DBI provide?
+An example of front-end functionality provided by DBI...
+
+* connect/disconnect to the DBMS
+* create and execute statements in the DBMS
+* extract results/output from statements
+* error/exception handling
+* information (meta-data) from database objects
+* transaction management (optional)
+
+SOURCES: 
+* `vignette("DBI", package = "DBI")`
 
 ## odbc package
 
 The odbc package provides the DBI back-end to any odbc driver connection, including those for Microsoft SQL Server.
 
-TODO: what backend functions does odbc provide?
+TODO: what back-end functions does odbc provide?
+
+## ODBC drivers
+
 
 # Q and A
 
 * Q: What does is the implication of dbplyr having, or not having, translations for a specific database?
     + A: If dbplyr has the translation then data can be retrieved from a database using dplyr syntax, without the need to write SQL code. If dbplyr does not have translations, you will need to write the SQL code yourself and use DBI and odbc packages to send queries.
 
-Resources to read: 
+SOURCES and other Resources to read: 
 
 https://dbplyr.tidyverse.org/
 https://dbi.r-dbi.org/
