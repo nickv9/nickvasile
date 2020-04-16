@@ -72,6 +72,7 @@ An example of front-end functionality provided by DBI...
 * transaction management (optional)
 
 SOURCES: 
+
 * `vignette("DBI", package = "DBI")`
 
 ## odbc package
