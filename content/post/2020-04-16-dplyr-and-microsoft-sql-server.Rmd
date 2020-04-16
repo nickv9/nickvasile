@@ -21,8 +21,6 @@ Given that the source of my motivation is encountering problems when working wit
 
 Additionally, I'm a relatively new R user and do all my R work in RStudio. I use the dplyr packageextensively so this will be centered on how dplyr interfaces with data held in a Microsoft SQL database.
 
-
-
 ## dplyr and dbplyr packages
 
 dbplyr is the database back-end for dplyr - it does not need to be loaded explicitly, it is loaded by dplyr when working with data in a database.
@@ -99,4 +97,4 @@ https://dbi.r-dbi.org/
 
 https://github.com/r-dbi/DBI    
   
-Continue reading https://db.rstudio.com/overview - connecting to database.
+Continue reading https://db.rstudio.com/getting-started/database-queries Database Queries With R 
