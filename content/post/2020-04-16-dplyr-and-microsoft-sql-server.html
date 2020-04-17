@@ -34,14 +34,14 @@ tags: []
 <li>Amazon Redshift</li>
 </ul>
 <p>What, “translation,” means is that dplyr syntax can be used to retrieve data from a database system without the need to write SQL code.</p>
-<p>The DBI package is used by dplyr as an intermediary for connections with the database.</p>
+<p>The DBI package is used by dbplyr as an intermediary for connections with the database.</p>
 <p>Note that even if dbplyr does not contain translations for a specific database, DBI and odbc packages can be used to connect and the user can send raw SQL queries.</p>
 </div>
 <div id="dbi-package" class="section level2">
 <h2>DBI package</h2>
 <p>DBI package provides a consistent set of functions regardless of the database type being accessed.</p>
 <p>DBI is, “middle-ware,” between an interactive user, or other packages, and the database.</p>
-<p>DBI itself is actually segments the connectivity to the database into a, “front-end,” and a, “back-end.”</p>
+<p>DBI itself actually segments the connectivity to the database into a, “front-end,” and a, “back-end.”</p>
 <p>DBI implements a standardized front-end, and other components act as drivers to interface with the specific back-end.</p>
 <p>Example back-end packages include:</p>
 <ul>
@@ -63,6 +63,9 @@ tags: []
 <p>SOURCES:</p>
 <ul>
 <li><code>vignette("DBI", package = "DBI")</code></li>
+<li><a href="https://db.rstudio.com/getting-started/database-queries" class="uri">https://db.rstudio.com/getting-started/database-queries</a></li>
+<li><a href="https://www.r-consortium.org/blog/2017/05/15/improving-dbi-a-retrospect" class="uri">https://www.r-consortium.org/blog/2017/05/15/improving-dbi-a-retrospect</a></li>
+<li><code>vignette("spec",package="DBI")</code></li>
 </ul>
 </div>
 <div id="odbc-package" class="section level2">
@@ -80,8 +83,57 @@ tags: []
 <ul>
 <li>A: If dbplyr has the translation then data can be retrieved from a database using dplyr syntax, without the need to write SQL code. If dbplyr does not have translations, you will need to write the SQL code yourself and use DBI and odbc packages to send queries.</li>
 </ul></li>
-<li>Q: Does each “front-end” function in DBI have a “back-end” equivalent of the same name in odbc?</li>
+<li>Q: Does each “front-end” function in DBI have a “back-end” equivalent of the same name in odbc?’</li>
 </ul>
+<p>Let’s start by looking at the exports of each and comparing them.</p>
+<pre class="r"><code>library(DBI)</code></pre>
+<pre><code>## Warning: package &#39;DBI&#39; was built under R version 3.6.3</code></pre>
+<pre class="r"><code>library(odbc)</code></pre>
+<pre><code>## Warning: package &#39;odbc&#39; was built under R version 3.6.3</code></pre>
+<pre class="r"><code>dbi_exports &lt;- ls(&quot;package:DBI&quot;)
+
+odbc_exports &lt;- ls(&quot;package:odbc&quot;)</code></pre>
+<p>functions exported by DBI, not exported by odbc…</p>
+<pre class="r"><code>setdiff(dbi_exports, odbc_exports)</code></pre>
+<pre><code>##  [1] &quot;ANSI&quot;                   &quot;dbAppendTable&quot;          &quot;dbBreak&quot;               
+##  [4] &quot;dbCallProc&quot;             &quot;dbCanConnect&quot;           &quot;dbCreateTable&quot;         
+##  [7] &quot;dbDriver&quot;               &quot;dbExecute&quot;              &quot;dbGetConnectArgs&quot;      
+## [10] &quot;dbGetDBIVersion&quot;        &quot;dbGetException&quot;         &quot;dbIsReadOnly&quot;          
+## [13] &quot;dbListConnections&quot;      &quot;dbListObjects&quot;          &quot;dbListResults&quot;         
+## [16] &quot;dbQuoteLiteral&quot;         &quot;dbReadTable&quot;            &quot;dbSetDataMappings&quot;     
+## [19] &quot;dbUnloadDriver&quot;         &quot;dbUnquoteIdentifier&quot;    &quot;dbWithTransaction&quot;     
+## [22] &quot;fetch&quot;                  &quot;Id&quot;                     &quot;isSQLKeyword&quot;          
+## [25] &quot;isSQLKeyword.default&quot;   &quot;make.db.names&quot;          &quot;make.db.names.default&quot; 
+## [28] &quot;SQL&quot;                    &quot;sqlAppendTable&quot;         &quot;sqlAppendTableTemplate&quot;
+## [31] &quot;sqlColumnToRownames&quot;    &quot;sqlCommentSpec&quot;         &quot;sqlInterpolate&quot;        
+## [34] &quot;SQLKeywords&quot;            &quot;sqlParseVariables&quot;      &quot;sqlParseVariablesImpl&quot; 
+## [37] &quot;sqlQuoteSpec&quot;           &quot;sqlRownamesToColumn&quot;</code></pre>
+<p>Well, quite a few! So the short answer is, “no,” there are functions in DBI that are not present in odbc.</p>
+<p>Given that some of these start with db*, lends me to believe that not all DBI back-ends implement all DBI front-ends.</p>
+<p>What about functions exported by odbc, that are not also present in DBI?</p>
+<pre class="r"><code>setdiff(odbc_exports, dbi_exports)</code></pre>
+<pre><code>##  [1] &quot;odbc&quot;                             &quot;odbcConnectionActions&quot;           
+##  [3] &quot;odbcConnectionColumns&quot;            &quot;odbcConnectionIcon&quot;              
+##  [5] &quot;odbcDataType&quot;                     &quot;odbcListColumns&quot;                 
+##  [7] &quot;odbcListDataSources&quot;              &quot;odbcListDrivers&quot;                 
+##  [9] &quot;odbcListObjects&quot;                  &quot;odbcListObjectTypes&quot;             
+## [11] &quot;odbcPreviewObject&quot;                &quot;odbcSetTransactionIsolationLevel&quot;</code></pre>
+<p>Well much fewer. It seems logical to me that back-end packages would have their own unique functions so I am not suprised.</p>
+<p>TODO: <code>odbcConnectionColumns</code>, <code>odbcDataType</code> , <code>odbcListColumns</code>, <code>odbcListObjectTypes</code> could be interesting in regards to exploring data types for the, “Invalid Descriptor Object,” error.</p>
+<p>What about what is exported by both packages?</p>
+<pre class="r"><code>intersect(dbi_exports, odbc_exports)</code></pre>
+<pre><code>##  [1] &quot;dbBegin&quot;           &quot;dbBind&quot;            &quot;dbClearResult&quot;    
+##  [4] &quot;dbColumnInfo&quot;      &quot;dbCommit&quot;          &quot;dbConnect&quot;        
+##  [7] &quot;dbDataType&quot;        &quot;dbDisconnect&quot;      &quot;dbExistsTable&quot;    
+## [10] &quot;dbFetch&quot;           &quot;dbGetInfo&quot;         &quot;dbGetQuery&quot;       
+## [13] &quot;dbGetRowCount&quot;     &quot;dbGetRowsAffected&quot; &quot;dbGetStatement&quot;   
+## [16] &quot;dbHasCompleted&quot;    &quot;dbIsValid&quot;         &quot;dbListFields&quot;     
+## [19] &quot;dbListTables&quot;      &quot;dbQuoteIdentifier&quot; &quot;dbQuoteString&quot;    
+## [22] &quot;dbRemoveTable&quot;     &quot;dbRollback&quot;        &quot;dbSendQuery&quot;      
+## [25] &quot;dbSendStatement&quot;   &quot;dbWriteTable&quot;      &quot;show&quot;             
+## [28] &quot;sqlCreateTable&quot;    &quot;sqlData&quot;</code></pre>
+<p>Looks like common functions all start with either db* or sql*, with the excption of <code>show()</code></p>
+<p>TODO: <code>dbColumnInfo()</code>, <code>dbDataType()</code>, <code>dbGetInfo()</code>, <code>dbListFields()</code></p>
 <p>SOURCES and other Resources to read:</p>
 <p><a href="https://dbplyr.tidyverse.org/" class="uri">https://dbplyr.tidyverse.org/</a>
 <a href="https://dbi.r-dbi.org/" class="uri">https://dbi.r-dbi.org/</a></p>

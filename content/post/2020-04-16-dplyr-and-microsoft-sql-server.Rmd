@@ -38,7 +38,7 @@ dbplyr has translations for the following database systems:
 
 What, "translation," means is that dplyr syntax can be used to retrieve data from a database system without the need to write SQL code.
 
-The DBI package is used by dplyr as an intermediary for connections with the database.
+The DBI package is used by dbplyr as an intermediary for connections with the database.
 
 Note that even if dbplyr does not contain translations for a specific database, DBI and odbc packages can be used to connect and the user can send raw SQL queries. 
 
@@ -48,7 +48,7 @@ DBI package provides a consistent set of functions regardless of the database ty
 
 DBI is, "middle-ware," between an interactive user, or other packages, and the database.
 
-DBI itself is actually segments the connectivity to the database into a, "front-end," and a, "back-end."
+DBI itself actually segments the connectivity to the database into a, "front-end," and a, "back-end."
 
 DBI implements a standardized front-end, and other components act as drivers to interface with the specific back-end.
 
@@ -72,6 +72,9 @@ An example of front-end functionality provided by DBI...
 SOURCES: 
 
 * `vignette("DBI", package = "DBI")`
+* https://db.rstudio.com/getting-started/database-queries 
+* https://www.r-consortium.org/blog/2017/05/15/improving-dbi-a-retrospect
+* `vignette("spec",package="DBI")`
 
 ## odbc package
 
@@ -87,8 +90,48 @@ TODO: what back-end functions does odbc provide?
 * Q: What does is the implication of dbplyr having, or not having, translations for a specific database?
     + A: If dbplyr has the translation then data can be retrieved from a database using dplyr syntax, without the need to write SQL code. If dbplyr does not have translations, you will need to write the SQL code yourself and use DBI and odbc packages to send queries.
 
-* Q: Does each "front-end" function in DBI have a "back-end" equivalent of the same name in odbc?
+* Q: Does each "front-end" function in DBI have a "back-end" equivalent of the same name in odbc?'
 
+Let's start by looking at the exports of each and comparing them.
+
+```{r}
+library(DBI)
+library(odbc)
+
+dbi_exports <- ls("package:DBI")
+
+odbc_exports <- ls("package:odbc")
+```
+
+functions exported by DBI, not exported by odbc...
+
+```{r}
+setdiff(dbi_exports, odbc_exports)
+```
+
+Well, quite a few! So the short answer is, "no," there are functions in DBI that are not present in odbc. 
+
+Given that some of these start with db*, lends me to believe that not all DBI back-ends implement all DBI front-ends.
+
+What about functions exported by odbc, that are not also present in DBI?
+
+```{r}
+setdiff(odbc_exports, dbi_exports)
+```
+
+Well much fewer. It seems logical to me that back-end packages would have their own unique functions so I am not suprised.
+
+TODO:  `odbcConnectionColumns`, `odbcDataType` , `odbcListColumns`, `odbcListObjectTypes` could be interesting in regards to exploring data types for the, "Invalid Descriptor Object," error.
+
+What about what is exported by both packages?
+
+```{r}
+intersect(dbi_exports, odbc_exports)
+```
+
+Looks like common functions all start with either db* or sql*, with the excption of `show()`
+
+TODO: `dbColumnInfo()`, `dbDataType()`, `dbGetInfo()`, `dbListFields()`
 
 SOURCES and other Resources to read: 
 
