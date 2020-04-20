@@ -634,3 +634,9 @@ odbc::odbcConnectionColumns(con, "table_name")
 odbc::odbcListColumns(con, table = "table_name")
 ```
 
+## Get just the column names
+
+```{r,eval = FALSE}
+DBI::dbListFields(con, "table_name")
+```
+

@@ -61,6 +61,7 @@ vignette: >
 <li><a href="#one-plot-for-each-attribute-in-a-data-frame---different-scale-for-each-attribute">One plot for each attribute in a data frame - different scale for each attribute</a></li>
 <li><a href="#get-detailed-information-for-each-column-in-a-database-table">Get detailed information for each column in a database table</a></li>
 <li><a href="#get-just-the-columns-and-datatypes-for-each-column-in-a-database-table">Get just the columns and datatypes for each column in a database table</a></li>
+<li><a href="#get-just-the-column-names">Get just the column names</a></li>
 </ul>
 </div>
 
@@ -1096,4 +1097,8 @@ str(n_mtcars$data)
 <div id="get-just-the-columns-and-datatypes-for-each-column-in-a-database-table" class="section level2">
 <h2>Get just the columns and datatypes for each column in a database table</h2>
 <pre class="r"><code>odbc::odbcListColumns(con, table = &quot;table_name&quot;)</code></pre>
+</div>
+<div id="get-just-the-column-names" class="section level2">
+<h2>Get just the column names</h2>
+<pre class="r"><code>DBI::dbListFields(con, &quot;table_name&quot;)</code></pre>
 </div>
