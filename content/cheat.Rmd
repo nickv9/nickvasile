@@ -622,3 +622,15 @@ datasets::airquality %>%
     ggplot2::facet_grid(attribute ~ ., scales = "free")
 ```
 
+## Get detailed information for each column in a database table
+
+```{r, eval = FALSE}
+odbc::odbcConnectionColumns(con, "table_name")
+```
+
+## Get just the columns and datatypes for each column in a database table
+
+```{r, eval = FALSE}
+odbc::odbcListColumns(con, table = "table_name")
+```
+
