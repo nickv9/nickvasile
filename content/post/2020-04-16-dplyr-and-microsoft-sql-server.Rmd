@@ -135,8 +135,19 @@ What I do see in odbc are entries like these..
 
 ![](/post/2020-04-16-dplyr-and-microsoft-sql-server_files/odbc_pure_virtual_functions.png)
 
+Notice the description for the help says
 
-TODO: `dbColumnInfo()`, `dbDataType()`, `dbGetInfo()`, `dbListFields()`
+> Implementations of pure virtual functions defined in the DBI package for OdbcConnection objects.
+
+According to [this article](https://techdifferences.com/difference-between-virtual-function-and-pure-virtual-function.html):
+
+> The main difference between ‘virtual function’ and ‘pure virtual function’ is that ‘virtual function’ has its definition in the base class and also the inheriting derived classes redefine it.
+
+What I *think* this is saying is that odbc is implementing pure virtual functions dictated by DBI. 
+
+I didn't check them all but a quick spot-check of the overlapping db* functions indicates they may all be pure virtual functions, to be implemented in a back-end. 
+
+The question is, where are these actually implemented - TODO: I assume in the odbc driver - but how to validate this assumption?
 
 SOURCES and other Resources to read: 
 
