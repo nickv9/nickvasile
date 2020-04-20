@@ -119,7 +119,6 @@ odbc_exports &lt;- ls(&quot;package:odbc&quot;)</code></pre>
 ##  [9] &quot;odbcListObjects&quot;                  &quot;odbcListObjectTypes&quot;             
 ## [11] &quot;odbcPreviewObject&quot;                &quot;odbcSetTransactionIsolationLevel&quot;</code></pre>
 <p>Well much fewer. It seems logical to me that back-end packages would have their own unique functions so I am not suprised.</p>
-<p>TODO: <code>odbcConnectionColumns</code>, <code>odbcDataType</code> , <code>odbcListColumns</code>, <code>odbcListObjectTypes</code> could be interesting in regards to exploring data types for the, “Invalid Descriptor Object,” error.</p>
 <p>What about what is exported by both packages?</p>
 <pre class="r"><code>intersect(dbi_exports, odbc_exports)</code></pre>
 <pre><code>##  [1] &quot;dbBegin&quot;           &quot;dbBind&quot;            &quot;dbClearResult&quot;    
@@ -133,6 +132,9 @@ odbc_exports &lt;- ls(&quot;package:odbc&quot;)</code></pre>
 ## [25] &quot;dbSendStatement&quot;   &quot;dbWriteTable&quot;      &quot;show&quot;             
 ## [28] &quot;sqlCreateTable&quot;    &quot;sqlData&quot;</code></pre>
 <p>Looks like common functions all start with either db* or sql*, with the excption of <code>show()</code></p>
+<p>Note that when I check odbc for the db* functions I don’t actually see them - but I do see them in DBI.</p>
+<p>What I do see in odbc are entries like these..</p>
+<p><img src="/post/2020-04-16-dplyr-and-microsoft-sql-server_files/odbc_pure_virtual_functions.png" /></p>
 <p>TODO: <code>dbColumnInfo()</code>, <code>dbDataType()</code>, <code>dbGetInfo()</code>, <code>dbListFields()</code></p>
 <p>SOURCES and other Resources to read:</p>
 <p><a href="https://dbplyr.tidyverse.org/" class="uri">https://dbplyr.tidyverse.org/</a>

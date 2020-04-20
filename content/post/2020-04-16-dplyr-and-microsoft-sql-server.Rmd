@@ -121,8 +121,6 @@ setdiff(odbc_exports, dbi_exports)
 
 Well much fewer. It seems logical to me that back-end packages would have their own unique functions so I am not suprised.
 
-TODO:  `odbcConnectionColumns`, `odbcDataType` , `odbcListColumns`, `odbcListObjectTypes` could be interesting in regards to exploring data types for the, "Invalid Descriptor Object," error.
-
 What about what is exported by both packages?
 
 ```{r}
@@ -130,6 +128,13 @@ intersect(dbi_exports, odbc_exports)
 ```
 
 Looks like common functions all start with either db* or sql*, with the excption of `show()`
+
+Note that when I check odbc for the db* functions I don't actually see them - but I do see them in DBI.
+
+What I do see in odbc are entries like these..
+
+![](/post/2020-04-16-dplyr-and-microsoft-sql-server_files/odbc_pure_virtual_functions.png)
+
 
 TODO: `dbColumnInfo()`, `dbDataType()`, `dbGetInfo()`, `dbListFields()`
 
