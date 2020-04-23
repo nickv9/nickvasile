@@ -146,9 +146,14 @@ odbc_exports &lt;- ls(&quot;package:odbc&quot;)</code></pre>
 <p>What I <em>think</em> this is saying is that odbc is implementing pure virtual functions dictated by DBI.</p>
 <p>I didn’t check them all but a quick spot-check of the overlapping db* functions indicates they may all be pure virtual functions, to be implemented in a back-end.</p>
 <p>The question is, where are these actually implemented - TODO: I assume in the odbc driver - but how to validate this assumption?</p>
-<p>SOURCES and other Resources to read:</p>
+<p>SOURCES and other Resources to read:
+Continue reading <a href="https://db.rstudio.com/dbi/" class="uri">https://db.rstudio.com/dbi/</a></p>
 <p><a href="https://dbplyr.tidyverse.org/" class="uri">https://dbplyr.tidyverse.org/</a>
 <a href="https://dbi.r-dbi.org/" class="uri">https://dbi.r-dbi.org/</a></p>
 <p><a href="https://github.com/r-dbi/DBI" class="uri">https://github.com/r-dbi/DBI</a></p>
-<p>Continue reading <a href="https://db.rstudio.com/getting-started/database-queries" class="uri">https://db.rstudio.com/getting-started/database-queries</a> Database Queries With R</p>
+<p>TODO: Hadleys recommended SQL learning resources for those with some familiarity (SOURCE: <a href="https://dbplyr.tidyverse.org/articles/dbplyr.html" class="uri">https://dbplyr.tidyverse.org/articles/dbplyr.html</a>):</p>
+<ul>
+<li><a href="https://www.sqlite.org/queryplanner.html" class="uri">https://www.sqlite.org/queryplanner.html</a></li>
+<li><a href="https://blog.jooq.org/2016/03/17/10-easy-steps-to-a-complete-understanding-of-sql/" class="uri">https://blog.jooq.org/2016/03/17/10-easy-steps-to-a-complete-understanding-of-sql/</a></li>
+</ul>
 </div>

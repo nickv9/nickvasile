@@ -150,10 +150,14 @@ I didn't check them all but a quick spot-check of the overlapping db* functions 
 The question is, where are these actually implemented - TODO: I assume in the odbc driver - but how to validate this assumption?
 
 SOURCES and other Resources to read: 
+Continue reading https://db.rstudio.com/dbi/ 
 
 https://dbplyr.tidyverse.org/
 https://dbi.r-dbi.org/
 
 https://github.com/r-dbi/DBI    
-  
-Continue reading https://db.rstudio.com/getting-started/database-queries Database Queries With R 
+
+TODO: Hadleys recommended SQL learning resources for those with some familiarity  (SOURCE: https://dbplyr.tidyverse.org/articles/dbplyr.html):
+
+* https://www.sqlite.org/queryplanner.html
+* https://blog.jooq.org/2016/03/17/10-easy-steps-to-a-complete-understanding-of-sql/
