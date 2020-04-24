@@ -71,7 +71,9 @@ tags: []
 <div id="odbc-package" class="section level2">
 <h2>odbc package</h2>
 <p>The odbc package provides the DBI back-end to any odbc driver connection, including those for Microsoft SQL Server.</p>
+<p>This enables a connection to any database with ODBC drivers available.</p>
 <p>TODO: what back-end functions does odbc provide?</p>
+<p>SOURCE: <a href="https://db.rstudio.com/odbc/" class="uri">https://db.rstudio.com/odbc/</a></p>
 </div>
 <div id="odbc-drivers" class="section level2">
 <h2>ODBC drivers</h2>
@@ -132,7 +134,7 @@ odbc_exports &lt;- ls(&quot;package:odbc&quot;)</code></pre>
 ## [25] &quot;dbSendStatement&quot;   &quot;dbWriteTable&quot;      &quot;show&quot;             
 ## [28] &quot;sqlCreateTable&quot;    &quot;sqlData&quot;</code></pre>
 <p>Looks like common functions all start with either db* or sql*, with the excption of <code>show()</code></p>
-<p>Note that when I check odbc for the db* functions I don’t actually see them - but I do see them in DBI.</p>
+<p>Note that when I check odbc for some of the db* functions, like dbBegin I don’t actually see them - but I do see them in DBI. I do see both <code>DBI::dbCOnnect()</code> and <code>odbc::dbConnect()</code>.</p>
 <p>What I do see in odbc are entries like these..</p>
 <p><img src="/post/2020-04-16-dplyr-and-microsoft-sql-server_files/odbc_pure_virtual_functions.png" /></p>
 <p>Notice the description for the help says</p>
@@ -147,9 +149,8 @@ odbc_exports &lt;- ls(&quot;package:odbc&quot;)</code></pre>
 <p>I didn’t check them all but a quick spot-check of the overlapping db* functions indicates they may all be pure virtual functions, to be implemented in a back-end.</p>
 <p>The question is, where are these actually implemented - TODO: I assume in the odbc driver - but how to validate this assumption?</p>
 <p>SOURCES and other Resources to read:
-Continue reading <a href="https://db.rstudio.com/dbi/" class="uri">https://db.rstudio.com/dbi/</a></p>
-<p><a href="https://dbplyr.tidyverse.org/" class="uri">https://dbplyr.tidyverse.org/</a>
-<a href="https://dbi.r-dbi.org/" class="uri">https://dbi.r-dbi.org/</a></p>
+Read <a href="https://dbi.r-dbi.org/" class="uri">https://dbi.r-dbi.org/</a></p>
+<p><a href="https://dbplyr.tidyverse.org/" class="uri">https://dbplyr.tidyverse.org/</a></p>
 <p><a href="https://github.com/r-dbi/DBI" class="uri">https://github.com/r-dbi/DBI</a></p>
 <p>TODO: Hadleys recommended SQL learning resources for those with some familiarity (SOURCE: <a href="https://dbplyr.tidyverse.org/articles/dbplyr.html" class="uri">https://dbplyr.tidyverse.org/articles/dbplyr.html</a>):</p>
 <ul>

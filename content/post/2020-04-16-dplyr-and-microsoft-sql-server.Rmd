@@ -80,7 +80,11 @@ SOURCES:
 
 The odbc package provides the DBI back-end to any odbc driver connection, including those for Microsoft SQL Server.
 
+This enables a connection to any database with ODBC drivers available.
+
 TODO: what back-end functions does odbc provide?
+
+SOURCE: https://db.rstudio.com/odbc/ 
 
 ## ODBC drivers
 
@@ -129,7 +133,7 @@ intersect(dbi_exports, odbc_exports)
 
 Looks like common functions all start with either db* or sql*, with the excption of `show()`
 
-Note that when I check odbc for the db* functions I don't actually see them - but I do see them in DBI.
+Note that when I check odbc for some of the db* functions, like dbBegin I don't actually see them - but I do see them in DBI. I do see both `DBI::dbCOnnect()` and `odbc::dbConnect()`.
 
 What I do see in odbc are entries like these..
 
@@ -150,10 +154,10 @@ I didn't check them all but a quick spot-check of the overlapping db* functions 
 The question is, where are these actually implemented - TODO: I assume in the odbc driver - but how to validate this assumption?
 
 SOURCES and other Resources to read: 
-Continue reading https://db.rstudio.com/dbi/ 
+Read  https://dbi.r-dbi.org/
+
 
 https://dbplyr.tidyverse.org/
-https://dbi.r-dbi.org/
 
 https://github.com/r-dbi/DBI    
 
