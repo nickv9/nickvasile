@@ -148,6 +148,7 @@ odbc_exports &lt;- ls(&quot;package:odbc&quot;)</code></pre>
 <p>What I <em>think</em> this is saying is that odbc is implementing pure virtual functions dictated by DBI.</p>
 <p>I didn’t check them all but a quick spot-check of the overlapping db* functions indicates they may all be pure virtual functions, to be implemented in a back-end.</p>
 <p>The question is, where are these actually implemented - TODO: I assume in the odbc driver - but how to validate this assumption?</p>
+<p>READ NEXT: continue reading <a href="https://db.rstudio.com/best-practices/" class="uri">https://db.rstudio.com/best-practices/</a></p>
 <p>SOURCES and other Resources to read:
 Read <a href="https://dbi.r-dbi.org/" class="uri">https://dbi.r-dbi.org/</a></p>
 <p><a href="https://dbplyr.tidyverse.org/" class="uri">https://dbplyr.tidyverse.org/</a></p>

@@ -153,6 +153,8 @@ I didn't check them all but a quick spot-check of the overlapping db* functions 
 
 The question is, where are these actually implemented - TODO: I assume in the odbc driver - but how to validate this assumption?
 
+READ NEXT: continue reading https://db.rstudio.com/best-practices/ 
+
 SOURCES and other Resources to read: 
 Read  https://dbi.r-dbi.org/
 
