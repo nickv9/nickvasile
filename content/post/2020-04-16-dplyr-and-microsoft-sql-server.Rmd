@@ -153,15 +153,12 @@ I didn't check them all but a quick spot-check of the overlapping db* functions 
 
 The question is, where are these actually implemented - TODO: I assume in the odbc driver - but how to validate this assumption?
 
-READ NEXT: continue reading https://db.rstudio.com/best-practices/ 
+READ NEXT: https://dbi.r-dbi.org/ 
 
 SOURCES and other Resources to read: 
-Read  https://dbi.r-dbi.org/
-
-
-https://dbplyr.tidyverse.org/
-
+Read  
 https://github.com/r-dbi/DBI    
+https://dbplyr.tidyverse.org/
 
 TODO: Hadleys recommended SQL learning resources for those with some familiarity  (SOURCE: https://dbplyr.tidyverse.org/articles/dbplyr.html):
 
