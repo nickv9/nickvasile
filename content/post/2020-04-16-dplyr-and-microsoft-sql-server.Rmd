@@ -1,5 +1,5 @@
 ---
-title: dplyr and Microsoft SQL Server
+title: How the dplyr, dbplyr, DBI and odbc packages work together to bring data stored in Microsoft SQL Server databases into R
 author: Nicholas Vasile
 date: '2020-04-16'
 slug: dplyr-and-microsoft-sql-server
@@ -11,30 +11,23 @@ tags: []
 
 ## Motivation
 
-I use R to access data held in Microsoft SQL Server databases on a daily basis. As a result of running into problems, I've realized I don't have an understanding of the specific roles different components, notably dbplyr, odbc and dbi each play in the process. As a result, resolving or mitigating issues is often an inefficient combination of Google searches and trial and error. Additionally, as I find or develop workarounds, I am unwilling to promote them with others because I don't fully understand the cause of the issue and, as a result, I am not confident I have addressed the problem at the appropriate level. 
+I use R to access data held in Microsoft SQL Server databases on a daily basis. As a result of running into problems, I've realized I don't have an understanding of the specific roles different components, notably dplyr, dbplyr, odbc and dbi each play in the process. As a result, resolving or mitigating issues is often an inefficient combination of Google searches and trial and error. Additionally, as I find or develop workarounds, I am unwilling to promote them with others because I don't fully understand the cause of the issue and, as a result, I am not confident I have addressed the problem at the appropriate level. 
 
 Specifically, this is most motivated by the, "Invalid descriptor index," error documented [here](https://github.com/r-dbi/odbc/issues/309 ).
 
 ## Scope
 
-Given that the source of my motivation is encountering problems when working with data in Microsoft SQL Server databases, this investigation will be focused on how R interfaces with Microsoft SQL server.
+Given that the source of my motivation is encountering problems when working with data in Microsoft SQL Server databases, and that I prefer to use packages in the tidyverse, this investigation will be focused on how these packages work together to collect data from databases managed by Microsoft SQL server.
 
-Additionally, I'm a relatively new R user and do all my R work in RStudio. I use the dplyr packageextensively so this will be centered on how dplyr interfaces with data held in a Microsoft SQL database.
+I won't be writing about other options like RODBC, RJDBC or database-specific package.
+
+I will also not include comments about satabase management systems (DBMS) other than Microsoft SQL Server.
 
 ## dplyr and dbplyr packages
 
 dbplyr is the database back-end for dplyr - it does not need to be loaded explicitly, it is loaded by dplyr when working with data in a database.
 
-dbplyr translates dplyr code into vendor specific SQL. 
-
-dbplyr has translations for the following database systems:
-
-* Microsoft SQL Server
-* Oracle
-* Apache Hive
-* Apache Impala
-* PostgreSQL
-* Amazon Redshift
+dbplyr translates dplyr code into Microsoft SQL Server specific SQL. 
 
 What, "translation," means is that dplyr syntax can be used to retrieve data from a database system without the need to write SQL code.
 
@@ -50,15 +43,8 @@ DBI is, "middle-ware," between an interactive user, or other packages, and the d
 
 DBI itself actually segments the connectivity to the database into a, "front-end," and a, "back-end."
 
-DBI implements a standardized front-end, and other components act as drivers to interface with the specific back-end.
+DBI implements a standardized front-end, and the odbc package acts as a driver to interface with SQL Server.
 
-Example back-end packages include: 
-
-* RPostgres
-* RMariaDB
-* RSQLite
-* odbc
-* bigrquery
 
 An example of front-end functionality provided by DBI...
 
@@ -153,11 +139,14 @@ I didn't check them all but a quick spot-check of the overlapping db* functions 
 
 The question is, where are these actually implemented - TODO: I assume in the odbc driver - but how to validate this assumption?
 
-READ NEXT: https://dbi.r-dbi.org/ 
+READ NEXT:     
 
 SOURCES and other Resources to read: 
-Read  
-https://github.com/r-dbi/DBI    
+To Read  
+
+Read: 
+https://dbi.r-dbi.org/ 
+https://github.com/r-dbi/DBI
 https://dbplyr.tidyverse.org/
 
 TODO: Hadleys recommended SQL learning resources for those with some familiarity  (SOURCE: https://dbplyr.tidyverse.org/articles/dbplyr.html):
