@@ -19,7 +19,7 @@ I am writing what I learn to solidly my thinking and to help others who may expe
 
 Given that the source of my motivation is encountering problems when working with data in Microsoft SQL Server databases, and that I prefer to use packages in the tidyverse, this investigation will be focused on how these packages work together to collect data from databases managed by Microsoft SQL server.
 
-I won't be writing about other options like RODBC, RJDBC or database-specific package.
+I won't be writing about other options like RODBC, RJDBC or database-specific packages.
 
 I will also not include comments about database management systems (DBMS) other than Microsoft SQL Server.
 
