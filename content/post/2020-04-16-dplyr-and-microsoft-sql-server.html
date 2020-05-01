@@ -9,139 +9,74 @@ tags: []
 
 
 
-<p><strong>This post is a work in progress</strong></p>
 <div id="motivation" class="section level2">
 <h2>Motivation</h2>
-<p>I use R to access data held in Microsoft SQL Server databases on a daily basis. As a result of running into problems, I’ve realized I don’t have an understanding of the specific roles different components, notably dplyr, dbplyr, odbc and dbi each play in the process. As a result, resolving or mitigating issues is often an inefficient combination of Google searches and trial and error. Additionally, as I find or develop workarounds, I am unwilling to promote them with others because I don’t fully understand the cause of the issue and, as a result, I am not confident I have addressed the problem at the appropriate level.</p>
+<p>I use R to access data held in Microsoft SQL Server databases on a daily basis. As a result of running into problems, I’ve realized I don’t have an understanding of the roles different components, notably dplyr, dbplyr, odbc and dbi each play in the process. This contributes to the fact that my efforts to resolve or mitigate issues are often an inefficient combination of Google searches and trial and error. Additionally, as I find or develop workarounds, I am unwilling to promote them with others because I don’t fully understand the cause of the issue and, as a result, I am not confident I have addressed the problem at the appropriate level.</p>
 <p>Specifically, this is most motivated by the, “Invalid descriptor index,” error documented <a href="https://github.com/r-dbi/odbc/issues/309">here</a>.</p>
+<p>I am writing what I learn to solidly my thinking and to help others who may experience the same challenge.</p>
 </div>
 <div id="scope" class="section level2">
 <h2>Scope</h2>
 <p>Given that the source of my motivation is encountering problems when working with data in Microsoft SQL Server databases, and that I prefer to use packages in the tidyverse, this investigation will be focused on how these packages work together to collect data from databases managed by Microsoft SQL server.</p>
 <p>I won’t be writing about other options like RODBC, RJDBC or database-specific package.</p>
-<p>I will also not include comments about satabase management systems (DBMS) other than Microsoft SQL Server.</p>
+<p>I will also not include comments about database management systems (DBMS) other than Microsoft SQL Server.</p>
+<p>While it’s possible to generalize many of the concepts I write about here to other DBMS systems, I will not explicitly call them out. There are plenty of resources that do that. I aim to be very focused on how these components interact in a tidyverse and Microsoft SQL Server environment in the hopes it will help paint a simpler, clearer picture for others working in that same configuration.</p>
+<p>Additionally, I almost never write data to a DBMS, and I suspect this is the case for many people working as analysts in Enterprise environments. In light of that I will be focused on how these components work together to extract data from SQL, and not how they write data to it.</p>
 </div>
-<div id="dplyr-and-dbplyr-packages" class="section level2">
-<h2>dplyr and dbplyr packages</h2>
+<div id="role-of-dplyr-and-dbplyr-packages" class="section level2">
+<h2>Role of dplyr and dbplyr packages</h2>
 <p>dbplyr is the database back-end for dplyr - it does not need to be loaded explicitly, it is loaded by dplyr when working with data in a database.</p>
-<p>dbplyr translates dplyr code into Microsoft SQL Server specific SQL.</p>
-<p>What, “translation,” means is that dplyr syntax can be used to retrieve data from a database system without the need to write SQL code.</p>
-<p>The DBI package is used by dbplyr as an intermediary for connections with the database.</p>
-<p>Note that even if dbplyr does not contain translations for a specific database, DBI and odbc packages can be used to connect and the user can send raw SQL queries.</p>
+<p>dbplyr translates dplyr syntax into Microsoft SQL Server specific SQL code so dplyr can be used to retrieve data from a database system without the need to write SQL code.</p>
+<p>dbplyr relies on the DBI and odbc packages as an intermediaries for connections with a SQL Server database.</p>
+<p>Dplyr can also pass on explicitly written (not translated from dplyr) SQL code to DBI.</p>
+<p><strong>dbplyr generates, or captures, the SQL code that is then passed into the front-end of the database stack provided by DBI, odbc and the ODBC driver</strong></p>
 </div>
-<div id="dbi-package" class="section level2">
-<h2>DBI package</h2>
-<p>DBI package provides a consistent set of functions regardless of the database type being accessed.</p>
-<p>DBI is, “middle-ware,” between an interactive user, or other packages, and the database.</p>
-<p>DBI itself actually segments the connectivity to the database into a, “front-end,” and a, “back-end.”</p>
-<p>DBI implements a standardized front-end, and the odbc package acts as a driver to interface with SQL Server.</p>
+<div id="role-of-the-dbi-package" class="section level2">
+<h2>Role of the DBI package</h2>
+<p>DBI segments the connectivity to the SQL database into a, “front-end,” and a, “back-end.”</p>
+<p>DBI implements a standardized front-end to dbplyr, and the odbc package acts as a driver for DBI to interface with SQL Server.</p>
 <p>An example of front-end functionality provided by DBI…</p>
 <ul>
-<li>connect/disconnect to the DBMS</li>
+<li>connect/disconnect to the database</li>
 <li>create and execute statements in the DBMS</li>
 <li>extract results/output from statements</li>
 <li>error/exception handling</li>
 <li>information (meta-data) from database objects</li>
 <li>transaction management (optional)</li>
 </ul>
-<p>SOURCES:</p>
-<ul>
-<li><code>vignette("DBI", package = "DBI")</code></li>
-<li><a href="https://db.rstudio.com/getting-started/database-queries" class="uri">https://db.rstudio.com/getting-started/database-queries</a></li>
-<li><a href="https://www.r-consortium.org/blog/2017/05/15/improving-dbi-a-retrospect" class="uri">https://www.r-consortium.org/blog/2017/05/15/improving-dbi-a-retrospect</a></li>
-<li><code>vignette("spec",package="DBI")</code></li>
-</ul>
+<p><strong>I think of the DBI package as the front end for interactive user at the R console, a script or package, into the other components, odbc and an ODBC driver, that make it possible to extract data from SQL server.</strong></p>
 </div>
-<div id="odbc-package" class="section level2">
-<h2>odbc package</h2>
+<div id="role-of-the-odbc-package" class="section level2">
+<h2>Role of the odbc package</h2>
 <p>The odbc package provides the DBI back-end to any odbc driver connection, including those for Microsoft SQL Server.</p>
 <p>This enables a connection to any database with ODBC drivers available.</p>
-<p>TODO: what back-end functions does odbc provide?</p>
-<p>SOURCE: <a href="https://db.rstudio.com/odbc/" class="uri">https://db.rstudio.com/odbc/</a></p>
+<p><strong>I think of the odbc package as the “back-end” of DBI and the “front-end” into the ODBC driver.</strong></p>
 </div>
-<div id="odbc-drivers" class="section level2">
-<h2>ODBC drivers</h2>
+<div id="role-of-odbc-drivers" class="section level2">
+<h2>Role of ODBC drivers</h2>
+<p>Open Database Connectivity (ODBC) drivers are the last leg of the link between dplyr and SQL Server. They are what enable the odbc package to interface with SQL server.</p>
+<p><strong>I think of the SQL Server ODBC driver as the “front-end” into SQL server, and again, back to the user, script or package</strong></p>
 </div>
-<div id="q-and-a" class="section level1">
-<h1>Q and A</h1>
+<div id="summary" class="section level2">
+<h2>Summary</h2>
 <ul>
-<li>Q: What does is the implication of dbplyr having, or not having, translations for a specific database?
-<ul>
-<li>A: If dbplyr has the translation then data can be retrieved from a database using dplyr syntax, without the need to write SQL code. If dbplyr does not have translations, you will need to write the SQL code yourself and use DBI and odbc packages to send queries.</li>
-</ul></li>
-<li>Q: Does each “front-end” function in DBI have a “back-end” equivalent of the same name in odbc?’</li>
+<li>Dbplyr translates dplyr syntax into SQL code, or captures explicitly written SQL, and hands it off to DBI</li>
+<li>DBI uses odbc to interface with the SQL Server ODBC driver</li>
+<li>ODBC driver communicates with SQL server and retrieves results</li>
 </ul>
-<p>Let’s start by looking at the exports of each and comparing them.</p>
-<pre class="r"><code>library(DBI)</code></pre>
-<pre><code>## Warning: package &#39;DBI&#39; was built under R version 3.6.3</code></pre>
-<pre class="r"><code>library(odbc)</code></pre>
-<pre><code>## Warning: package &#39;odbc&#39; was built under R version 3.6.3</code></pre>
-<pre class="r"><code>dbi_exports &lt;- ls(&quot;package:DBI&quot;)
-
-odbc_exports &lt;- ls(&quot;package:odbc&quot;)</code></pre>
-<p>functions exported by DBI, not exported by odbc…</p>
-<pre class="r"><code>setdiff(dbi_exports, odbc_exports)</code></pre>
-<pre><code>##  [1] &quot;ANSI&quot;                   &quot;dbAppendTable&quot;          &quot;dbBreak&quot;               
-##  [4] &quot;dbCallProc&quot;             &quot;dbCanConnect&quot;           &quot;dbCreateTable&quot;         
-##  [7] &quot;dbDriver&quot;               &quot;dbExecute&quot;              &quot;dbGetConnectArgs&quot;      
-## [10] &quot;dbGetDBIVersion&quot;        &quot;dbGetException&quot;         &quot;dbIsReadOnly&quot;          
-## [13] &quot;dbListConnections&quot;      &quot;dbListObjects&quot;          &quot;dbListResults&quot;         
-## [16] &quot;dbQuoteLiteral&quot;         &quot;dbReadTable&quot;            &quot;dbSetDataMappings&quot;     
-## [19] &quot;dbUnloadDriver&quot;         &quot;dbUnquoteIdentifier&quot;    &quot;dbWithTransaction&quot;     
-## [22] &quot;fetch&quot;                  &quot;Id&quot;                     &quot;isSQLKeyword&quot;          
-## [25] &quot;isSQLKeyword.default&quot;   &quot;make.db.names&quot;          &quot;make.db.names.default&quot; 
-## [28] &quot;SQL&quot;                    &quot;sqlAppendTable&quot;         &quot;sqlAppendTableTemplate&quot;
-## [31] &quot;sqlColumnToRownames&quot;    &quot;sqlCommentSpec&quot;         &quot;sqlInterpolate&quot;        
-## [34] &quot;SQLKeywords&quot;            &quot;sqlParseVariables&quot;      &quot;sqlParseVariablesImpl&quot; 
-## [37] &quot;sqlQuoteSpec&quot;           &quot;sqlRownamesToColumn&quot;</code></pre>
-<p>Well, quite a few! So the short answer is, “no,” there are functions in DBI that are not present in odbc.</p>
-<p>Given that some of these start with db*, lends me to believe that not all DBI back-ends implement all DBI front-ends.</p>
-<p>What about functions exported by odbc, that are not also present in DBI?</p>
-<pre class="r"><code>setdiff(odbc_exports, dbi_exports)</code></pre>
-<pre><code>##  [1] &quot;odbc&quot;                             &quot;odbcConnectionActions&quot;           
-##  [3] &quot;odbcConnectionColumns&quot;            &quot;odbcConnectionIcon&quot;              
-##  [5] &quot;odbcDataType&quot;                     &quot;odbcListColumns&quot;                 
-##  [7] &quot;odbcListDataSources&quot;              &quot;odbcListDrivers&quot;                 
-##  [9] &quot;odbcListObjects&quot;                  &quot;odbcListObjectTypes&quot;             
-## [11] &quot;odbcPreviewObject&quot;                &quot;odbcSetTransactionIsolationLevel&quot;</code></pre>
-<p>Well much fewer. It seems logical to me that back-end packages would have their own unique functions so I am not suprised.</p>
-<p>What about what is exported by both packages?</p>
-<pre class="r"><code>intersect(dbi_exports, odbc_exports)</code></pre>
-<pre><code>##  [1] &quot;dbBegin&quot;           &quot;dbBind&quot;            &quot;dbClearResult&quot;    
-##  [4] &quot;dbColumnInfo&quot;      &quot;dbCommit&quot;          &quot;dbConnect&quot;        
-##  [7] &quot;dbDataType&quot;        &quot;dbDisconnect&quot;      &quot;dbExistsTable&quot;    
-## [10] &quot;dbFetch&quot;           &quot;dbGetInfo&quot;         &quot;dbGetQuery&quot;       
-## [13] &quot;dbGetRowCount&quot;     &quot;dbGetRowsAffected&quot; &quot;dbGetStatement&quot;   
-## [16] &quot;dbHasCompleted&quot;    &quot;dbIsValid&quot;         &quot;dbListFields&quot;     
-## [19] &quot;dbListTables&quot;      &quot;dbQuoteIdentifier&quot; &quot;dbQuoteString&quot;    
-## [22] &quot;dbRemoveTable&quot;     &quot;dbRollback&quot;        &quot;dbSendQuery&quot;      
-## [25] &quot;dbSendStatement&quot;   &quot;dbWriteTable&quot;      &quot;show&quot;             
-## [28] &quot;sqlCreateTable&quot;    &quot;sqlData&quot;</code></pre>
-<p>Looks like common functions all start with either db* or sql*, with the excption of <code>show()</code></p>
-<p>Note that when I check odbc for some of the db* functions, like dbBegin I don’t actually see them - but I do see them in DBI. I do see both <code>DBI::dbCOnnect()</code> and <code>odbc::dbConnect()</code>.</p>
-<p>What I do see in odbc are entries like these..</p>
-<p><img src="/post/2020-04-16-dplyr-and-microsoft-sql-server_files/odbc_pure_virtual_functions.png" /></p>
-<p>Notice the description for the help says</p>
-<blockquote>
-<p>Implementations of pure virtual functions defined in the DBI package for OdbcConnection objects.</p>
-</blockquote>
-<p>According to <a href="https://techdifferences.com/difference-between-virtual-function-and-pure-virtual-function.html">this article</a>:</p>
-<blockquote>
-<p>The main difference between ‘virtual function’ and ‘pure virtual function’ is that ‘virtual function’ has its definition in the base class and also the inheriting derived classes redefine it.</p>
-</blockquote>
-<p>What I <em>think</em> this is saying is that odbc is implementing pure virtual functions dictated by DBI.</p>
-<p>I didn’t check them all but a quick spot-check of the overlapping db* functions indicates they may all be pure virtual functions, to be implemented in a back-end.</p>
-<p>The question is, where are these actually implemented - TODO: I assume in the odbc driver - but how to validate this assumption?</p>
-<p>READ NEXT:</p>
-<p>SOURCES and other Resources to read:
-To Read</p>
-<p>Read:
-<a href="https://dbi.r-dbi.org/" class="uri">https://dbi.r-dbi.org/</a>
-<a href="https://github.com/r-dbi/DBI" class="uri">https://github.com/r-dbi/DBI</a>
-<a href="https://dbplyr.tidyverse.org/" class="uri">https://dbplyr.tidyverse.org/</a></p>
-<p>TODO: Hadleys recommended SQL learning resources for those with some familiarity (SOURCE: <a href="https://dbplyr.tidyverse.org/articles/dbplyr.html" class="uri">https://dbplyr.tidyverse.org/articles/dbplyr.html</a>):</p>
+<p>User or package code -&gt; DBI -&gt; odbc -&gt; SQL Server ODBC driver -&gt; SQL server</p>
+</div>
+<div id="sources-and-notes" class="section level2">
+<h2>Sources and notes</h2>
+<p>I haven’t written anything new here, just focused it on the configuration I use day to day in the hopes it helps someone else.</p>
+<p>Most was gleaned from the following and I’d recommend reviewing them for a broader perspective, and deeper insights into specific areas:</p>
 <ul>
-<li><a href="https://www.sqlite.org/queryplanner.html" class="uri">https://www.sqlite.org/queryplanner.html</a></li>
-<li><a href="https://blog.jooq.org/2016/03/17/10-easy-steps-to-a-complete-understanding-of-sql/" class="uri">https://blog.jooq.org/2016/03/17/10-easy-steps-to-a-complete-understanding-of-sql/</a></li>
+<li><a href="https://db.rstudio.com" class="uri">https://db.rstudio.com</a></li>
+<li><a href="https://dbi.r-dbi.org/" class="uri">https://dbi.r-dbi.org/</a></li>
+<li><a href="https://github.com/r-dbi/DBI" class="uri">https://github.com/r-dbi/DBI</a></li>
+<li><a href="https://dbplyr.tidyverse.org/" class="uri">https://dbplyr.tidyverse.org/</a></li>
+<li><code>vignette("DBI", package = "DBI")</code></li>
+<li><code>vignette("dbplyr", "package = "dbplyr)</code></li>
+<li><a href="https://docs.microsoft.com/en-us/sql/odbc/microsoft-open-database-connectivity-odbc?redirectedfrom=MSDN&amp;view=sql-server-ver15" class="uri">https://docs.microsoft.com/en-us/sql/odbc/microsoft-open-database-connectivity-odbc?redirectedfrom=MSDN&amp;view=sql-server-ver15</a></li>
 </ul>
 </div>

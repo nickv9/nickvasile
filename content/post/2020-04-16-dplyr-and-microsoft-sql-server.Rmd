@@ -7,13 +7,13 @@ categories: []
 tags: []
 ---
 
-**This post is a work in progress**
-
 ## Motivation
 
-I use R to access data held in Microsoft SQL Server databases on a daily basis. As a result of running into problems, I've realized I don't have an understanding of the specific roles different components, notably dplyr, dbplyr, odbc and dbi each play in the process. As a result, resolving or mitigating issues is often an inefficient combination of Google searches and trial and error. Additionally, as I find or develop workarounds, I am unwilling to promote them with others because I don't fully understand the cause of the issue and, as a result, I am not confident I have addressed the problem at the appropriate level. 
+I use R to access data held in Microsoft SQL Server databases on a daily basis. As a result of running into problems, I've realized I don't have an understanding of the roles different components, notably dplyr, dbplyr, odbc and dbi each play in the process. This contributes to the fact that my efforts to resolve or mitigate issues are often an inefficient combination of Google searches and trial and error. Additionally, as I find or develop workarounds, I am unwilling to promote them with others because I don't fully understand the cause of the issue and, as a result, I am not confident I have addressed the problem at the appropriate level. 
 
 Specifically, this is most motivated by the, "Invalid descriptor index," error documented [here](https://github.com/r-dbi/odbc/issues/309 ).
+
+I am writing what I learn to solidly my thinking and to help others who may experience the same challenge.
 
 ## Scope
 
@@ -21,135 +21,73 @@ Given that the source of my motivation is encountering problems when working wit
 
 I won't be writing about other options like RODBC, RJDBC or database-specific package.
 
-I will also not include comments about satabase management systems (DBMS) other than Microsoft SQL Server.
+I will also not include comments about database management systems (DBMS) other than Microsoft SQL Server.
 
-## dplyr and dbplyr packages
+While it's possible to generalize many of the concepts I write about here to other DBMS systems, I will not explicitly call them out. There are plenty of resources that do that. I aim to be very focused on how these components interact in a tidyverse and Microsoft SQL Server environment in the hopes it will help paint a simpler, clearer picture for others working in that same configuration.
+
+Additionally, I almost never write data to a DBMS, and I suspect this is the case for many people working as analysts in Enterprise environments. In light of that I will be focused on how these components work together to extract data from SQL, and not how they write data to it.
+
+## Role of dplyr and dbplyr packages
 
 dbplyr is the database back-end for dplyr - it does not need to be loaded explicitly, it is loaded by dplyr when working with data in a database.
 
-dbplyr translates dplyr code into Microsoft SQL Server specific SQL. 
+dbplyr translates dplyr syntax into Microsoft SQL Server specific SQL code so dplyr can be used to retrieve data from a database system without the need to write SQL code.
 
-What, "translation," means is that dplyr syntax can be used to retrieve data from a database system without the need to write SQL code.
+dbplyr relies on the DBI and odbc packages as an intermediaries for connections with a SQL Server database.
 
-The DBI package is used by dbplyr as an intermediary for connections with the database.
+Dplyr can also pass on explicitly written (not translated from dplyr) SQL code to DBI.
 
-Note that even if dbplyr does not contain translations for a specific database, DBI and odbc packages can be used to connect and the user can send raw SQL queries. 
+**dbplyr generates, or captures, the SQL code that is then passed into the front-end of the database stack provided by DBI, odbc and the ODBC driver**
 
-## DBI package
+## Role of the DBI package
 
-DBI package provides a consistent set of functions regardless of the database type being accessed.
+DBI segments the connectivity to the SQL database into a, "front-end," and a, "back-end."
 
-DBI is, "middle-ware," between an interactive user, or other packages, and the database.
-
-DBI itself actually segments the connectivity to the database into a, "front-end," and a, "back-end."
-
-DBI implements a standardized front-end, and the odbc package acts as a driver to interface with SQL Server.
-
+DBI implements a standardized front-end to dbplyr, and the odbc package acts as a driver for DBI to interface with SQL Server.
 
 An example of front-end functionality provided by DBI...
 
-* connect/disconnect to the DBMS
+* connect/disconnect to the database
 * create and execute statements in the DBMS
 * extract results/output from statements
 * error/exception handling
 * information (meta-data) from database objects
 * transaction management (optional)
 
-SOURCES: 
+**I think of the DBI package as the front end for interactive user at the R console, a script or package, into the other components, odbc and an ODBC driver, that make it possible to extract data from SQL server.**
 
-* `vignette("DBI", package = "DBI")`
-* https://db.rstudio.com/getting-started/database-queries 
-* https://www.r-consortium.org/blog/2017/05/15/improving-dbi-a-retrospect
-* `vignette("spec",package="DBI")`
-
-## odbc package
+## Role of the odbc package
 
 The odbc package provides the DBI back-end to any odbc driver connection, including those for Microsoft SQL Server.
 
 This enables a connection to any database with ODBC drivers available.
 
-TODO: what back-end functions does odbc provide?
+**I think of the odbc package as the "back-end" of DBI and the "front-end" into the ODBC driver.**
 
-SOURCE: https://db.rstudio.com/odbc/ 
+## Role of ODBC drivers
 
-## ODBC drivers
+Open Database Connectivity (ODBC) drivers are the last leg of the link between dplyr and SQL Server. They are what enable the odbc package to interface with SQL server.
 
+**I think of the SQL Server ODBC driver as the "front-end" into SQL server, and again, back to the user, script or package**
 
-# Q and A
+## Summary
 
-* Q: What does is the implication of dbplyr having, or not having, translations for a specific database?
-    + A: If dbplyr has the translation then data can be retrieved from a database using dplyr syntax, without the need to write SQL code. If dbplyr does not have translations, you will need to write the SQL code yourself and use DBI and odbc packages to send queries.
+* Dbplyr translates dplyr syntax into SQL code, or captures explicitly written SQL, and hands it off to DBI
+* DBI uses odbc to interface with the SQL Server ODBC driver
+* ODBC driver communicates with SQL server and retrieves results
 
-* Q: Does each "front-end" function in DBI have a "back-end" equivalent of the same name in odbc?'
+User or package code -> DBI -> odbc -> SQL Server ODBC driver -> SQL server
 
-Let's start by looking at the exports of each and comparing them.
+## Sources and notes
 
-```{r}
-library(DBI)
-library(odbc)
+I haven't written anything new here, just focused it on the configuration I use day to day in the hopes it helps someone else.
 
-dbi_exports <- ls("package:DBI")
+Most was gleaned from the following and I'd recommend reviewing them for a broader perspective, and deeper insights into specific areas:
 
-odbc_exports <- ls("package:odbc")
-```
-
-functions exported by DBI, not exported by odbc...
-
-```{r}
-setdiff(dbi_exports, odbc_exports)
-```
-
-Well, quite a few! So the short answer is, "no," there are functions in DBI that are not present in odbc. 
-
-Given that some of these start with db*, lends me to believe that not all DBI back-ends implement all DBI front-ends.
-
-What about functions exported by odbc, that are not also present in DBI?
-
-```{r}
-setdiff(odbc_exports, dbi_exports)
-```
-
-Well much fewer. It seems logical to me that back-end packages would have their own unique functions so I am not suprised.
-
-What about what is exported by both packages?
-
-```{r}
-intersect(dbi_exports, odbc_exports)
-```
-
-Looks like common functions all start with either db* or sql*, with the excption of `show()`
-
-Note that when I check odbc for some of the db* functions, like dbBegin I don't actually see them - but I do see them in DBI. I do see both `DBI::dbCOnnect()` and `odbc::dbConnect()`.
-
-What I do see in odbc are entries like these..
-
-![](/post/2020-04-16-dplyr-and-microsoft-sql-server_files/odbc_pure_virtual_functions.png)
-
-Notice the description for the help says
-
-> Implementations of pure virtual functions defined in the DBI package for OdbcConnection objects.
-
-According to [this article](https://techdifferences.com/difference-between-virtual-function-and-pure-virtual-function.html):
-
-> The main difference between ‘virtual function’ and ‘pure virtual function’ is that ‘virtual function’ has its definition in the base class and also the inheriting derived classes redefine it.
-
-What I *think* this is saying is that odbc is implementing pure virtual functions dictated by DBI. 
-
-I didn't check them all but a quick spot-check of the overlapping db* functions indicates they may all be pure virtual functions, to be implemented in a back-end. 
-
-The question is, where are these actually implemented - TODO: I assume in the odbc driver - but how to validate this assumption?
-
-READ NEXT:     
-
-SOURCES and other Resources to read: 
-To Read  
-
-Read: 
-https://dbi.r-dbi.org/ 
-https://github.com/r-dbi/DBI
-https://dbplyr.tidyverse.org/
-
-TODO: Hadleys recommended SQL learning resources for those with some familiarity  (SOURCE: https://dbplyr.tidyverse.org/articles/dbplyr.html):
-
-* https://www.sqlite.org/queryplanner.html
-* https://blog.jooq.org/2016/03/17/10-easy-steps-to-a-complete-understanding-of-sql/
+* https://db.rstudio.com
+* https://dbi.r-dbi.org/
+* https://github.com/r-dbi/DBI
+* https://dbplyr.tidyverse.org/
+* `vignette("DBI", package = "DBI")`
+* `vignette("dbplyr", "package = "dbplyr)`
+* https://docs.microsoft.com/en-us/sql/odbc/microsoft-open-database-connectivity-odbc?redirectedfrom=MSDN&view=sql-server-ver15
