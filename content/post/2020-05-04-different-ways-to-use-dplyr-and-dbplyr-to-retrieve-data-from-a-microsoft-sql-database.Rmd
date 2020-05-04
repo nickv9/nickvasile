@@ -1,0 +1,40 @@
+---
+title: Options for using dplyr to retrieve data from a Microsoft SQL
+  Database
+author: 'Nick Vasile'
+date: '2020-05-04'
+slug: different-ways-to-use-dplyr-and-dbplyr-to-retrieve-data-from-a-microsoft-sql-database
+categories: []
+tags: []
+---
+
+**This post is a work in progress**
+
+## Motivation
+
+I use R to extract data held in Microsoft SQL Server databases on a daily basis. 
+
+When I first started I was confused by all the different ways to accomplish this task. I was a bit overwhelmed trying to choose the, "best," option given the specific job at hand.
+
+I want to share what the approaches I've landed on to solidly my thinking and to help others who may want a, "quck and dirty," list of options to get started with.
+
+## Scope 
+
+This post is about reading data from a database, not writing to one.
+
+I prefer to use packages in the tidyverse so this post will be focused on those  packages.
+
+While it's possible to generalize many of the concepts I write about here to other DBMS systems I will be focused exclusively on Microsoft SQL Server in the hopes this will provide simple, prescriptive guidance for those working in a similiar configuration.
+
+One last thing - these are a few options I populated my toolbox with. They have served me well over the past two years as an analyst in an enterprise enviroment, but are definately not the only options available.
+
+## Option 1: Use dplyr syntax and let dbplyr handle the rest
+
+### When I use this option
+
+
+### Example
+
+## Option 2: Write SQL syntax and have dplyr and dbplyr run the query
+
+## Option 3: Store the query in a text file and have dplyr and dbplyr run the query

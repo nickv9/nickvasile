@@ -1,0 +1,41 @@
+---
+title: Options for using dplyr to retrieve data from a Microsoft SQL
+  Database
+author: 'Nick Vasile'
+date: '2020-05-04'
+slug: different-ways-to-use-dplyr-and-dbplyr-to-retrieve-data-from-a-microsoft-sql-database
+categories: []
+tags: []
+---
+
+
+
+<p><strong>This post is a work in progress</strong></p>
+<div id="motivation" class="section level2">
+<h2>Motivation</h2>
+<p>I use R to extract data held in Microsoft SQL Server databases on a daily basis.</p>
+<p>When I first started I was confused by all the different ways to accomplish this task. I was a bit overwhelmed trying to choose the, “best,” option given the specific job at hand.</p>
+<p>I want to share what the approaches I’ve landed on to solidly my thinking and to help others who may want a, “quck and dirty,” list of options to get started with.</p>
+</div>
+<div id="scope" class="section level2">
+<h2>Scope</h2>
+<p>This post is about reading data from a database, not writing to one.</p>
+<p>I prefer to use packages in the tidyverse so this post will be focused on those packages.</p>
+<p>While it’s possible to generalize many of the concepts I write about here to other DBMS systems I will be focused exclusively on Microsoft SQL Server in the hopes this will provide simple, prescriptive guidance for those working in a similiar configuration.</p>
+<p>One last thing - these are a few options I populated my toolbox with. They have served me well over the past two years as an analyst in an enterprise enviroment, but are definately not the only options available.</p>
+</div>
+<div id="option-1-use-dplyr-syntax-and-let-dbplyr-handle-the-rest" class="section level2">
+<h2>Option 1: Use dplyr syntax and let dbplyr handle the rest</h2>
+<div id="when-i-use-this-option" class="section level3">
+<h3>When I use this option</h3>
+</div>
+<div id="example" class="section level3">
+<h3>Example</h3>
+</div>
+</div>
+<div id="option-2-write-sql-syntax-and-have-dplyr-and-dbplyr-run-the-query" class="section level2">
+<h2>Option 2: Write SQL syntax and have dplyr and dbplyr run the query</h2>
+</div>
+<div id="option-3-store-the-query-in-a-text-file-and-have-dplyr-and-dbplyr-run-the-query" class="section level2">
+<h2>Option 3: Store the query in a text file and have dplyr and dbplyr run the query</h2>
+</div>
