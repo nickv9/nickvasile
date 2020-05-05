@@ -15,14 +15,19 @@ tags: []
 <h2>Motivation</h2>
 <p>I use R to extract data held in Microsoft SQL Server databases on a daily basis.</p>
 <p>When I first started I was confused by all the different ways to accomplish this task. I was a bit overwhelmed trying to choose the, “best,” option given the specific job at hand.</p>
-<p>I want to share what the approaches I’ve landed on to solidly my thinking and to help others who may want a, “quck and dirty,” list of options to get started with.</p>
+<p>I want to share what approaches I’ve landed on to solidly my thinking and to help others who may want a, “quick and dirty,” list of options to get started with.</p>
 </div>
 <div id="scope" class="section level2">
 <h2>Scope</h2>
 <p>This post is about reading data from a database, not writing to one.</p>
-<p>I prefer to use packages in the tidyverse so this post will be focused on those packages.</p>
-<p>While it’s possible to generalize many of the concepts I write about here to other DBMS systems I will be focused exclusively on Microsoft SQL Server in the hopes this will provide simple, prescriptive guidance for those working in a similiar configuration.</p>
-<p>One last thing - these are a few options I populated my toolbox with. They have served me well over the past two years as an analyst in an enterprise enviroment, but are definately not the only options available.</p>
+<p>I prefer to use packages in the tidyverse so I’ll focus on those packages.</p>
+<p>While it’s possible to generalize many of the concepts I write about here to other DBMS systems I will be focused exclusively on Microsoft SQL Server in the hopes this will provide simple, prescriptive guidance for those working in a similar configuration.</p>
+<p>Many people working in an enterprise environment are probably working from machines joined to a Windows domain so my examples will be tailored to that configuration. That introduces a couple of implications:</p>
+<ul>
+<li>I won’t be demonstrating how to connect from a system not joined to a Windows domain - the documentation for <code>DBI::dbConnect</code> covers that well if needed.</li>
+<li>I’m not writing this content from a machine that is joined to a Windows domain, and I haven’t populated a Microsoft SQL database with the data I use in my examples, so for now, the results of the code won’t be shown in examples.</li>
+</ul>
+<p>One last thing - these are a few options I populated my toolbox with. They have served me well over the past two years as an analyst in an enterprise environment, but are definitely not the only options available.</p>
 </div>
 <div id="option-1-use-dplyr-syntax-and-let-dbplyr-handle-the-rest" class="section level2">
 <h2>Option 1: Use dplyr syntax and let dbplyr handle the rest</h2>
@@ -32,6 +37,27 @@ tags: []
 </div>
 <div id="examples" class="section level3">
 <h3>Examples</h3>
+<pre class="r"><code>library(tidyverse)
+
+con &lt;- DBI::dbConnect(
+      odbc::odbc(),
+      Driver = &quot;SQL Server&quot;,
+      Server = &quot;your_servers_host_name&quot;,
+      Database = &quot;name_of_database_you_want_to_query&quot;
+   )
+
+# Example 1: filter rows, and retrieve selected columns
+dplyr::tbl(con, &quot;People&quot;) %&gt;% #People is the table
+  dplyr::filter(!is.na(Email), Department == &quot;Purchasing&quot; ) %&gt;% 
+  dplyr::select(Email, FirstName, LastName) %&gt;% 
+  # I will remove the following line if exploring the data and
+  # not interested in actually retrieving all records
+  dplyr::collect() 
+
+# Example 2: join across tables, filter and retrieve selected 
+# columns 
+
+# Example 3: Summarize and count</code></pre>
 </div>
 </div>
 <div id="option-2-write-sql-syntax-and-have-dplyr-and-dbplyr-run-the-query" class="section level2">
