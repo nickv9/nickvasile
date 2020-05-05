@@ -32,8 +32,32 @@ One last thing - these are a few options I populated my toolbox with. They have 
 
 ### When I use this option
 
+This is my default option. I do almost all of my analysis in R and this helps me avoid fragmenting my work and thoughts across different tools.
 
-### Example
+### Examples
+
+```{r, eval = false}
+
+library(tidyverse)
+
+con <- DBI::dbConnect(
+      odbc::odbc(),
+      Driver = "SQL Server",
+      Server = "your_servers_host_name",
+      Database = "name_of_database_you_want_to_query"
+   )
+
+# Example 1: filter rows, and retrieve selected rows
+dplyr::tbl(con, "People") %>% #People is the table
+  dplyr::filter(!is.na(Email), Department == "Purchasing" ) %>% 
+  dplyr::select(Email, FirstName, LastName) %>% 
+  # I will remove the following line if exploring the data and not interested in
+  # actually retrieving all records
+  dplyr::collect() 
+
+
+# Example 2: Summarize and count
+```
 
 ## Option 2: Write SQL syntax and have dplyr and dbplyr run the query
 
