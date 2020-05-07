@@ -54,18 +54,52 @@ con <- DBI::dbConnect(
 
 # Example 1: filter rows, and retrieve selected columns
 dplyr::tbl(con, "People") %>% #People is the table
-  dplyr::filter(!is.na(Email), Department == "Purchasing" ) %>% 
-  dplyr::select(Email, FirstName, LastName) %>% 
+  dplyr::filter(!is.na(email), department == "Purchasing" ) %>% 
+  dplyr::select(email, first_name, last_name) %>% 
   # I will remove the following line if exploring the data and
   # not interested in actually retrieving all records
   dplyr::collect() 
 
-# Example 2: join across tables, filter and retrieve selected 
-# columns 
+# Example 2: join across tables and retrieve selected columns
+dplyr::tbl(con, "People") %>%
+  dplyr::select(email, first_name, last_name, account_id ) %>% 
+  dplyr::left_join( #dplyr can join database tables 
+    dplyr::tbl(con, "Companies") %>% 
+      #Just get the company name, and the attribute
+      # needed to join to People (Id)
+      dplyr::select(Id, account_name = name),
+    by = c("AccountId" = "Id")
+    ) %>% 
+  collect()
 
 # Example 3: Summarize and count
+dplyr::tbl(con, "Companies") %>% 
+  dplyr::filter(country == "United States") %>% 
+  dplyr::group_by(state) %>% 
+  summarise(companies = n()) %>% #n() is similiar to SQL count
+  # arrange in descending order by number of records in a
+  # given state
+  arrange(desc(companies)) %>% 
+  collect()
 ```
 
 ## Option 2: Write SQL syntax and have dplyr and dbplyr run the query
+
+### When I use this option
+
+I use this option when I am reusing a *fairly short*, existing SQL query 
+with minor modifications.
+
+```{r, eval = FALSE}
+# Example 1: Simple selection of records using SQL syntax
+query <- "Select Id, name, billing_country, billing_state FROM
+          Companies"
+
+tbl(con, dplyr::sql(query)) %>% 
+  head(10) %>% #limit for speed during demo
+  collect()
+
+# Example 2: Use dplyr syntax to manipulate raw SQL query
+```
 
 ## Option 3: Store the query in a text file and have dplyr and dbplyr run the query
