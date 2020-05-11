@@ -1,5 +1,5 @@
 ---
-title: Options for using dplyr to retrieve data from a Microsoft SQL
+title: Three ways to use dplyr to retrieve data from a Microsoft SQL
   Database
 author: 'Nick Vasile'
 date: '2020-05-04'
@@ -8,15 +8,13 @@ categories: []
 tags: []
 ---
 
-**This post is a work in progress**
-
 ## Motivation
 
 I use R to extract data held in Microsoft SQL Server databases on a daily basis. 
 
 When I first started I was confused by all the different ways to accomplish this task. I was a bit overwhelmed trying to choose the, "best," option given the specific job at hand.
 
-I want to share what approaches I've landed on to solidly my thinking and to help others who may want a, "quick and dirty," list of options to get started with.
+I want to share what approaches I've landed on to help others who may want a simple list of options to get started with.
 
 ## Scope 
 
@@ -24,9 +22,9 @@ This post is about reading data from a database, not writing to one.
 
 I prefer to use packages in the tidyverse so I'll focus on those packages.
 
-While it's possible to generalize many of the concepts I write about here to other DBMS systems I will be focused exclusively on Microsoft SQL Server in the hopes this will provide simple, prescriptive guidance for those working in a similar configuration.
+While it's possible to generalize many of the concepts I write about here to other DBMS systems I will be focused exclusively on Microsoft SQL Server. I hope this will provide simple, prescriptive guidance for those working in a similar configuration.
 
-Many people working in an enterprise environment are probably working from machines joined to a Windows domain so my examples will be tailored to that configuration. That introduces a couple of implications:
+Many people working in an enterprise environment are probably working from machines joined to a Windows domain so my examples will be tailored to that configuration. That introduces a couple implications:
 
 * I won't be demonstrating how to connect from a system not joined to a Windows domain - the documentation for `DBI::dbConnect` covers that well if needed.
 * I'm not writing this content from a machine that is joined to a Windows domain, and I haven't populated a Microsoft SQL database with the data I use in my examples, so for now, the results of the code won't be shown in examples.
@@ -37,7 +35,7 @@ One last thing - these are a few options I populated my toolbox with. They have 
 
 ### When I use this option
 
-This is my default option. I do almost all of my analysis in R and this helps me avoid fragmenting my work and thoughts across different tools.
+This is my default option. I do almost all of my analysis in R and this avoids fragmenting my work and thoughts across different tools.
 
 ### Examples
 
@@ -62,25 +60,25 @@ dplyr::tbl(con, "People") %>% #People is the table
 
 # Example 2: join across tables and retrieve selected columns
 dplyr::tbl(con, "People") %>%
-  dplyr::select(email, first_name, last_name, account_id ) %>% 
+  dplyr::select(email, first_name, last_name, company_id ) %>% 
   dplyr::left_join( #dplyr can join database tables 
     dplyr::tbl(con, "Companies") %>% 
       #Just get the company name, and the attribute
       # needed to join to People (Id)
-      dplyr::select(Id, account_name = name),
-    by = c("AccountId" = "Id")
+      dplyr::select(id, account_name = name),
+    by = c("company_id" = "id")
     ) %>% 
-  collect()
+  dplyr::collect()
 
 # Example 3: Summarize and count
 dplyr::tbl(con, "Companies") %>% 
   dplyr::filter(country == "United States") %>% 
   dplyr::group_by(state) %>% 
-  summarise(companies = n()) %>% #n() is similiar to SQL count
+  dplyr::summarise(companies = n()) %>% #n() is similiar to SQL count
   # arrange in descending order by number of records in a
   # given state
-  arrange(desc(companies)) %>% 
-  collect()
+  dplyr::arrange(desc(companies)) %>% 
+  dplyr::collect()
 ```
 
 ## Option 2: Write SQL syntax and have dplyr and dbplyr run the query
@@ -95,11 +93,59 @@ with minor modifications.
 query <- "Select Id, name, billing_country, billing_state FROM
           Companies"
 
-tbl(con, dplyr::sql(query)) %>% 
+dplyr::tbl(con, dplyr::sql(query)) %>% 
   head(10) %>% #limit for speed during demo
-  collect()
+  dplyr:collect()
 
-# Example 2: Use dplyr syntax to manipulate raw SQL query
+# Example 2: Use dplyr syntax to enhance a raw SQL query
+dplyr::tbl(con, dplyr::sql(query)) %>% #reuse query from previous example
+  # add a filter state on top of the raw sql statement
+  dplyr::filter(billing_country == "United States") %>%  
+  head(10) %>%  #limit results for speed in demo
+  collect()
 ```
 
-## Option 3: Store the query in a text file and have dplyr and dbplyr run the query
+## Option 3: Store the SQL query in a text file and have dplyr and dbplyr run the query
+
+### When I use this option
+
+I use this approach under the following conditions:
+
+1. I'm reusing existing SQL code
+2. The SQL code is longer than a line or two
+
+I prefer to, "modularize," my R code and having an extremely long SQL statement 
+in my R code doesn't abstract away the complexity of the SQL query. Putting the
+query into it's own file helps achieve my desired level of abstraction. 
+
+In conjunction with source control it makes tracking changes to the definition of a
+data set simple.
+
+**Even more importantly, it's a really useful way to collaborate with others who 
+are comfortable with SQL but don't use R.** For example, I recently used this 
+approach on a project involving aggregation of multiple data sets. 
+Another team member focused on building out the data collection logic for 
+some of the data sets in SQL. Once he had them built and validated he handed off
+the query to me and I pasted it into a text file.
+
+Step 1: Put your SQL code into a text file
+
+Here is some example SQL code that might be in a file
+```{sql, eval = FALSE}
+SELECT p.*, a.*
+  FROM People p
+  LEFT JOIN Companies c ON p.company_id = c.id
+  WHERE c.state == "FL" AND p.role = "Purchasing"
+```
+
+Let's say that SQL code was stored in a text file called, `people.sql`
+
+Step 2: Use the SQL code in the file to retrieve data and execute the query.
+
+```{r, eval = FALSE}
+#reference: https://stackoverflow.com/a/46105261/7416441 
+query <- readr::read_file("people.sql") 
+
+dplyr::tbl(con, dplyr::sql(query))
+```
+
