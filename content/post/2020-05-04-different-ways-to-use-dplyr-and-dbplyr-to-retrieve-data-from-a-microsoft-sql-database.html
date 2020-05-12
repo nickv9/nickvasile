@@ -104,7 +104,7 @@ dplyr::tbl(con, dplyr::sql(query)) %&gt;% #reuse query from previous example
 <h3>When I use this option</h3>
 <p>I use this approach under the following conditions:</p>
 <ol style="list-style-type: decimal">
-<li>I’m reusing existing SQL code</li>
+<li>I’m reusing existing SQL code or when collaborating with someone who will be writing new code in SQL</li>
 <li>The SQL code is longer than a line or two</li>
 </ol>
 <p>I prefer to, “modularize,” my R code and having an extremely long SQL statement
