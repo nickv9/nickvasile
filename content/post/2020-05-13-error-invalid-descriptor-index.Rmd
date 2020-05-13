@@ -1,0 +1,31 @@
+---
+title: 'Debugging the Invalid Descriptor Index Error' 
+author: Nick Vasile
+date: '2020-05-13'
+slug: error-invalid-descriptor-index
+categories: []
+tags: []
+---
+
+**This post is a work in progress**
+
+## Motivation
+
+I use the dbplyr, dplyr, DBI and odbc R packages to extract data held in Microsoft SQL Server databases on a daily basis. 
+
+I run into the, "Invalid Descriptor Index," error documented [here](https://github.com/r-dbi/odbc/issues/309) constantly. It was awful! I spent so much time trying to find the, "problem," columns in tables that often had over 100 columns. I spent so many hours trying to get my queries to work which significantly took away from the time I had available to transform and analyze my data.
+
+Through the work of many great people sharing their expertise on GitHub, I was able to identify [a workaround that worked well for me](https://github.com/r-dbi/odbc/issues/309#issuecomment-615255613).
+
+The workaround helped *me* continue my daily work but did nothing to prevent others from encountering the same issue in the future. One of the great things about R is the community and I would like to do my part to help others. That might involve making a code change in a package or component involved.
+
+I don't yet have a firm grasp on what, from a technical standpoint, leads to the failure but I do know multiple things are involved - specifically multiple R packages, ODBC drivers and Microsoft SQL Server.
+
+I am comfortable as an R user and debugging C++ code individually but have not spent much time debugging multi-component issues in R. 
+
+This investigation is an opportunity for me:
+
+* Advance my R debugging skills
+* Understand, at a deep level, what the failure is that leads to this error. With that understanding I will be a much better position to propose, evaluate and contribute to solutions.
+
+## Scope

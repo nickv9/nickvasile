@@ -1,0 +1,29 @@
+---
+title: 'Debugging the Invalid Descriptor Index Error' 
+author: Nick Vasile
+date: '2020-05-13'
+slug: error-invalid-descriptor-index
+categories: []
+tags: []
+---
+
+
+
+<p><strong>This post is a work in progress</strong></p>
+<div id="motivation" class="section level2">
+<h2>Motivation</h2>
+<p>I use the dbplyr, dplyr, DBI and odbc R packages to extract data held in Microsoft SQL Server databases on a daily basis.</p>
+<p>I run into the, “Invalid Descriptor Index,” error documented <a href="https://github.com/r-dbi/odbc/issues/309">here</a> constantly. It was awful! I spent so much time trying to find the, “problem,” columns in tables that often had over 100 columns. I spent so many hours trying to get my queries to work which significantly took away from the time I had available to transform and analyze my data.</p>
+<p>Through the work of many great people sharing their expertise on GitHub, I was able to identify <a href="https://github.com/r-dbi/odbc/issues/309#issuecomment-615255613">a workaround that worked well for me</a>.</p>
+<p>The workaround helped <em>me</em> continue my daily work but did nothing to prevent others from encountering the same issue in the future. One of the great things about R is the community and I would like to do my part to help others. That might involve making a code change in a package or component involved.</p>
+<p>I don’t yet have a firm grasp on what, from a technical standpoint, leads to the failure but I do know multiple things are involved - specifically multiple R packages, ODBC drivers and Microsoft SQL Server.</p>
+<p>I am comfortable as an R user and debugging C++ code individually but have not spent much time debugging multi-component issues in R.</p>
+<p>This investigation is an opportunity for me:</p>
+<ul>
+<li>Advance my R debugging skills</li>
+<li>Understand, at a deep level, what the failure is that leads to this error. With that understanding I will be a much better position to propose, evaluate and contribute to solutions.</li>
+</ul>
+</div>
+<div id="scope" class="section level2">
+<h2>Scope</h2>
+</div>
