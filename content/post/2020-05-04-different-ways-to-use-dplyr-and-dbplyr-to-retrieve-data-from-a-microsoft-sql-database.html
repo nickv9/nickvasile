@@ -20,60 +20,118 @@ tags: []
 <h2>Scope</h2>
 <p>This post is about reading data from a database, not writing to one.</p>
 <p>I prefer to use packages in the tidyverse so I’ll focus on those packages.</p>
-<p>While it’s possible to generalize many of the concepts I write about here to other DBMS systems I will be focused exclusively on Microsoft SQL Server. I hope this will provide simple, prescriptive guidance for those working in a similar configuration.</p>
-<p>Many people working in an enterprise environment are probably working from machines joined to a Windows domain so my examples will be tailored to that configuration. That introduces a couple implications:</p>
-<ul>
-<li>I won’t be demonstrating how to connect from a system not joined to a Windows domain - the documentation for <code>DBI::dbConnect</code> covers that well if needed.</li>
-<li>I’m not writing this content from a machine that is joined to a Windows domain, and I haven’t populated a Microsoft SQL database with the data I use in my examples, so for now, the results of the code won’t be shown in examples.</li>
-</ul>
+<p>While it’s possible to generalize many of the concepts I write about here to other DBMS systems I will focus exclusively on Microsoft SQL Server. I hope this will provide simple, prescriptive guidance for those working in a similar configuration.</p>
+<p>The data for these examples is stored using Microsoft SQL Server Express. Free download available <a href="https://www.microsoft.com/en-us/sql-server/sql-server-downloads">here</a>.</p>
 <p>One last thing - these are a few options I populated my toolbox with. They have served me well over the past two years as an analyst in an enterprise environment, but are definitely not the only options available.</p>
+</div>
+<div id="setup" class="section level2">
+<h2>Setup</h2>
+<div id="connect-to-the-server" class="section level3">
+<h3>Connect to the server</h3>
+<p>I use the keyring package to keep my credentials out of my R code. You can use the <a href="https://db.rstudio.com/best-practices/managing-credentials/#encrypt-credentials-with-keyring">great documentation available from RStudio</a> to learn how do the same.</p>
+<pre class="r"><code>user_name &lt;-
+  keyring::key_list(&quot;dbi_test&quot;)$username
+
+con &lt;- DBI::dbConnect(
+      odbc::odbc(),
+      Driver = &quot;SQL Server&quot;,
+      Server = &quot;testsqlserver&quot;,
+      UID = user_name,
+      PWD = keyring::key_get(&quot;dbi_test&quot;, user_name)
+   )</code></pre>
+</div>
+<div id="write-some-sample-data" class="section level3">
+<h3>Write some sample data</h3>
+<p>Note that I set the temporary argument to TRUE so that the data is written to the tempdb on SQL server, which will result in it being deleted on disconnection.</p>
+<p>This results in dplyr prefixing the table name with, “##.”</p>
+<p>SOURCE: <a href="https://db.rstudio.com/dplyr/#connecting-to-the-database" class="uri">https://db.rstudio.com/dplyr/#connecting-to-the-database</a></p>
+<pre class="r"><code>dplyr::copy_to(con, nycflights13::flights, &quot;flights&quot;,
+  temporary = TRUE
+) </code></pre>
+<pre><code>## Created a temporary table named: ##flights</code></pre>
+<pre class="r"><code>dplyr::copy_to(con, nycflights13::airlines, &quot;airlines&quot;,
+  temporary = TRUE
+) </code></pre>
+<pre><code>## Created a temporary table named: ##airlines</code></pre>
+<pre class="r"><code>dplyr::copy_to(con, nycflights13::planes, &quot;planes&quot;,
+  temporary = TRUE
+) </code></pre>
+<pre><code>## Created a temporary table named: ##planes</code></pre>
+</div>
 </div>
 <div id="option-1-use-dplyr-syntax-and-let-dbplyr-handle-the-rest" class="section level2">
 <h2>Option 1: Use dplyr syntax and let dbplyr handle the rest</h2>
 <div id="when-i-use-this-option" class="section level3">
 <h3>When I use this option</h3>
-<p>This is my default option. I do almost all of my analysis in R and this avoids fragmenting my work and thoughts across different tools.</p>
+<p>This is my default option.</p>
+<p>I do almost all of my analysis in R and this avoids fragmenting my work and thoughts across different tools.</p>
 </div>
 <div id="examples" class="section level3">
 <h3>Examples</h3>
-<pre class="r"><code>library(tidyverse)
-
-con &lt;- DBI::dbConnect(
-      odbc::odbc(),
-      Driver = &quot;SQL Server&quot;,
-      Server = &quot;your_servers_host_name&quot;,
-      Database = &quot;name_of_database_you_want_to_query&quot;
-   )
-
-# Example 1: filter rows, and retrieve selected columns
-dplyr::tbl(con, &quot;People&quot;) %&gt;% #People is the table
-  dplyr::filter(!is.na(email), department == &quot;Purchasing&quot; ) %&gt;% 
-  dplyr::select(email, first_name, last_name) %&gt;% 
+<p>Example 1: filter rows, and retrieve selected columns</p>
+<pre class="r"><code>dplyr::tbl(con, &quot;##flights&quot;) %&gt;%
+  dplyr::filter(origin == &quot;JFK&quot;, dest == &quot;BQN&quot; ) %&gt;% 
+  dplyr::select(flight, tailnum, dep_time, sched_dep_time,
+                dep_delay) %&gt;% 
   # I will remove the following line if exploring the data and
   # not interested in actually retrieving all records
-  dplyr::collect() 
-
-# Example 2: join across tables and retrieve selected columns
-dplyr::tbl(con, &quot;People&quot;) %&gt;%
-  dplyr::select(email, first_name, last_name, company_id ) %&gt;% 
+  dplyr::collect() </code></pre>
+<pre><code>## # A tibble: 599 x 5
+##    flight tailnum dep_time sched_dep_time dep_delay
+##     &lt;int&gt; &lt;chr&gt;      &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;
+##  1    839 N708JB        34           2359        35
+##  2    939 N636JB       601            545        16
+##  3    839 N505JB        57           2359        58
+##  4    939 N633JB       556            545        11
+##  5    839 N641JB       125           2359        86
+##  6    939 N644JB       539            545        -6
+##  7    839 N591JB        27           2359        28
+##  8    939 N558JB       541            545        -4
+##  9    939 N603JB       542            545        -3
+## 10    839 N569JB      2357           2359        -2
+## # ... with 589 more rows</code></pre>
+<p>Example 2: join across tables and retrieve selected columns</p>
+<pre class="r"><code>dplyr::tbl(con, &quot;##flights&quot;) %&gt;%
+  dplyr::select(origin, dest, carrier, tailnum ) %&gt;% 
   dplyr::left_join( #dplyr can join database tables 
-    dplyr::tbl(con, &quot;Companies&quot;) %&gt;% 
-      #Just get the company name, and the attribute
-      # needed to join to People (Id)
-      dplyr::select(id, account_name = name),
-    by = c(&quot;company_id&quot; = &quot;id&quot;)
+    dplyr::tbl(con, &quot;##airlines&quot;), by = &quot;carrier&quot;
     ) %&gt;% 
-  dplyr::collect()
-
-# Example 3: Summarize and count
-dplyr::tbl(con, &quot;Companies&quot;) %&gt;% 
-  dplyr::filter(country == &quot;United States&quot;) %&gt;% 
-  dplyr::group_by(state) %&gt;% 
-  dplyr::summarise(companies = n()) %&gt;% #n() is similiar to SQL count
-  # arrange in descending order by number of records in a
-  # given state
-  dplyr::arrange(desc(companies)) %&gt;% 
+  mutate(airline = name) %&gt;% 
+  select(-carrier) %&gt;% # only want the &quot;human readable&quot; airline name
   dplyr::collect()</code></pre>
+<pre><code>## # A tibble: 336,776 x 5
+##    origin dest  tailnum name                        airline                    
+##    &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;                       &lt;chr&gt;                      
+##  1 JFK    PIT   N903XJ  Endeavor Air Inc.           Endeavor Air Inc.          
+##  2 LGA    MCO   N981DL  Delta Air Lines Inc.        Delta Air Lines Inc.       
+##  3 JFK    SEA   N703TW  Delta Air Lines Inc.        Delta Air Lines Inc.       
+##  4 EWR    ATL   N329NB  Delta Air Lines Inc.        Delta Air Lines Inc.       
+##  5 JFK    SFO   N527JB  JetBlue Airways             JetBlue Airways            
+##  6 LGA    ATL   N308AT  AirTran Airways Corporation AirTran Airways Corporation
+##  7 EWR    LAX   N528VA  Virgin America              Virgin America             
+##  8 JFK    FLL   N216JB  JetBlue Airways             JetBlue Airways            
+##  9 EWR    PBI   N53442  United Air Lines Inc.       United Air Lines Inc.      
+## 10 JFK    DTW   N931XJ  Endeavor Air Inc.           Endeavor Air Inc.          
+## # ... with 336,766 more rows</code></pre>
+<p>Example 3: Summarize and count</p>
+<pre class="r"><code>dplyr::tbl(con, &quot;##flights&quot;) %&gt;% 
+  filter(!is.na(tailnum)) %&gt;% 
+  dplyr::left_join(tbl(con, &quot;##planes&quot;), by = &quot;tailnum&quot;) %&gt;% 
+  dplyr::group_by(engine) %&gt;% 
+  dplyr::summarise(flights = n()) %&gt;%
+  dplyr::collect() %&gt;% 
+  dplyr::arrange(desc(flights))</code></pre>
+<pre><code>## # A tibble: 7 x 2
+##   engine        flights
+##   &lt;chr&gt;           &lt;int&gt;
+## 1 Turbo-fan      240915
+## 2 &lt;NA&gt;            50094
+## 3 Turbo-jet       40976
+## 4 Reciprocating    1774
+## 5 Turbo-shaft       410
+## 6 4 Cycle            48
+## 7 Turbo-prop         47</code></pre>
+<p>Quite a few tailnum values in flights, are not present in planes, interesting!</p>
 </div>
 </div>
 <div id="option-2-write-sql-syntax-and-have-dplyr-and-dbplyr-run-the-query" class="section level2">
@@ -82,20 +140,45 @@ dplyr::tbl(con, &quot;Companies&quot;) %&gt;%
 <h3>When I use this option</h3>
 <p>I use this option when I am reusing a <em>fairly short</em>, existing SQL query
 with minor modifications.</p>
-<pre class="r"><code># Example 1: Simple selection of records using SQL syntax
-query &lt;- &quot;Select Id, name, billing_country, billing_state FROM
-          Companies&quot;
+<p>Example 1: Simple selection of records using SQL syntax</p>
+<pre class="r"><code>query &lt;- &quot;SELECT  flight, tailnum, dep_time, origin, dest 
+            FROM ##flights&quot;
 
 dplyr::tbl(con, dplyr::sql(query)) %&gt;% 
-  head(10) %&gt;% #limit for speed during demo
-  dplyr:collect()
-
-# Example 2: Use dplyr syntax to enhance a raw SQL query
-dplyr::tbl(con, dplyr::sql(query)) %&gt;% #reuse query from previous example
+  dplyr::collect()</code></pre>
+<pre><code>## # A tibble: 336,776 x 5
+##    flight tailnum dep_time origin dest 
+##     &lt;int&gt; &lt;chr&gt;      &lt;int&gt; &lt;chr&gt;  &lt;chr&gt;
+##  1   3433 N903XJ      1856 JFK    PIT  
+##  2   1585 N981DL      1857 LGA    MCO  
+##  3   1643 N703TW      1857 JFK    SEA  
+##  4    926 N329NB      1857 EWR    ATL  
+##  5    415 N527JB      1857 JFK    SFO  
+##  6    771 N308AT      1858 LGA    ATL  
+##  7    169 N528VA      1859 EWR    LAX  
+##  8    201 N216JB      1900 JFK    FLL  
+##  9   1417 N53442      1902 EWR    PBI  
+## 10   3472 N931XJ      1903 JFK    DTW  
+## # ... with 336,766 more rows</code></pre>
+<p>Example 2: Use dplyr syntax to enhance a raw SQL query</p>
+<pre class="r"><code>dplyr::tbl(con, dplyr::sql(query)) %&gt;% #reuse query from previous example
   # add a filter state on top of the raw sql statement
-  dplyr::filter(billing_country == &quot;United States&quot;) %&gt;%  
-  head(10) %&gt;%  #limit results for speed in demo
+  dplyr::filter(origin == &quot;JFK&quot;, dest == &quot;BQN&quot; ) %&gt;% 
   collect()</code></pre>
+<pre><code>## # A tibble: 599 x 5
+##    flight tailnum dep_time origin dest 
+##     &lt;int&gt; &lt;chr&gt;      &lt;int&gt; &lt;chr&gt;  &lt;chr&gt;
+##  1    839 N708JB        34 JFK    BQN  
+##  2    939 N636JB       601 JFK    BQN  
+##  3    839 N505JB        57 JFK    BQN  
+##  4    939 N633JB       556 JFK    BQN  
+##  5    839 N641JB       125 JFK    BQN  
+##  6    939 N644JB       539 JFK    BQN  
+##  7    839 N591JB        27 JFK    BQN  
+##  8    939 N558JB       541 JFK    BQN  
+##  9    939 N603JB       542 JFK    BQN  
+## 10    839 N569JB      2357 JFK    BQN  
+## # ... with 589 more rows</code></pre>
 </div>
 </div>
 <div id="option-3-store-the-sql-query-in-a-text-file-and-have-dplyr-and-dbplyr-run-the-query" class="section level2">
@@ -107,12 +190,12 @@ dplyr::tbl(con, dplyr::sql(query)) %&gt;% #reuse query from previous example
 <li>I’m reusing existing SQL code or when collaborating with someone who will be writing new code in SQL</li>
 <li>The SQL code is longer than a line or two</li>
 </ol>
-<p>I prefer to, “modularize,” my R code and having an extremely long SQL statement
+<p>I prefer to, “modularize,” my R code. Having an extremely long SQL statement
 in my R code doesn’t abstract away the complexity of the SQL query. Putting the
 query into it’s own file helps achieve my desired level of abstraction.</p>
 <p>In conjunction with source control it makes tracking changes to the definition of a
 data set simple.</p>
-<p><strong>Even more importantly, it’s a really useful way to collaborate with others who
+<p><strong>More importantly, it’s a really useful way to collaborate with others who
 are comfortable with SQL but don’t use R.</strong> For example, I recently used this
 approach on a project involving aggregation of multiple data sets.
 Another team member focused on building out the data collection logic for
@@ -120,15 +203,38 @@ some of the data sets in SQL. Once he had them built and validated he handed off
 the query to me and I pasted it into a text file.</p>
 <p>Step 1: Put your SQL code into a text file</p>
 <p>Here is some example SQL code that might be in a file</p>
-<pre class="sql"><code>SELECT p.*, a.*
-  FROM People p
-  LEFT JOIN Companies c ON p.company_id = c.id
-  WHERE c.state == &quot;FL&quot; AND p.role = &quot;Purchasing&quot;</code></pre>
-<p>Let’s say that SQL code was stored in a text file called, <code>people.sql</code></p>
+<pre class="sql"><code>SELECT f.year
+        ,f.month
+        ,f.day
+        ,f.dep_time
+        ,a.name
+        ,p.manufacturer
+        ,p.model
+  FROM ##flights f
+  LEFT JOIN ##airlines a ON f.carrier = a.carrier
+  LEFT JOIN ##planes p ON f.tailnum = p.tailnum
+  WHERE p.manufacturer IS NOT NULL </code></pre>
+<p>Let’s say that SQL code was stored in a text file called, <code>flights.sql</code></p>
 <p>Step 2: Use the SQL code in the file to retrieve data and execute the query.</p>
 <pre class="r"><code>#reference: https://stackoverflow.com/a/46105261/7416441 
-query &lt;- readr::read_file(&quot;people.sql&quot;) 
+query &lt;- readr::read_file(&quot;flights.sql&quot;) 
 
 dplyr::tbl(con, dplyr::sql(query))</code></pre>
+<pre><code>## # Source:   SQL [?? x 7]
+## # Database: Microsoft SQL Server
+## #   15.00.2000[dbo@FTLLYUNGTINGF01\SQLEXPRESS/master]
+##     year month   day dep_time name                     manufacturer model    
+##    &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt; &lt;chr&gt;                    &lt;chr&gt;        &lt;chr&gt;    
+##  1  2013     7    22     1313 ExpressJet Airlines Inc. EMBRAER      EMB-145XR
+##  2  2013     7    23      602 ExpressJet Airlines Inc. EMBRAER      EMB-145XR
+##  3  2013     7    29     1157 ExpressJet Airlines Inc. EMBRAER      EMB-145XR
+##  4  2013     7    31      659 ExpressJet Airlines Inc. EMBRAER      EMB-145XR
+##  5  2013     8     1      553 ExpressJet Airlines Inc. EMBRAER      EMB-145XR
+##  6  2013     8     5      837 ExpressJet Airlines Inc. EMBRAER      EMB-145XR
+##  7  2013     8     8      827 ExpressJet Airlines Inc. EMBRAER      EMB-145XR
+##  8  2013     8     9       NA ExpressJet Airlines Inc. EMBRAER      EMB-145XR
+##  9  2013     8    12     1312 ExpressJet Airlines Inc. EMBRAER      EMB-145XR
+## 10  2013     8    12     2056 ExpressJet Airlines Inc. EMBRAER      EMB-145XR
+## # ... with more rows</code></pre>
 </div>
 </div>
