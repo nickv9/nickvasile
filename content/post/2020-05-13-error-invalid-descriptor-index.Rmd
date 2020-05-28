@@ -29,3 +29,53 @@ This investigation is an opportunity for me:
 * Understand, at a deep level, the root cause, and contributing factors, of the failure that leads to this error. With that understanding I will be a much better position to propose, evaluate and contribute to solutions.
 
 ## Scope
+
+I'll be reproducing this issue using Microsoft SQL Server Express which is a free download available [here](https://www.microsoft.com/en-us/sql-server/sql-server-downloads).
+
+I'll be focusing my analysis on this error when ecountered when running R on the Microsoft Windows operating system.
+
+## Reproducing the problem
+
+I'll write two different sets of data:
+
+1. A table, "##problem_data," with, "long" columns that are not the last columns in the table.
+2. A table, "##working_data," with the same data, only this time with the, "long," column at the end of the table.
+
+```{r}
+library(tidyverse)
+
+user_name <-
+  keyring::key_list("dbi_test")$username
+
+con <- DBI::dbConnect(
+      odbc::odbc(),
+      Driver = "SQL Server",
+      Server = "testsqlserver",
+      UID = user_name,
+      PWD = keyring::key_get("dbi_test", user_name)
+   )
+
+dplyr::copy_to(con,
+               tibble(a = 1:3, 
+                      b = blob::blob(raw(1)),
+                      c = 1
+                      ),
+               "problem_data",
+               temporary = TRUE
+               )
+
+dplyr::copy_to(con,
+               tibble(a = 1:3,
+                      c = 1,
+                      b = blob::blob(raw(1))
+                      ),
+               "working_data",
+               temporary = TRUE
+               )
+```
+
+
+## Q&A
+
+Q: What constitutes "long" data?
+A: 
