@@ -376,7 +376,8 @@ avg_delay_by_carrier %>%
 ```
 
 ```{r}
-avg_delay_by_carrier <- nycflights13::flights %>% 
+avg_delay_by_carrier <- 
+  nycflights13::flights %>% 
   dplyr::group_by(carrier) %>% 
   dplyr::summarize(mean_delay = mean(dep_delay, na.rm = TRUE))
 
@@ -385,6 +386,24 @@ avg_delay_by_carrier %>%
                                y = mean_delay)) +
   ggplot2::geom_bar(stat="identity") +
   ggplot2::coord_flip()
+```
+
+### Sort bar plots by counts, within facets, when using stat - "identity"
+
+SOURCE: https://www.programmingwithr.com/how-to-reorder-arrange-bars-with-in-each-facet-of-ggplot/ 
+
+```{r}
+iris_gathered <- 
+  tidyr::gather(iris, metric, value, -Species)
+
+iris_gathered %>% 
+  ggplot2::ggplot(ggplot2::aes(tidytext::reorder_within(Species, value, metric),
+                      value)) +
+  ggplot2::geom_bar(stat = 'identity') +
+  tidytext::scale_x_reordered() +
+  ggplot2::coord_flip() +
+  ggplot2::facet_wrap(~ metric, scales = "free") +
+  ggplot2::xlab("species")
 ```
 
 ### Color coded correlation table

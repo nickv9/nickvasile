@@ -1,7 +1,7 @@
 ---
 title: "Nick's R Cheat Sheet"
 author: "Nicholas Vasile"
-date: "2020-04-20"
+date: "2020-05-28"
 output: 
   blogdown::html_page:
     toc: true
@@ -46,6 +46,7 @@ vignette: >
 <li><a href="#interactively-explore-plots">Interactively explore plots</a></li>
 <li><a href="#sort-bar-plot-by-counts">Sort bar plot by counts</a></li>
 <li><a href="#sort-bar-plot-by-counts---when-using-stat-identity">Sort bar plot by counts - when using stat = “identity”</a></li>
+<li><a href="#sort-bar-plots-by-counts-within-facets-when-using-stat---identity">Sort bar plots by counts, within facets, when using stat - “identity”</a></li>
 <li><a href="#color-coded-correlation-table">Color coded correlation table</a></li>
 <li><a href="#filter-correlations-at-a-cutoff-value">filter correlations at a cutoff value</a></li>
 <li><a href="#plot-distribution-of-all-variables">plot distribution of all variables</a></li>
@@ -788,7 +789,8 @@ avg_delay_by_carrier %&gt;%
   ggplot2::geom_bar(stat=&quot;identity&quot;) +
   ggplot2::labs(x = &quot;carrier&quot;) # if you want to set x-axis to original attribute</code></pre>
 <p><img src="/cheat_files/figure-html/unnamed-chunk-32-1.png" width="672" /></p>
-<pre class="r"><code>avg_delay_by_carrier &lt;- nycflights13::flights %&gt;% 
+<pre class="r"><code>avg_delay_by_carrier &lt;- 
+  nycflights13::flights %&gt;% 
   dplyr::group_by(carrier) %&gt;% 
   dplyr::summarize(mean_delay = mean(dep_delay, na.rm = TRUE))
 
@@ -799,14 +801,30 @@ avg_delay_by_carrier %&gt;%
   ggplot2::coord_flip()</code></pre>
 <p><img src="/cheat_files/figure-html/unnamed-chunk-33-1.png" width="672" /></p>
 </div>
+<div id="sort-bar-plots-by-counts-within-facets-when-using-stat---identity" class="section level3">
+<h3>Sort bar plots by counts, within facets, when using stat - “identity”</h3>
+<p>SOURCE: <a href="https://www.programmingwithr.com/how-to-reorder-arrange-bars-with-in-each-facet-of-ggplot/" class="uri">https://www.programmingwithr.com/how-to-reorder-arrange-bars-with-in-each-facet-of-ggplot/</a></p>
+<pre class="r"><code>iris_gathered &lt;- 
+  tidyr::gather(iris, metric, value, -Species)
+
+iris_gathered %&gt;% 
+  ggplot2::ggplot(ggplot2::aes(tidytext::reorder_within(Species, value, metric),
+                      value)) +
+  ggplot2::geom_bar(stat = &#39;identity&#39;) +
+  tidytext::scale_x_reordered() +
+  ggplot2::coord_flip() +
+  ggplot2::facet_wrap(~ metric, scales = &quot;free&quot;) +
+  ggplot2::xlab(&quot;species&quot;)</code></pre>
+<p><img src="/cheat_files/figure-html/unnamed-chunk-34-1.png" width="672" /></p>
+</div>
 <div id="color-coded-correlation-table" class="section level3">
 <h3>Color coded correlation table</h3>
 <pre class="r"><code>M &lt;- cor(mtcars)
 corrplot::corrplot(M, method=&quot;color&quot;)</code></pre>
-<p><img src="/cheat_files/figure-html/unnamed-chunk-34-1.png" width="672" /></p>
+<p><img src="/cheat_files/figure-html/unnamed-chunk-35-1.png" width="672" /></p>
 <p>with clustering</p>
 <pre class="r"><code>corrplot::corrplot(M, order = &quot;hclust&quot;)</code></pre>
-<p><img src="/cheat_files/figure-html/unnamed-chunk-35-1.png" width="672" /></p>
+<p><img src="/cheat_files/figure-html/unnamed-chunk-36-1.png" width="672" /></p>
 </div>
 <div id="filter-correlations-at-a-cutoff-value" class="section level3">
 <h3>filter correlations at a cutoff value</h3>
@@ -860,7 +878,7 @@ corrplot::corrplot(M, method=&quot;color&quot;)</code></pre>
     ggplot2::facet_wrap(~key, scales = &quot;free&quot;) + 
     ggplot2::geom_histogram()
 #&gt; `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
-<p><img src="/cheat_files/figure-html/unnamed-chunk-38-1.png" width="672" /></p>
+<p><img src="/cheat_files/figure-html/unnamed-chunk-39-1.png" width="672" /></p>
 </div>
 <div id="all-variables" class="section level4">
 <h4>all variables</h4>
@@ -870,7 +888,7 @@ corrplot::corrplot(M, method=&quot;color&quot;)</code></pre>
   ggplot2::facet_wrap(~key, scales = &quot;free&quot;) + 
   ggplot2::geom_bar(stat = &quot;count&quot;) + 
   ggplot2::coord_flip ()</code></pre>
-<p><img src="/cheat_files/figure-html/unnamed-chunk-39-1.png" width="672" /></p>
+<p><img src="/cheat_files/figure-html/unnamed-chunk-40-1.png" width="672" /></p>
 </div>
 </div>
 <div id="rmarkdown-insert-date-document-was-knitted" class="section level3">
@@ -895,7 +913,7 @@ soybean %&gt;%
     ggplot2::geom_bar(stat = &quot;identity&quot;) +
     ggplot2::coord_flip() +
     ggplot2::theme(legend.position = &quot;none&quot;)</code></pre>
-<p><img src="/cheat_files/figure-html/unnamed-chunk-40-1.png" width="672" /></p>
+<p><img src="/cheat_files/figure-html/unnamed-chunk-41-1.png" width="672" /></p>
 </div>
 <div id="plot-the-pecentage-of-rows-that-has-at-least-1-na-attribute-by-outcome" class="section level3">
 <h3>Plot the pecentage of rows that has at least 1 NA attribute, by outcome</h3>
@@ -914,7 +932,7 @@ soybean %&gt;%
     ggplot2::geom_bar(stat = &quot;identity&quot;) +
     ggplot2::coord_flip() +
     ggplot2::theme(legend.position = &quot;none&quot;)</code></pre>
-<p><img src="/cheat_files/figure-html/unnamed-chunk-41-1.png" width="672" /></p>
+<p><img src="/cheat_files/figure-html/unnamed-chunk-42-1.png" width="672" /></p>
 </div>
 <div id="plot-the-attributes-predictors-that-are-most-likely-to-be-missing" class="section level2">
 <h2>Plot the attributes (predictors) that are most likely to be missing</h2>
@@ -929,7 +947,7 @@ predictor_na_rate %&gt;% ggplot2::ggplot(ggplot2::aes(x = predictor, y = na_rate
   ggplot2::geom_bar(stat = &quot;identity&quot;) +
   ggplot2::coord_flip() +
   ggplot2::theme(legend.position = &quot;none&quot;)</code></pre>
-<p><img src="/cheat_files/figure-html/unnamed-chunk-42-1.png" width="672" /></p>
+<p><img src="/cheat_files/figure-html/unnamed-chunk-43-1.png" width="672" /></p>
 </div>
 <div id="plot-the-attributes-predictors-that-are-most-likely-to-be-missing-by-outcome" class="section level2">
 <h2>Plot the attributes (predictors) that are most likely to be missing, by outcome</h2>
@@ -947,7 +965,7 @@ soybean_l %&gt;% dplyr::group_by(Class, predictor) %&gt;%
   ggplot2::coord_flip() +
   ggplot2::facet_wrap(~Class, scales = &quot;free&quot;) +
   ggplot2::theme(legend.position = &quot;none&quot;)</code></pre>
-<p><img src="/cheat_files/figure-html/unnamed-chunk-43-1.png" width="672" /></p>
+<p><img src="/cheat_files/figure-html/unnamed-chunk-44-1.png" width="672" /></p>
 </div>
 <div id="create-a-matrix-that-shows-whether-or-not-a-particular-combination-of-values-is-in-the-data" class="section level2">
 <h2>Create a matrix that shows whether or not a particular combination of values is in the data</h2>
@@ -959,7 +977,7 @@ soybean_l %&gt;% dplyr::group_by(Class, predictor) %&gt;%
   dplyr::mutate(has_gear = dplyr::if_else(is.na(has_gear),FALSE, TRUE)) %&gt;% 
   ggplot2::ggplot(ggplot2::aes(x=cyl, y =gear )) +
   ggplot2::geom_tile(ggplot2::aes(fill = has_gear),color = &quot;white&quot;)</code></pre>
-<p><img src="/cheat_files/figure-html/unnamed-chunk-44-1.png" width="672" /></p>
+<p><img src="/cheat_files/figure-html/unnamed-chunk-45-1.png" width="672" /></p>
 </div>
 <div id="convert-unix-style-epoch-time-to-human-readable-time" class="section level2">
 <h2>Convert unix style epoch time to human readable time</h2>
@@ -1071,13 +1089,13 @@ str(n_mtcars$data)
 <pre class="r"><code>purrr::map2(n_mtcars$data, names(n_mtcars$data),
      plot_issues_by_epic)
 #&gt; $`6_cyl`</code></pre>
-<p><img src="/cheat_files/figure-html/unnamed-chunk-50-1.png" width="672" /></p>
+<p><img src="/cheat_files/figure-html/unnamed-chunk-51-1.png" width="672" /></p>
 <pre><code>#&gt; 
 #&gt; $`4_cyl`</code></pre>
-<p><img src="/cheat_files/figure-html/unnamed-chunk-50-2.png" width="672" /></p>
+<p><img src="/cheat_files/figure-html/unnamed-chunk-51-2.png" width="672" /></p>
 <pre><code>#&gt; 
 #&gt; $`8_cyl`</code></pre>
-<p><img src="/cheat_files/figure-html/unnamed-chunk-50-3.png" width="672" /></p>
+<p><img src="/cheat_files/figure-html/unnamed-chunk-51-3.png" width="672" /></p>
 </div>
 <div id="one-plot-for-each-attribute-in-a-data-frame---different-scale-for-each-attribute" class="section level2">
 <h2>One plot for each attribute in a data frame - different scale for each attribute</h2>
@@ -1088,7 +1106,7 @@ str(n_mtcars$data)
     ggplot2::ggplot(ggplot2::aes(Day, value)) +
     ggplot2::geom_line() +
     ggplot2::facet_grid(attribute ~ ., scales = &quot;free&quot;)</code></pre>
-<p><img src="/cheat_files/figure-html/unnamed-chunk-51-1.png" width="672" /></p>
+<p><img src="/cheat_files/figure-html/unnamed-chunk-52-1.png" width="672" /></p>
 </div>
 <div id="get-detailed-information-for-each-column-in-a-database-table" class="section level2">
 <h2>Get detailed information for each column in a database table</h2>

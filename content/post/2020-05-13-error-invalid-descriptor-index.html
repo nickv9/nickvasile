@@ -61,7 +61,8 @@ con &lt;- DBI::dbConnect(
 dplyr::copy_to(con,
                tibble(a = 1:3, 
                       b = blob::blob(raw(1)),
-                      c = 1),
+                      c = 1
+                      ),
                &quot;problem_data&quot;,
                temporary = TRUE
                )</code></pre>
