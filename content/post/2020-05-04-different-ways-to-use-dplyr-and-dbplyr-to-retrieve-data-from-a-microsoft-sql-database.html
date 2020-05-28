@@ -79,16 +79,16 @@ con &lt;- DBI::dbConnect(
 <pre><code>## # A tibble: 599 x 5
 ##    flight tailnum dep_time sched_dep_time dep_delay
 ##     &lt;int&gt; &lt;chr&gt;      &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;
-##  1    839 N708JB        34           2359        35
-##  2    939 N636JB       601            545        16
-##  3    839 N505JB        57           2359        58
-##  4    939 N633JB       556            545        11
-##  5    839 N641JB       125           2359        86
-##  6    939 N644JB       539            545        -6
-##  7    839 N591JB        27           2359        28
-##  8    939 N558JB       541            545        -4
-##  9    939 N603JB       542            545        -3
-## 10    839 N569JB      2357           2359        -2
+##  1    725 N804JB       544            545        -1
+##  2    727 N588JB      2356           2359        -3
+##  3    725 N624JB       539            545        -6
+##  4    727 N789JB      2354           2359        -5
+##  5    727 N618JB       235           2359       156
+##  6    725 N779JB       543            545        -2
+##  7    725 N652JB       608            545        23
+##  8    727 N599JB      2358           2359        -1
+##  9    725 N589JB       602            545        17
+## 10    727 N649JB      2357           2359        -2
 ## # ... with 589 more rows</code></pre>
 <p>Example 2: join across tables and retrieve selected columns</p>
 <pre class="r"><code>dplyr::tbl(con, &quot;##flights&quot;) %&gt;%
@@ -100,18 +100,18 @@ con &lt;- DBI::dbConnect(
   select(-carrier) %&gt;% # only want the &quot;human readable&quot; airline name
   dplyr::collect()</code></pre>
 <pre><code>## # A tibble: 336,776 x 5
-##    origin dest  tailnum name                        airline                    
-##    &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;                       &lt;chr&gt;                      
-##  1 JFK    PIT   N903XJ  Endeavor Air Inc.           Endeavor Air Inc.          
-##  2 LGA    MCO   N981DL  Delta Air Lines Inc.        Delta Air Lines Inc.       
-##  3 JFK    SEA   N703TW  Delta Air Lines Inc.        Delta Air Lines Inc.       
-##  4 EWR    ATL   N329NB  Delta Air Lines Inc.        Delta Air Lines Inc.       
-##  5 JFK    SFO   N527JB  JetBlue Airways             JetBlue Airways            
-##  6 LGA    ATL   N308AT  AirTran Airways Corporation AirTran Airways Corporation
-##  7 EWR    LAX   N528VA  Virgin America              Virgin America             
-##  8 JFK    FLL   N216JB  JetBlue Airways             JetBlue Airways            
-##  9 EWR    PBI   N53442  United Air Lines Inc.       United Air Lines Inc.      
-## 10 JFK    DTW   N931XJ  Endeavor Air Inc.           Endeavor Air Inc.          
+##    origin dest  tailnum name                     airline                 
+##    &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;                    &lt;chr&gt;                   
+##  1 EWR    IAH   N14228  United Air Lines Inc.    United Air Lines Inc.   
+##  2 LGA    IAH   N24211  United Air Lines Inc.    United Air Lines Inc.   
+##  3 JFK    MIA   N619AA  American Airlines Inc.   American Airlines Inc.  
+##  4 JFK    BQN   N804JB  JetBlue Airways          JetBlue Airways         
+##  5 LGA    ATL   N668DN  Delta Air Lines Inc.     Delta Air Lines Inc.    
+##  6 EWR    ORD   N39463  United Air Lines Inc.    United Air Lines Inc.   
+##  7 EWR    FLL   N516JB  JetBlue Airways          JetBlue Airways         
+##  8 LGA    IAD   N829AS  ExpressJet Airlines Inc. ExpressJet Airlines Inc.
+##  9 JFK    MCO   N593JB  JetBlue Airways          JetBlue Airways         
+## 10 LGA    ORD   N3ALAA  American Airlines Inc.   American Airlines Inc.  
 ## # ... with 336,766 more rows</code></pre>
 <p>Example 3: Summarize and count</p>
 <pre class="r"><code>dplyr::tbl(con, &quot;##flights&quot;) %&gt;% 
@@ -149,16 +149,16 @@ dplyr::tbl(con, dplyr::sql(query)) %&gt;%
 <pre><code>## # A tibble: 336,776 x 5
 ##    flight tailnum dep_time origin dest 
 ##     &lt;int&gt; &lt;chr&gt;      &lt;int&gt; &lt;chr&gt;  &lt;chr&gt;
-##  1   3433 N903XJ      1856 JFK    PIT  
-##  2   1585 N981DL      1857 LGA    MCO  
-##  3   1643 N703TW      1857 JFK    SEA  
-##  4    926 N329NB      1857 EWR    ATL  
-##  5    415 N527JB      1857 JFK    SFO  
-##  6    771 N308AT      1858 LGA    ATL  
-##  7    169 N528VA      1859 EWR    LAX  
-##  8    201 N216JB      1900 JFK    FLL  
-##  9   1417 N53442      1902 EWR    PBI  
-## 10   3472 N931XJ      1903 JFK    DTW  
+##  1   1545 N14228       517 EWR    IAH  
+##  2   1714 N24211       533 LGA    IAH  
+##  3   1141 N619AA       542 JFK    MIA  
+##  4    725 N804JB       544 JFK    BQN  
+##  5    461 N668DN       554 LGA    ATL  
+##  6   1696 N39463       554 EWR    ORD  
+##  7    507 N516JB       555 EWR    FLL  
+##  8   5708 N829AS       557 LGA    IAD  
+##  9     79 N593JB       557 JFK    MCO  
+## 10    301 N3ALAA       558 LGA    ORD  
 ## # ... with 336,766 more rows</code></pre>
 <p>Example 2: Use dplyr syntax to enhance a raw SQL query</p>
 <pre class="r"><code>dplyr::tbl(con, dplyr::sql(query)) %&gt;% #reuse query from previous example
@@ -168,16 +168,16 @@ dplyr::tbl(con, dplyr::sql(query)) %&gt;%
 <pre><code>## # A tibble: 599 x 5
 ##    flight tailnum dep_time origin dest 
 ##     &lt;int&gt; &lt;chr&gt;      &lt;int&gt; &lt;chr&gt;  &lt;chr&gt;
-##  1    839 N708JB        34 JFK    BQN  
-##  2    939 N636JB       601 JFK    BQN  
-##  3    839 N505JB        57 JFK    BQN  
-##  4    939 N633JB       556 JFK    BQN  
-##  5    839 N641JB       125 JFK    BQN  
-##  6    939 N644JB       539 JFK    BQN  
-##  7    839 N591JB        27 JFK    BQN  
-##  8    939 N558JB       541 JFK    BQN  
-##  9    939 N603JB       542 JFK    BQN  
-## 10    839 N569JB      2357 JFK    BQN  
+##  1    725 N804JB       544 JFK    BQN  
+##  2    727 N588JB      2356 JFK    BQN  
+##  3    725 N624JB       539 JFK    BQN  
+##  4    727 N789JB      2354 JFK    BQN  
+##  5    727 N618JB       235 JFK    BQN  
+##  6    725 N779JB       543 JFK    BQN  
+##  7    725 N652JB       608 JFK    BQN  
+##  8    727 N599JB      2358 JFK    BQN  
+##  9    725 N589JB       602 JFK    BQN  
+## 10    727 N649JB      2357 JFK    BQN  
 ## # ... with 589 more rows</code></pre>
 </div>
 </div>
@@ -220,21 +220,19 @@ the query to me and I pasted it into a text file.</p>
 query &lt;- readr::read_file(&quot;flights.sql&quot;) 
 
 dplyr::tbl(con, dplyr::sql(query))</code></pre>
-<pre><code>## # Source:   SQL [?? x 7]
-## # Database: Microsoft SQL Server
-## #   15.00.2000[dbo@FTLLYUNGTINGF01\SQLEXPRESS/master]
-##     year month   day dep_time name                     manufacturer model    
-##    &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt; &lt;chr&gt;                    &lt;chr&gt;        &lt;chr&gt;    
-##  1  2013     7    22     1313 ExpressJet Airlines Inc. EMBRAER      EMB-145XR
-##  2  2013     7    23      602 ExpressJet Airlines Inc. EMBRAER      EMB-145XR
-##  3  2013     7    29     1157 ExpressJet Airlines Inc. EMBRAER      EMB-145XR
-##  4  2013     7    31      659 ExpressJet Airlines Inc. EMBRAER      EMB-145XR
-##  5  2013     8     1      553 ExpressJet Airlines Inc. EMBRAER      EMB-145XR
-##  6  2013     8     5      837 ExpressJet Airlines Inc. EMBRAER      EMB-145XR
-##  7  2013     8     8      827 ExpressJet Airlines Inc. EMBRAER      EMB-145XR
-##  8  2013     8     9       NA ExpressJet Airlines Inc. EMBRAER      EMB-145XR
-##  9  2013     8    12     1312 ExpressJet Airlines Inc. EMBRAER      EMB-145XR
-## 10  2013     8    12     2056 ExpressJet Airlines Inc. EMBRAER      EMB-145XR
-## # ... with more rows</code></pre>
+<pre><code>## # A tibble: 284,170 x 7
+##     year month   day dep_time name                    manufacturer    model     
+##    &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt; &lt;chr&gt;                   &lt;chr&gt;           &lt;chr&gt;     
+##  1  2013     1     1      517 United Air Lines Inc.   BOEING          737-824   
+##  2  2013     1     1      533 United Air Lines Inc.   BOEING          737-824   
+##  3  2013     1     1      542 American Airlines Inc.  BOEING          757-223   
+##  4  2013     1     1      544 JetBlue Airways         AIRBUS          A320-232  
+##  5  2013     1     1      554 Delta Air Lines Inc.    BOEING          757-232   
+##  6  2013     1     1      554 United Air Lines Inc.   BOEING          737-924ER 
+##  7  2013     1     1      555 JetBlue Airways         AIRBUS INDUSTR~ A320-232  
+##  8  2013     1     1      557 ExpressJet Airlines In~ CANADAIR        CL-600-2B~
+##  9  2013     1     1      557 JetBlue Airways         AIRBUS          A320-232  
+## 10  2013     1     1      558 JetBlue Airways         AIRBUS          A320-232  
+## # ... with 284,160 more rows</code></pre>
 </div>
 </div>

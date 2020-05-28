@@ -208,5 +208,6 @@ query <-
   LEFT JOIN ##planes p ON f.tailnum = p.tailnum
   WHERE p.manufacturer IS NOT NULL"
 
-dplyr::tbl(con, dplyr::sql(query))
+dplyr::tbl(con, dplyr::sql(query)) %>% 
+  collect()
 ```
