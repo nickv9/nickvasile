@@ -9,7 +9,7 @@ tags: []
 
 **This post is a work in progress**
 
-## Motivation
+# Motivation
 
 I use the dbplyr, dplyr, DBI and odbc R packages to extract data held in Microsoft SQL on a daily basis. 
 
@@ -28,13 +28,13 @@ This investigation is an opportunity for me:
 * Advance my R debugging skills so I well-armed to tackle other multi-component R issues in the future
 * Understand, at a deep level, the root cause, and contributing factors, of the failure that leads to this error. With that understanding I will be a much better position to propose, evaluate and contribute to solutions.
 
-## Scope
+# Scope
 
 I'll be reproducing this issue using Microsoft SQL Server Express which is a free download available [here](https://www.microsoft.com/en-us/sql-server/sql-server-downloads).
 
 I'll be focusing my analysis on when this error occurs running R on the Microsoft Windows operating system.
 
-## Reproducing the problem
+# Reproducing the problem
 
 I'll write two different sets of data:
 
@@ -74,13 +74,13 @@ dplyr::copy_to(con,
                )
 ```
 
-Here the problem occurs.
+Here the problem occurs - because the column with, "long," data is NOT the the last column in the table.
 
 ```{r, error = TRUE}
 dplyr::tbl(con,"##problem_data")
 ```
 
-Here the problem does not occur.
+Here the problem does not occur - because the column with "long" data is the last column in the table. 
 
 ```{r}
 dplyr::tbl(con, "##working_data")
@@ -88,7 +88,7 @@ dplyr::tbl(con, "##working_data")
 
 SOURCE: SOURCE: https://github.com/r-dbi/odbc/issues/309#issue-507726267 
 
-## Appendix: Some Reports of, and references to, this issue
+# Appendix: Some Reports of, and references to, this issue
 
 * https://github.com/r-dbi/odbc/issues/10
 * https://github.com/r-dbi/odbc/issues/86
@@ -98,7 +98,7 @@ SOURCE: SOURCE: https://github.com/r-dbi/odbc/issues/309#issue-507726267
 
 * https://github.com/nanodbc/nanodbc/issues/149 
 
-## Q&A
+# Q&A
 
 Q: What constitutes "long" data?
 A: 

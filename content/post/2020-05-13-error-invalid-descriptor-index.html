@@ -10,8 +10,8 @@ tags: []
 
 
 <p><strong>This post is a work in progress</strong></p>
-<div id="motivation" class="section level2">
-<h2>Motivation</h2>
+<div id="motivation" class="section level1">
+<h1>Motivation</h1>
 <p>I use the dbplyr, dplyr, DBI and odbc R packages to extract data held in Microsoft SQL on a daily basis.</p>
 <p>I used to run into the, “Invalid Descriptor Index,” error documented <a href="https://github.com/r-dbi/odbc/issues/309">here</a> constantly. It was awful! I spent so much time trying to find the, “problem,” columns in tables that often had over 100 columns. The time I spent trying to get my queries to work severely reduced the time I had available to clean, transform and analyze my data.</p>
 <p>Through the work of many great people sharing their expertise on GitHub, I was able to identify <a href="https://github.com/r-dbi/odbc/issues/309#issuecomment-615255613">a workaround that worked well for me</a>.</p>
@@ -24,13 +24,13 @@ tags: []
 <li>Understand, at a deep level, the root cause, and contributing factors, of the failure that leads to this error. With that understanding I will be a much better position to propose, evaluate and contribute to solutions.</li>
 </ul>
 </div>
-<div id="scope" class="section level2">
-<h2>Scope</h2>
+<div id="scope" class="section level1">
+<h1>Scope</h1>
 <p>I’ll be reproducing this issue using Microsoft SQL Server Express which is a free download available <a href="https://www.microsoft.com/en-us/sql-server/sql-server-downloads">here</a>.</p>
 <p>I’ll be focusing my analysis on when this error occurs running R on the Microsoft Windows operating system.</p>
 </div>
-<div id="reproducing-the-problem" class="section level2">
-<h2>Reproducing the problem</h2>
+<div id="reproducing-the-problem" class="section level1">
+<h1>Reproducing the problem</h1>
 <p>I’ll write two different sets of data:</p>
 <ol style="list-style-type: decimal">
 <li>A table, “##problem_data,” with, “long” columns that are not the last columns in the table.</li>
@@ -76,11 +76,11 @@ dplyr::copy_to(con,
                temporary = TRUE
                )</code></pre>
 <pre><code>## Created a temporary table named: ##working_data</code></pre>
-<p>Here the problem occurs.</p>
+<p>Here the problem occurs - because the column with, “long,” data is NOT the the last column in the table.</p>
 <pre class="r"><code>dplyr::tbl(con,&quot;##problem_data&quot;)</code></pre>
 <pre><code>## Error in result_fetch(res@ptr, n): nanodbc/nanodbc.cpp:3186: 07009: [Microsoft][ODBC SQL Server Driver]Invalid Descriptor Index</code></pre>
 <pre><code>## Warning in dbClearResult(res): Result already cleared</code></pre>
-<p>Here the problem does not occur.</p>
+<p>Here the problem does not occur - because the column with “long” data is the last column in the table.</p>
 <pre class="r"><code>dplyr::tbl(con, &quot;##working_data&quot;)</code></pre>
 <pre><code>## # Source:   table&lt;##working_data&gt; [?? x 3]
 ## # Database: Microsoft SQL Server
@@ -92,8 +92,8 @@ dplyr::copy_to(con,
 ## 3     3     1 &lt;raw 1 B&gt;</code></pre>
 <p>SOURCE: SOURCE: <a href="https://github.com/r-dbi/odbc/issues/309#issue-507726267" class="uri">https://github.com/r-dbi/odbc/issues/309#issue-507726267</a></p>
 </div>
-<div id="appendix-some-reports-of-and-references-to-this-issue" class="section level2">
-<h2>Appendix: Some Reports of, and references to, this issue</h2>
+<div id="appendix-some-reports-of-and-references-to-this-issue" class="section level1">
+<h1>Appendix: Some Reports of, and references to, this issue</h1>
 <ul>
 <li><p><a href="https://github.com/r-dbi/odbc/issues/10" class="uri">https://github.com/r-dbi/odbc/issues/10</a></p></li>
 <li><p><a href="https://github.com/r-dbi/odbc/issues/86" class="uri">https://github.com/r-dbi/odbc/issues/86</a></p></li>
@@ -103,8 +103,8 @@ dplyr::copy_to(con,
 <li><p><a href="https://github.com/nanodbc/nanodbc/issues/149" class="uri">https://github.com/nanodbc/nanodbc/issues/149</a></p></li>
 </ul>
 </div>
-<div id="qa" class="section level2">
-<h2>Q&amp;A</h2>
+<div id="qa" class="section level1">
+<h1>Q&amp;A</h1>
 <p>Q: What constitutes “long” data?
 A:</p>
 </div>
