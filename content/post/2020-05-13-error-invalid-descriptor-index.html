@@ -96,16 +96,29 @@ dplyr::copy_to(con,
 <h1>Debugging the error</h1>
 <p>One of the primary motivations for this post is to force me to advance my debugging skills.</p>
 <p>I decided to start with <a href="https://adv-r.hadley.nz/debugging.html">the debugging chapter from Hadley Wickham’s Advanced R book</a>.</p>
+<div id="debugging-step-1-google-it" class="section level2">
+<h2>Debugging Step 1: Google it!</h2>
+<p>I started out by Googling a portion of the error string, “<code>[Microsoft][ODBC SQL Server Driver]Invalid Descriptor Index</code>,” which yielded quite a few relevant hits, including a surprising amount of duplicate GitHub issues raised in the odbc project. I’ve captured the list in the <a href="#issues">Appendix</a>.~~</p>
+<p>Based on Hadley’s recommendation in the book I decided to check out the <a href="https://github.com/r-assist/errorist">errorist package</a> which gave me much more target hits because it included the entire text of the error message in the search string. It was also automatic, saving me a second or two of copying and pasting. I’ll be incorporating this package into my debugging work-flow going forward!</p>
 </div>
-<div id="appendix-some-reports-of-and-references-to-this-issue" class="section level1">
+</div>
+<div id="issues" class="section level1">
 <h1>Appendix: Some Reports of, and references to, this issue</h1>
+<p>Issues logged against odbc R package:</p>
 <ul>
-<li><p><a href="https://github.com/r-dbi/odbc/issues/10" class="uri">https://github.com/r-dbi/odbc/issues/10</a></p></li>
-<li><p><a href="https://github.com/r-dbi/odbc/issues/86" class="uri">https://github.com/r-dbi/odbc/issues/86</a></p></li>
-<li><p><a href="https://github.com/r-dbi/odbc/issues/112" class="uri">https://github.com/r-dbi/odbc/issues/112</a></p></li>
-<li><p><a href="https://github.com/r-dbi/odbc/issues/256" class="uri">https://github.com/r-dbi/odbc/issues/256</a></p></li>
-<li><p><a href="https://github.com/r-dbi/odbc/issues/309" class="uri">https://github.com/r-dbi/odbc/issues/309</a></p></li>
-<li><p><a href="https://github.com/nanodbc/nanodbc/issues/149" class="uri">https://github.com/nanodbc/nanodbc/issues/149</a></p></li>
+<li><a href="https://github.com/r-dbi/odbc/issues/10" class="uri">https://github.com/r-dbi/odbc/issues/10</a></li>
+<li><a href="https://github.com/r-dbi/odbc/issues/86" class="uri">https://github.com/r-dbi/odbc/issues/86</a></li>
+<li><a href="https://github.com/r-dbi/odbc/issues/112" class="uri">https://github.com/r-dbi/odbc/issues/112</a></li>
+<li><a href="https://github.com/r-dbi/odbc/issues/256" class="uri">https://github.com/r-dbi/odbc/issues/256</a></li>
+<li><a href="https://github.com/r-dbi/odbc/issues/309" class="uri">https://github.com/r-dbi/odbc/issues/309</a></li>
+</ul>
+<p>Issues logged against nanodbc:</p>
+<ul>
+<li><a href="https://github.com/nanodbc/nanodbc/issues/149" class="uri">https://github.com/nanodbc/nanodbc/issues/149</a></li>
+</ul>
+<p>Stack Overflow threads:</p>
+<ul>
+<li><a href="https://stackoverflow.com/questions/45001152/r-dbi-odbc-error-nanodbc-nanodbc-cpp3110-07009-microsoftodbc-driver-13-fo" class="uri">https://stackoverflow.com/questions/45001152/r-dbi-odbc-error-nanodbc-nanodbc-cpp3110-07009-microsoftodbc-driver-13-fo</a></li>
 </ul>
 </div>
 <div id="qa" class="section level1">

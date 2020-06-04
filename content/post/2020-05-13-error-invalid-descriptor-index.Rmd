@@ -94,7 +94,16 @@ One of the primary motivations for this post is to force me to advance my debugg
 
 I decided to start with [the debugging chapter from Hadley Wickham's Advanced R book](https://adv-r.hadley.nz/debugging.html).
 
-# Appendix: Some Reports of, and references to, this issue
+## Debugging Step 1: Google it!
+
+I started out by Googling a portion of the error string, "`[Microsoft][ODBC SQL Server Driver]Invalid Descriptor Index`," which yielded quite a few relevant hits, including a surprising amount of duplicate GitHub issues raised in the odbc project. I've captured the list in the [Appendix](#issues).~~
+
+Based on Hadley's recommendation in the book I decided to check out the [errorist package](https://github.com/r-assist/errorist) which gave me much more target hits because it included the entire text of the error message in the search string. It was also automatic, saving me a second or two of copying and pasting. I'll be incorporating this package into my debugging work-flow going forward!
+
+
+# Appendix: Some Reports of, and references to, this issue {#issues}
+
+Issues logged against odbc R package:
 
 * https://github.com/r-dbi/odbc/issues/10
 * https://github.com/r-dbi/odbc/issues/86
@@ -102,7 +111,13 @@ I decided to start with [the debugging chapter from Hadley Wickham's Advanced R 
 * https://github.com/r-dbi/odbc/issues/256
 * https://github.com/r-dbi/odbc/issues/309
 
+Issues logged against nanodbc:
+
 * https://github.com/nanodbc/nanodbc/issues/149 
+
+Stack Overflow threads:
+
+* https://stackoverflow.com/questions/45001152/r-dbi-odbc-error-nanodbc-nanodbc-cpp3110-07009-microsoftodbc-driver-13-fo 
 
 # Q&A
 
