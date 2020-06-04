@@ -76,10 +76,7 @@ dplyr::copy_to(con,
 
 Here the problem occurs.
 
-TODO: if this is evaluated is causes blogdown::serve_site() to fail. Probably need to wrap the call in some sort of exception handling.
-Read through: https://adv-r.hadley.nz/conditions.html 
-
-```{r, eval = FALSE}
+```{r, error = TRUE}
 dplyr::tbl(con,"##problem_data")
 ```
 
@@ -89,6 +86,17 @@ Here the problem does not occur.
 dplyr::tbl(con, "##working_data")
 ```
 
+SOURCE: SOURCE: https://github.com/r-dbi/odbc/issues/309#issue-507726267 
+
+## Appendix: Some Reports of, and references to, this issue
+
+* https://github.com/r-dbi/odbc/issues/10
+* https://github.com/r-dbi/odbc/issues/86
+* https://github.com/r-dbi/odbc/issues/112 
+* https://github.com/r-dbi/odbc/issues/256
+* https://github.com/r-dbi/odbc/issues/309
+
+* https://github.com/nanodbc/nanodbc/issues/149 
 
 ## Q&A
 
