@@ -86,7 +86,13 @@ Here the problem does not occur - because the column with "long" data is the las
 dplyr::tbl(con, "##working_data")
 ```
 
-SOURCE: SOURCE: https://github.com/r-dbi/odbc/issues/309#issue-507726267 
+SOURCE: https://github.com/r-dbi/odbc/issues/309#issue-507726267 
+
+# Debugging the error
+
+One of the primary motivations for this post is to force me to advance my debugging skills.
+
+I decided to start with [the debugging chapter from Hadley Wickham's Advanced R book](https://adv-r.hadley.nz/debugging.html).
 
 # Appendix: Some Reports of, and references to, this issue
 
