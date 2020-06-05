@@ -98,8 +98,15 @@ dplyr::copy_to(con,
 <p>I decided to start with <a href="https://adv-r.hadley.nz/debugging.html">the debugging chapter from Hadley Wickham’s Advanced R book</a>.</p>
 <div id="debugging-step-1-google-it" class="section level2">
 <h2>Debugging Step 1: Google it!</h2>
-<p>I started out by Googling a portion of the error string, “<code>[Microsoft][ODBC SQL Server Driver]Invalid Descriptor Index</code>,” which yielded quite a few relevant hits, including a surprising amount of duplicate GitHub issues raised in the odbc project. I’ve captured the list in the <a href="#issues">Appendix</a>.~~</p>
+<p>I started out by Googling a portion of the error string, “<code>[Microsoft][ODBC SQL Server Driver]Invalid Descriptor Index</code>,” which yielded quite a few relevant hits, including a surprising amount of duplicate GitHub issues raised in the odbc project.</p>
 <p>Based on Hadley’s recommendation in the book I decided to check out the <a href="https://github.com/r-assist/errorist">errorist package</a> which gave me much more target hits because it included the entire text of the error message in the search string. It was also automatic, saving me a second or two of copying and pasting. I’ll be incorporating this package into my debugging work-flow going forward!</p>
+<p>I’ve captured a list of relevant issues, and the Stack Overflow thread I found most helpful in the <a href="#issues">Appendix</a>.</p>
+<p>Here is what I gleaned:</p>
+<ol style="list-style-type: decimal">
+<li>TODO: something about this being caused by a ODBC (the Microsoft C interface - not the R odbc package) constraint.</li>
+<li>TODO: The workaround is to put “long” columns at the end of the select statement - there are a few different ways to do this</li>
+<li>TODO: doesn’t occur with: 1) RStudio’s professional drivers which are part of their commercial (you need to pay for) offerings 2) RODBC package 3) FreeTDS drivers (*nix systems only)</li>
+</ol>
 </div>
 </div>
 <div id="issues" class="section level1">
@@ -116,7 +123,7 @@ dplyr::copy_to(con,
 <ul>
 <li><a href="https://github.com/nanodbc/nanodbc/issues/149" class="uri">https://github.com/nanodbc/nanodbc/issues/149</a></li>
 </ul>
-<p>Stack Overflow threads:</p>
+<p>Most Helpful (to me) Stack Overflow thread:</p>
 <ul>
 <li><a href="https://stackoverflow.com/questions/45001152/r-dbi-odbc-error-nanodbc-nanodbc-cpp3110-07009-microsoftodbc-driver-13-fo" class="uri">https://stackoverflow.com/questions/45001152/r-dbi-odbc-error-nanodbc-nanodbc-cpp3110-07009-microsoftodbc-driver-13-fo</a></li>
 </ul>

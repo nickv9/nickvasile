@@ -96,10 +96,17 @@ I decided to start with [the debugging chapter from Hadley Wickham's Advanced R 
 
 ## Debugging Step 1: Google it!
 
-I started out by Googling a portion of the error string, "`[Microsoft][ODBC SQL Server Driver]Invalid Descriptor Index`," which yielded quite a few relevant hits, including a surprising amount of duplicate GitHub issues raised in the odbc project. I've captured the list in the [Appendix](#issues).~~
+I started out by Googling a portion of the error string, "`[Microsoft][ODBC SQL Server Driver]Invalid Descriptor Index`," which yielded quite a few relevant hits, including a surprising amount of duplicate GitHub issues raised in the odbc project.
 
 Based on Hadley's recommendation in the book I decided to check out the [errorist package](https://github.com/r-assist/errorist) which gave me much more target hits because it included the entire text of the error message in the search string. It was also automatic, saving me a second or two of copying and pasting. I'll be incorporating this package into my debugging work-flow going forward!
 
+I've captured a list of relevant issues, and the Stack Overflow thread I found most helpful in the [Appendix](#issues).
+
+Here is what I gleaned:
+
+1. TODO: something about this being caused by a ODBC (the Microsoft C interface - not the R odbc package) constraint.
+2. TODO: The workaround is to put "long" columns at the end of the select statement - there are a few different ways to do this
+3. TODO: doesn't occur with: 1) RStudio's professional drivers which are part of their commercial (you need to pay for) offerings 2) RODBC package 3) FreeTDS drivers (*nix systems only)
 
 # Appendix: Some Reports of, and references to, this issue {#issues}
 
@@ -115,9 +122,10 @@ Issues logged against nanodbc:
 
 * https://github.com/nanodbc/nanodbc/issues/149 
 
-Stack Overflow threads:
+Most Helpful (to me) Stack Overflow thread:
 
 * https://stackoverflow.com/questions/45001152/r-dbi-odbc-error-nanodbc-nanodbc-cpp3110-07009-microsoftodbc-driver-13-fo 
+
 
 # Q&A
 
