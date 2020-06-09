@@ -113,10 +113,16 @@ Here is what I gleaned:
 Issues logged against odbc R package:
 
 * https://github.com/r-dbi/odbc/issues/10
-* https://github.com/r-dbi/odbc/issues/86
+* https://github.com/r-dbi/odbc/issues/86 TODO: keep reading this 
 * https://github.com/r-dbi/odbc/issues/112 
 * https://github.com/r-dbi/odbc/issues/256
 * https://github.com/r-dbi/odbc/issues/309
+* https://github.com/r-dbi/odbc/issues/331 
+
+Issues logged against DBI R package:
+
+* https://github.com/r-dbi/DBI/issues/315 
+
 
 Issues logged against nanodbc:
 
@@ -130,4 +136,9 @@ Most Helpful (to me) Stack Overflow thread:
 # Q&A
 
 Q: What constitutes "long" data?
+
 A: 
+
+> DBMSs define long data as any character or binary data over a certain size, such as 255 characters
+
+SOURCE: [Microsoft documentation on Getting Long Data](https://docs.microsoft.com/en-us/sql/odbc/reference/develop-app/getting-long-data?view=sql-server-ver15)
