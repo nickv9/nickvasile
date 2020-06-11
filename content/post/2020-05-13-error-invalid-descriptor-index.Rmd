@@ -113,20 +113,21 @@ Here is what I gleaned:
 Issues logged against odbc R package:
 
 * https://github.com/r-dbi/odbc/issues/10
-* https://github.com/r-dbi/odbc/issues/86 TODO: keep reading this 
+* https://github.com/r-dbi/odbc/issues/86 
 * https://github.com/r-dbi/odbc/issues/112 
 * https://github.com/r-dbi/odbc/issues/256
-* https://github.com/r-dbi/odbc/issues/309
-* https://github.com/r-dbi/odbc/issues/331 
+* https://github.com/r-dbi/odbc/issues/309 
+* https://github.com/r-dbi/odbc/issues/331 TODO: read this
+* https://github.com/r-dbi/odbc/issues/358
 
 Issues logged against DBI R package:
 
 * https://github.com/r-dbi/DBI/issues/315 
 
-
 Issues logged against nanodbc:
 
 * https://github.com/nanodbc/nanodbc/issues/149 
+* https://github.com/nanodbc/nanodbc/issues/228 
 
 Most Helpful (to me) Stack Overflow thread:
 
