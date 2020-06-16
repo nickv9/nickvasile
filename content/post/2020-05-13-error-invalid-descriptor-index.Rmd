@@ -36,9 +36,9 @@ I'll be focusing my analysis on when this error occurs running R on the Microsof
 
 # Reproducing the problem
 
-First, I'll create a test database following [simple instructions from Microsoft](https://docs.microsoft.com/en-us/sql/t-sql/statements/create-database-transact-sql?view=sql-server-ver15#a-creating-a-database-without-specifying-files).
+First, I'll create a test database following [simple steps based on instructions from Microsoft](https://docs.microsoft.com/en-us/sql/t-sql/statements/create-database-transact-sql?view=sql-server-ver15#a-creating-a-database-without-specifying-files).
 
-```{r}
+```{r, warning=FALSE, message=FALSE}
 library(tidyverse)
 
 user_name <-
@@ -52,9 +52,15 @@ con <- DBI::dbConnect(
       PWD = keyring::key_get("dbi_test", user_name)
    )
 
+# kill any connections before trying to drop database
+DBI::dbExecute(con,
+               "IF DB_ID (N'dbi_error') IS NOT NULL 
+               ALTER DATABASE [dbi_error] set single_user with rollback immediate")
+
 # Delete the test database if it already exists
 DBI::dbExecute(con,
-               "IF DB_ID (N'dbi_error') IS NOT NULL DROP DATABASE dbi_error")
+               "IF DB_ID (N'dbi_error') IS NOT NULL 
+               DROP DATABASE dbi_error")
 
 # Create the test database
 DBI::dbExecute(con, "CREATE DATABASE dbi_error")
@@ -73,7 +79,7 @@ Next, I'll write two different sets of data:
 1. A table, "problem_data," with, "long" columns that are not the last columns in the table.
 2. A table, "working_data," with the same data, only this time with the, "long," column at the end of the table.
 
-```{r}
+```{r, warning=FALSE}
 con <- DBI::dbConnect(
       odbc::odbc(),
       Driver = "SQL Server",
@@ -104,7 +110,7 @@ dplyr::copy_to(con,
 
 Here the problem occurs - because the column with, "long," data is NOT the the last column in the table.
 
-```{r, error = TRUE}
+```{r, error = TRUE, warning = FALSE}
 dplyr::tbl(con,"problem_data")
 ```
 
@@ -143,11 +149,24 @@ Here is what I gleaned:
 ...  
 Must have a higher column number than the last bound column. For example, if the last bound column is column 3, it is an error to call SQLGetData for column 2. For this reason, applications should make sure to place long data columns at the end of the select list.
 
-SOURCE: [Microsoft documentation on "Gettling Long Data"](https://docs.microsoft.com/en-us/sql/odbc/reference/develop-app/getting-long-data?view=sql-server-ver15)
+SOURCE: [Microsoft documentation on "Getting Long Data"](https://docs.microsoft.com/en-us/sql/odbc/reference/develop-app/getting-long-data?view=sql-server-ver15)
 
-2. The workaround is to put "long" columns at the end of the select statement, and there are a few different methods to do this.
+3. The most common workaround is to put "long" columns at the end of the select 
+statement, and there are a few different methods to do this. 
+See [Appendix: Methods to move "long" data to end of query](#move_long_data) for
+options to do this.
 
-3. TODO: doesn't occur with: 1) RStudio's professional drivers which are part of their commercial (you need to pay for) offerings 2) RODBC package 3) FreeTDS drivers (*nix systems only)
+4. People have reported that the error doesn't occur with: 
+    + RStudio's professional drivers which are part of their commercial 
+    (you need to pay for) offerings. SOURCE: [GitHub issue comment from Jim Hester](https://github.com/r-dbi/odbc/issues/86#issuecomment-558280484)
+    + RODBC package. 
+    [Reported in this GitHub issue](https://github.com/r-dbi/odbc/issues/256#issue-411385255),
+    although Jim Hester reported [here](https://github.com/r-dbi/odbc/issues/86#issuecomment-558199954)
+    that RODBC is simply truncating the long data.
+    + FreeTDS drivers SOURCE: [Bill Evans comment on GitHub](https://github.com/r-dbi/DBI/issues/315#issuecomment-639984938) See [Appendix: Installing and using the FreeTDS driver on Windows](#freeTDS). Note that this is an evloving approach and Bill Evans notes some cons to using FreeTDS:
+      + Might be slower than Microsoft drivers
+      + `pool` package doesn't reconnect after disconnects
+      + Hasn't been able to identify a way to use SSL for the database connections
 
 # Appendix: Some Reports of, and references to, this issue {#issues}
 
@@ -178,7 +197,7 @@ Most Helpful (to me) Stack Overflow thread:
 
 * https://stackoverflow.com/questions/45001152/r-dbi-odbc-error-nanodbc-nanodbc-cpp3110-07009-microsoftodbc-driver-13-fo 
 
-# Appendix: Methods to move "long" data to end of query
+# Appendix: Methods to move "long" data to end of query {#move_long_data}
 
 ## Method 1: Identify and move columns over a certain size to the end
 
@@ -221,14 +240,37 @@ tbl_long_cols_2(con, "problem_data") %>%
   dplyr::select(a,b,c) #can move the "long" cols back after retrievel from db
 ```
 
-
 ## Method 3: Move certain data types to the end
 
-TODO: https://github.com/r-dbi/odbc/issues/309#issuecomment-615255613 
+There are certain data types that are, "long." You can look for these long data
+types and move them to the end of the select statement.
+
+
+```{r}
+
+tbl_long_cols_3 <- function(con, table) {
+  long_cols <-
+  odbc::odbcConnectionColumns(con, table) %>%
+  dplyr::filter(field.type == "varbinary") %>%
+  pull(name)
+
+dplyr::tbl(con, table) %>%
+  dplyr::select(-tidyselect::all_of(long_cols), tidyselect::everything(),
+                tidyselect::all_of(long_cols))
+  
+}
+
+tbl_long_cols_3(con, "problem_data") %>% 
+  collect()
+```
+
 
 ```{r close_connections, include = FALSE}
 DBI::dbDisconnect(con)
 ```
+
+
+# Appendix: Installing and using the FreeTDS driver on Windows {#freeTDS}
 
 # Q&A
 
@@ -237,5 +279,5 @@ Q: How "long" data be identified?
 A: 
 
 > DBMSs define long data as any character or binary data over a certain size, such as 255 characters
-
+TODO
 SOURCE: [Microsoft documentation on Getting Long Data](https://docs.microsoft.com/en-us/sql/odbc/reference/develop-app/getting-long-data?view=sql-server-ver15)

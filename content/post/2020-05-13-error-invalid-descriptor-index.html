@@ -31,19 +31,10 @@ tags: []
 </div>
 <div id="reproducing-the-problem" class="section level1">
 <h1>Reproducing the problem</h1>
-<p>First, I’ll create a test database following <a href="https://docs.microsoft.com/en-us/sql/t-sql/statements/create-database-transact-sql?view=sql-server-ver15#a-creating-a-database-without-specifying-files">simple instructions from Microsoft</a>.</p>
-<pre class="r"><code>library(tidyverse)</code></pre>
-<pre><code>## -- Attaching packages ------------------------------------------------------------------------------------------ tidyverse 1.3.0 --</code></pre>
-<pre><code>## v ggplot2 3.3.0     v purrr   0.3.3
-## v tibble  2.1.3     v dplyr   0.8.5
-## v tidyr   1.0.2     v stringr 1.4.0
-## v readr   1.3.1     v forcats 0.5.0</code></pre>
-<pre><code>## Warning: package &#39;tidyr&#39; was built under R version 3.6.3</code></pre>
-<pre><code>## Warning: package &#39;forcats&#39; was built under R version 3.6.3</code></pre>
-<pre><code>## -- Conflicts --------------------------------------------------------------------------------------------- tidyverse_conflicts() --
-## x dplyr::filter() masks stats::filter()
-## x dplyr::lag()    masks stats::lag()</code></pre>
-<pre class="r"><code>user_name &lt;-
+<p>First, I’ll create a test database following <a href="https://docs.microsoft.com/en-us/sql/t-sql/statements/create-database-transact-sql?view=sql-server-ver15#a-creating-a-database-without-specifying-files">simple steps based on instructions from Microsoft</a>.</p>
+<pre class="r"><code>library(tidyverse)
+
+user_name &lt;-
   keyring::key_list(&quot;dbi_test&quot;)$username
 
 con &lt;- DBI::dbConnect(
@@ -54,9 +45,15 @@ con &lt;- DBI::dbConnect(
       PWD = keyring::key_get(&quot;dbi_test&quot;, user_name)
    )
 
-# Delete the test database if it already exists
+# kill any connections before trying to drop database
 DBI::dbExecute(con,
-               &quot;IF DB_ID (N&#39;dbi_error&#39;) IS NOT NULL DROP DATABASE dbi_error&quot;)</code></pre>
+               &quot;IF DB_ID (N&#39;dbi_error&#39;) IS NOT NULL 
+               ALTER DATABASE [dbi_error] set single_user with rollback immediate&quot;)</code></pre>
+<pre><code>## [1] 0</code></pre>
+<pre class="r"><code># Delete the test database if it already exists
+DBI::dbExecute(con,
+               &quot;IF DB_ID (N&#39;dbi_error&#39;) IS NOT NULL 
+               DROP DATABASE dbi_error&quot;)</code></pre>
 <pre><code>## [1] 0</code></pre>
 <pre class="r"><code># Create the test database
 DBI::dbExecute(con, &quot;CREATE DATABASE dbi_error&quot;)</code></pre>
@@ -102,7 +99,6 @@ dplyr::copy_to(con,
 <p>Here the problem occurs - because the column with, “long,” data is NOT the the last column in the table.</p>
 <pre class="r"><code>dplyr::tbl(con,&quot;problem_data&quot;)</code></pre>
 <pre><code>## Error in result_fetch(res@ptr, n): nanodbc/nanodbc.cpp:3186: 07009: [Microsoft][ODBC SQL Server Driver]Invalid Descriptor Index</code></pre>
-<pre><code>## Warning in dbClearResult(res): Result already cleared</code></pre>
 <p>Here the problem does not occur - because the column with “long” data is the last column in the table.</p>
 <pre class="r"><code>dplyr::tbl(con, &quot;working_data&quot;) %&gt;% 
   collect()</code></pre>
@@ -136,10 +132,27 @@ dplyr::copy_to(con,
 …<br />
 Must have a higher column number than the last bound column. For example, if the last bound column is column 3, it is an error to call SQLGetData for column 2. For this reason, applications should make sure to place long data columns at the end of the select list.</p>
 </blockquote>
-<p>SOURCE: <a href="https://docs.microsoft.com/en-us/sql/odbc/reference/develop-app/getting-long-data?view=sql-server-ver15">Microsoft documentation on “Gettling Long Data”</a></p>
-<ol start="2" style="list-style-type: decimal">
-<li><p>The workaround is to put “long” columns at the end of the select statement, and there are a few different methods to do this.</p></li>
-<li><p>TODO: doesn’t occur with: 1) RStudio’s professional drivers which are part of their commercial (you need to pay for) offerings 2) RODBC package 3) FreeTDS drivers (*nix systems only)</p></li>
+<p>SOURCE: <a href="https://docs.microsoft.com/en-us/sql/odbc/reference/develop-app/getting-long-data?view=sql-server-ver15">Microsoft documentation on “Getting Long Data”</a></p>
+<ol start="3" style="list-style-type: decimal">
+<li><p>The most common workaround is to put “long” columns at the end of the select
+statement, and there are a few different methods to do this.
+See <a href="#move_long_data">Appendix: Methods to move “long” data to end of query</a> for
+options to do this.</p></li>
+<li><p>People have reported that the error doesn’t occur with:</p>
+<ul>
+<li>RStudio’s professional drivers which are part of their commercial
+(you need to pay for) offerings. SOURCE: <a href="https://github.com/r-dbi/odbc/issues/86#issuecomment-558280484">GitHub issue comment from Jim Hester</a></li>
+<li>RODBC package.
+<a href="https://github.com/r-dbi/odbc/issues/256#issue-411385255">Reported in this GitHub issue</a>,
+although Jim Hester reported <a href="https://github.com/r-dbi/odbc/issues/86#issuecomment-558199954">here</a>
+that RODBC is simply truncating the long data.</li>
+<li>FreeTDS drivers SOURCE: <a href="https://github.com/r-dbi/DBI/issues/315#issuecomment-639984938">Bill Evans comment on GitHub</a> See <a href="#freeTDS">Appendix: Installing and using the FreeTDS driver on Windows</a>. Note that this is an evloving approach and Bill Evans notes some cons to using FreeTDS:
+<ul>
+<li>Might be slower than Microsoft drivers</li>
+<li><code>pool</code> package doesn’t reconnect after disconnects</li>
+<li>Hasn’t been able to identify a way to use SSL for the database connections</li>
+</ul></li>
+</ul></li>
 </ol>
 </div>
 </div>
@@ -173,7 +186,7 @@ Must have a higher column number than the last bound column. For example, if the
 <li><a href="https://stackoverflow.com/questions/45001152/r-dbi-odbc-error-nanodbc-nanodbc-cpp3110-07009-microsoftodbc-driver-13-fo" class="uri">https://stackoverflow.com/questions/45001152/r-dbi-odbc-error-nanodbc-nanodbc-cpp3110-07009-microsoftodbc-driver-13-fo</a></li>
 </ul>
 </div>
-<div id="appendix-methods-to-move-long-data-to-end-of-query" class="section level1">
+<div id="move_long_data" class="section level1">
 <h1>Appendix: Methods to move “long” data to end of query</h1>
 <div id="method-1-identify-and-move-columns-over-a-certain-size-to-the-end" class="section level2">
 <h2>Method 1: Identify and move columns over a certain size to the end</h2>
@@ -224,15 +237,40 @@ tbl_long_cols_2(con, &quot;problem_data&quot;) %&gt;%
 </div>
 <div id="method-3-move-certain-data-types-to-the-end" class="section level2">
 <h2>Method 3: Move certain data types to the end</h2>
-<p>TODO: <a href="https://github.com/r-dbi/odbc/issues/309#issuecomment-615255613" class="uri">https://github.com/r-dbi/odbc/issues/309#issuecomment-615255613</a></p>
+<p>There are certain data types that are, “long.” You can look for these long data
+types and move them to the end of the select statement.</p>
+<pre class="r"><code>tbl_long_cols_3 &lt;- function(con, table) {
+  long_cols &lt;-
+  odbc::odbcConnectionColumns(con, table) %&gt;%
+  dplyr::filter(field.type == &quot;varbinary&quot;) %&gt;%
+  pull(name)
+
+dplyr::tbl(con, table) %&gt;%
+  dplyr::select(-tidyselect::all_of(long_cols), tidyselect::everything(),
+                tidyselect::all_of(long_cols))
+  
+}
+
+tbl_long_cols_3(con, &quot;problem_data&quot;) %&gt;% 
+  collect()</code></pre>
+<pre><code>## # A tibble: 3 x 3
+##       a     c         b
+##   &lt;int&gt; &lt;dbl&gt;    &lt;blob&gt;
+## 1     1     1 &lt;raw 1 B&gt;
+## 2     2     1 &lt;raw 1 B&gt;
+## 3     3     1 &lt;raw 1 B&gt;</code></pre>
 </div>
+</div>
+<div id="freeTDS" class="section level1">
+<h1>Appendix: Installing and using the FreeTDS driver on Windows</h1>
 </div>
 <div id="qa" class="section level1">
 <h1>Q&amp;A</h1>
 <p>Q: How “long” data be identified?</p>
 <p>A:</p>
 <blockquote>
-<p>DBMSs define long data as any character or binary data over a certain size, such as 255 characters</p>
+<p>DBMSs define long data as any character or binary data over a certain size, such as 255 characters
+TODO
+SOURCE: <a href="https://docs.microsoft.com/en-us/sql/odbc/reference/develop-app/getting-long-data?view=sql-server-ver15">Microsoft documentation on Getting Long Data</a></p>
 </blockquote>
-<p>SOURCE: <a href="https://docs.microsoft.com/en-us/sql/odbc/reference/develop-app/getting-long-data?view=sql-server-ver15">Microsoft documentation on Getting Long Data</a></p>
 </div>
