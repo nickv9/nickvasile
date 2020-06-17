@@ -146,7 +146,7 @@ options to do this.</p></li>
 <a href="https://github.com/r-dbi/odbc/issues/256#issue-411385255">Reported in this GitHub issue</a>,
 although Jim Hester reported <a href="https://github.com/r-dbi/odbc/issues/86#issuecomment-558199954">here</a>
 that RODBC is simply truncating the long data.</li>
-<li>FreeTDS drivers SOURCE: <a href="https://github.com/r-dbi/DBI/issues/315#issuecomment-639984938">Bill Evans comment on GitHub</a> See <a href="#freeTDS">Appendix: Installing and using the FreeTDS driver on Windows</a>. Note that this is an evloving approach and Bill Evans notes some cons to using FreeTDS:
+<li>FreeTDS drivers SOURCE: <a href="https://github.com/r-dbi/DBI/issues/315#issuecomment-639984938">Bill Evans comment on GitHub</a> See <a href="#freeTDS">Appendix: Installing and using the FreeTDS driver on Windows</a>. Note that this is an evolving approach and Bill Evans notes some cons to using FreeTDS:
 <ul>
 <li>Might be slower than Microsoft drivers</li>
 <li><code>pool</code> package doesn’t reconnect after disconnects</li>
@@ -198,7 +198,8 @@ that RODBC is simply truncating the long data.</li>
         dplyr::pull(name)
 
     dplyr::tbl(con, table) %&gt;%
-        dplyr::select(-tidyselect::all_of(long_cols), tidyselect::everything(),
+        dplyr::select(-tidyselect::all_of(long_cols),
+                      tidyselect::everything(),
                       tidyselect::all_of(long_cols))
 }
 
@@ -246,7 +247,8 @@ types and move them to the end of the select statement.</p>
   pull(name)
 
 dplyr::tbl(con, table) %&gt;%
-  dplyr::select(-tidyselect::all_of(long_cols), tidyselect::everything(),
+  dplyr::select(-tidyselect::all_of(long_cols),
+                tidyselect::everything(),
                 tidyselect::all_of(long_cols))
   
 }
@@ -263,6 +265,20 @@ tbl_long_cols_3(con, &quot;problem_data&quot;) %&gt;%
 </div>
 <div id="freeTDS" class="section level1">
 <h1>Appendix: Installing and using the FreeTDS driver on Windows</h1>
+<ol style="list-style-type: decimal">
+<li>View the latest FreeTDS build for your architecture (32 or 64 bit). Here is a link to the current <a href="https://ci.appveyor.com/project/FreeTDS/freetds">FreeTDS build</a></li>
+</ol>
+<p>Click one of the rows.</p>
+<p><img src="/post/2020-05-13-error-invalid-descriptor-index_files/free_tds_1.png" /></p>
+<ol start="2" style="list-style-type: decimal">
+<li>Click Artifacts and click a .zip file</li>
+</ol>
+<p><img src="/post/2020-05-13-error-invalid-descriptor-index_files/free_tds_2.png" /></p>
+<ol start="3" style="list-style-type: decimal">
+<li>Extract the contents of the zip file</li>
+</ol>
+<p>SOURCE: <a href="https://github.com/r-dbi/DBI/issues/315#issuecomment-639984938">Bill Even’s GitHub Issue post where he shares solution</a></p>
+<p>SOURCE: <a href="https://lists.ibiblio.org/pipermail/freetds/2016q3/029980.html">Setting up FreeTDS to work with ODBC Data Source Administrator on Windows 7</a></p>
 </div>
 <div id="qa" class="section level1">
 <h1>Q&amp;A</h1>
