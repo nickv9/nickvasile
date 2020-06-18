@@ -259,7 +259,6 @@ dplyr::tbl(con, table) %>%
   dplyr::select(-tidyselect::all_of(long_cols),
                 tidyselect::everything(),
                 tidyselect::all_of(long_cols))
-  
 }
 
 tbl_long_cols_3(con, "problem_data") %>% 
@@ -278,15 +277,73 @@ Click one of the rows.
 
 ![](/post/2020-05-13-error-invalid-descriptor-index_files/free_tds_1.png)
 
-2. Click Artifacts and click a .zip file
+2. Click Artifacts and click a .zip file - I tried `vs2017_64-master.zip` variant but received an error when trying to register the driver dll. I *believe* this is due to the dependency on OpenSSL. I looked to install OpenSSL but it had quite a few dependencies that I didn't feel like setting up (Perl and make for example)
 
 ![](/post/2020-05-13-error-invalid-descriptor-index_files/free_tds_2.png)
 
 3. Extract the contents of the zip file
 
+4. Open a command prompt or PowerShell window and execute the following command:
+
+`regsvr32 "C:\temp\vs2017_64-master\bin\tdsodbc.dll"`
+
+5. Success should yield a message like this:
+
+![](/post/2020-05-13-error-invalid-descriptor-index_files/freetds_install_success.png)
+
+
+6. Verify that R can see the new driver
+
+```{r}
+odbc::odbcListDrivers() %>% 
+  dplyr::filter(name == "FreeTDS")
+```
+
+Let's connect using the FreeTDS driver and verify the issue does not occur.
+
+NOTE: I had to make a couple changes, in addition to changing the driver to get
+this to work:
+
+* Specified SQL port(typically this is 1433)
+* Set the client character set to UTF-8 (referenced 
+in [this post](https://lists.ibiblio.org/pipermail/freetds/2016q3/029980.html)).
+
+```{r}
+user_name <-
+  keyring::key_list("dbi_test")$username
+
+con_freetds <- DBI::dbConnect(
+      odbc::odbc(),
+      Driver = "FreeTDS",
+      Server = "testsqlserver",
+      UID = user_name,
+      PWD = keyring::key_get("dbi_test", user_name),
+      ClientCharset = "UTF-8",
+      port = 1433,
+      Database = "dbi_error"
+   )
+
+dplyr::tbl(con_freetds,"problem_data") %>% 
+  collect()
+
+DBI::dbDisconnect(con_freetds)
+```
+
+It works!
+
+A few NOTES:
+
+*  I think there may be an implication for extended (longer than 8-bit) 
+character data when setting character set to 8-bit. I don't know what that is. 
+
+* TODO: I am not *yet* sure if FreeTDS will work in a Windows domain joined 
+environment. Will test this tomorrow.
+
 SOURCE: [Bill Even's GitHub Issue post where he shares solution](https://github.com/r-dbi/DBI/issues/315#issuecomment-639984938)
 
 SOURCE: [Setting up FreeTDS to work with ODBC Data Source Administrator on Windows 7](https://lists.ibiblio.org/pipermail/freetds/2016q3/029980.html)
+
+SOURCE: [FreeTDS user guide](https://www.freetds.org/userguide/osissues.html#Windows)
 
 # Q&A
 
