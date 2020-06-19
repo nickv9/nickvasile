@@ -34,95 +34,6 @@ I'll be reproducing this issue using Microsoft SQL Server Express which is a fre
 
 I'll be focusing my analysis on when this error occurs running R on the Microsoft Windows operating system.
 
-# Reproducing the problem
-
-First, I'll create a test database following [simple steps based on instructions from Microsoft](https://docs.microsoft.com/en-us/sql/t-sql/statements/create-database-transact-sql?view=sql-server-ver15#a-creating-a-database-without-specifying-files).
-
-```{r, warning=FALSE, message=FALSE}
-library(tidyverse)
-
-user_name <-
-  keyring::key_list("dbi_test")$username
-
-con <- DBI::dbConnect(
-      odbc::odbc(),
-      Driver = "SQL Server",
-      Server = "testsqlserver",
-      UID = user_name,
-      PWD = keyring::key_get("dbi_test", user_name)
-   )
-
-# kill any connections before trying to drop database
-DBI::dbExecute(con,
-               "IF DB_ID (N'dbi_error') IS NOT NULL 
-               ALTER DATABASE [dbi_error] set single_user with rollback immediate")
-
-# Delete the test database if it already exists
-DBI::dbExecute(con,
-               "IF DB_ID (N'dbi_error') IS NOT NULL 
-               DROP DATABASE dbi_error")
-
-# Create the test database
-DBI::dbExecute(con, "CREATE DATABASE dbi_error")
-
-# Verify it was created
-DBI::dbGetQuery(con,
-                "SELECT name, size, size*1.0/128 AS [Size in MBs]
-                FROM sys.master_files WHERE name = N'dbi_error'")
-
-DBI::dbDisconnect(con)
-```
-
-
-Next, I'll write two different sets of data:
-
-1. A table, "problem_data," with, "long" columns that are not the last columns in the table.
-2. A table, "working_data," with the same data, only this time with the, "long," column at the end of the table.
-
-```{r, warning=FALSE}
-con <- DBI::dbConnect(
-      odbc::odbc(),
-      Driver = "SQL Server",
-      Server = "testsqlserver",
-      UID = user_name,
-      Database = "dbi_error",
-      PWD = keyring::key_get("dbi_test", user_name)
-   )
-
-dplyr::copy_to(con,
-               tibble(a = 1:3, 
-                      b = blob::blob(raw(1)), #blob data NOT at end of table
-                      c = 1
-                      ),
-               "problem_data", # will expose problem
-               temporary = FALSE
-               )
-
-dplyr::copy_to(con,
-               tibble(a = 1:3,
-                      c = 1,
-                      b = blob::blob(raw(1)) # blob data at end of table
-                      ),
-               "working_data", # will not expose problem
-               temporary = FALSE
-               )
-```
-
-Here the problem occurs - because the column with, "long," data is NOT the the last column in the table.
-
-```{r, error = TRUE, warning = FALSE}
-dplyr::tbl(con,"problem_data")
-```
-
-Here the problem does not occur - because the column with "long" data is the last column in the table. 
-
-```{r}
-dplyr::tbl(con, "working_data") %>% 
-  collect()
-```
-
-SOURCE: https://github.com/r-dbi/odbc/issues/309#issue-507726267 
-
 # Debugging the error
 
 One of the primary motivations for this post is to force me to advance my debugging skills.
@@ -135,11 +46,9 @@ I started out by Googling a portion of the error string, "`[Microsoft][ODBC SQL 
 
 Based on Hadley's recommendation in the book I decided to check out the [errorist package](https://github.com/r-assist/errorist) which gave me much more target hits because it included the entire text of the error message in the search string. It was also automatic, saving me a second or two of copying and pasting. I'll be incorporating this package into my debugging work-flow going forward!
 
-I've captured a list of relevant issues, and the Stack Overflow thread I found most helpful in the [Appendix](#issues).
-
 Here is what I gleaned:
 
-1. Judging by the sheer frequency, and recency, of this issue being reported, I don't believe this is a corner case affecting a small minority of R users.
+1. Judging by the sheer frequency, and recency, of this issue being reported, I don't believe this is a corner case affecting a small minority of R users. I've captured a list of relevant issues, and the Stack Overflow thread I found most helpful in [Appendix: Some Reports of, and references to, this issue](#issues).
 
 2. This is  caused by a ODBC (the Microsoft C interface - not the R odbc package) constraint:
 
@@ -168,6 +77,119 @@ options to do this.
       + `pool` package doesn't reconnect after disconnects
       + Hasn't been able to identify a way to use SSL for the database connections
 
+## Debugging Step 2: Make it repeatable
+
+This is a little more complex than the standard reprex because it requires
+that you have access to a SQL Server database which has problematic data, and 
+ideally that you can modify data in order to test theories.
+
+### Create the test database 
+
+[Simple steps based on instructions from Microsoft](https://docs.microsoft.com/en-us/sql/t-sql/statements/create-database-transact-sql?view=sql-server-ver15#a-creating-a-database-without-specifying-files).
+
+```{r, warning=FALSE, message=FALSE}
+library(tidyverse)
+
+user_name <-
+  keyring::key_list("dbi_test")$username
+
+con <- DBI::dbConnect(
+      odbc::odbc(),
+      Driver = "SQL Server",
+      Server = "testsqlserver",
+      UID = user_name,
+      PWD = keyring::key_get("dbi_test", user_name)
+   )
+
+# kill any connections before trying to drop database
+DBI::dbExecute(con,
+               "IF DB_ID (N'dbi_error') IS NOT NULL 
+               ALTER DATABASE [dbi_error] set single_user
+               with rollback immediate")
+
+# Delete the test database if it already exists
+DBI::dbExecute(con,
+               "IF DB_ID (N'dbi_error') IS NOT NULL 
+               DROP DATABASE dbi_error")
+
+# Create the test database
+DBI::dbExecute(con, "CREATE DATABASE dbi_error")
+
+# Verify it was created
+DBI::dbGetQuery(con,
+                "SELECT name, size, size*1.0/128 AS [Size in MBs]
+                FROM sys.master_files WHERE name = N'dbi_error'")
+
+DBI::dbDisconnect(con)
+```
+
+### Write test data
+
+Create working and non-working data: 
+
+1. A table, "problem_data," with, "long" columns that are not the last columns in the table.
+2. A table, "working_data," with the same data, only this time with the, "long," column at the end of the table.
+
+```{r, warning=FALSE}
+con <- DBI::dbConnect(
+      odbc::odbc(),
+      Driver = "SQL Server",
+      Server = "testsqlserver",
+      UID = user_name,
+      Database = "dbi_error",
+      PWD = keyring::key_get("dbi_test", user_name)
+   )
+
+dplyr::copy_to(con,
+               tibble(a = 1:3, 
+                      b = blob::blob(raw(1)), #blob data NOT at
+                      # end of table
+                      c = 1
+                      ),
+               "problem_data", # will expose problem
+               temporary = FALSE
+               )
+
+dplyr::copy_to(con,
+               tibble(a = 1:3,
+                      c = 1,
+                      b = blob::blob(raw(1)) # blob data at end
+                      # of table
+                      ),
+               "working_data", # will not expose problem
+               temporary = FALSE
+               )
+```
+
+### Reproduce the error 
+Here the problem occurs - because the column with, "long," data is NOT the the last column in the table.
+
+```{r error=TRUE, warning=FALSE}
+dplyr::tbl(con,"problem_data") %>% 
+  collect()
+```
+
+Here the problem does not occur - because the column with "long" data is the last column in the table. 
+
+```{r}
+dplyr::tbl(con, "working_data") %>% 
+  collect()
+```
+
+SOURCE: https://github.com/r-dbi/odbc/issues/309#issue-507726267 
+
+## Debugging Step 3: Figure out where it is (the error)
+
+```{r, error=TRUE, warning = FALSE}
+dplyr::tbl(con,"problem_data") %>% 
+  collect()
+```
+```{r}
+traceback()
+```
+
+TODO: how am I going to display the output of traceback() from rmarkdown?
+
 # Appendix: Some Reports of, and references to, this issue {#issues}
 
 Issues logged against odbc R package:
@@ -182,7 +204,8 @@ Issues logged against odbc R package:
 
 Pull request in odbc:
 
-* https://github.com/r-dbi/odbc/pull/359  <- looks like it adds better error messaging (tremendously valuable!) vs. fully addressing the problem
+* [looks like it adds better error messaging (tremendously valuable!) vs. fully
+addressing the problem](https://github.com/r-dbi/odbc/pull/359)
 
 Issues logged against DBI R package:
 
@@ -193,9 +216,7 @@ Issues logged against nanodbc:
 * https://github.com/nanodbc/nanodbc/issues/149 
 * https://github.com/nanodbc/nanodbc/issues/228 
 
-Most Helpful (to me) Stack Overflow thread:
-
-* https://stackoverflow.com/questions/45001152/r-dbi-odbc-error-nanodbc-nanodbc-cpp3110-07009-microsoftodbc-driver-13-fo 
+[Most Helpful (to me) Stack Overflow thread](https://stackoverflow.com/questions/45001152/r-dbi-odbc-error-nanodbc-nanodbc-cpp3110-07009-microsoftodbc-driver-13-fo) 
 
 # Appendix: Methods to move "long" data to end of query {#move_long_data}
 
@@ -333,11 +354,10 @@ It works!
 
 A few NOTES:
 
-*  I think there may be an implication for extended (longer than 8-bit) 
-character data when setting character set to 8-bit. I don't know what that is. 
+*  It's possible there may be an implication for extended (longer than 8-bit) 
+character data when setting character set to 8-bit. I haven't evaluated that.
 
-* TODO: I am not *yet* sure if FreeTDS will work in a Windows domain joined 
-environment. Will test this tomorrow.
+* I also tested FreeTDS in a Windows domain joined environment and it worked!
 
 SOURCE: [Bill Even's GitHub Issue post where he shares solution](https://github.com/r-dbi/DBI/issues/315#issuecomment-639984938)
 

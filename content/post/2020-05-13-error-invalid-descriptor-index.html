@@ -29,87 +29,6 @@ tags: []
 <p>I’ll be reproducing this issue using Microsoft SQL Server Express which is a free download available <a href="https://www.microsoft.com/en-us/sql-server/sql-server-downloads">here</a>.</p>
 <p>I’ll be focusing my analysis on when this error occurs running R on the Microsoft Windows operating system.</p>
 </div>
-<div id="reproducing-the-problem" class="section level1">
-<h1>Reproducing the problem</h1>
-<p>First, I’ll create a test database following <a href="https://docs.microsoft.com/en-us/sql/t-sql/statements/create-database-transact-sql?view=sql-server-ver15#a-creating-a-database-without-specifying-files">simple steps based on instructions from Microsoft</a>.</p>
-<pre class="r"><code>library(tidyverse)
-
-user_name &lt;-
-  keyring::key_list(&quot;dbi_test&quot;)$username
-
-con &lt;- DBI::dbConnect(
-      odbc::odbc(),
-      Driver = &quot;SQL Server&quot;,
-      Server = &quot;testsqlserver&quot;,
-      UID = user_name,
-      PWD = keyring::key_get(&quot;dbi_test&quot;, user_name)
-   )
-
-# kill any connections before trying to drop database
-DBI::dbExecute(con,
-               &quot;IF DB_ID (N&#39;dbi_error&#39;) IS NOT NULL 
-               ALTER DATABASE [dbi_error] set single_user with rollback immediate&quot;)</code></pre>
-<pre><code>## [1] 0</code></pre>
-<pre class="r"><code># Delete the test database if it already exists
-DBI::dbExecute(con,
-               &quot;IF DB_ID (N&#39;dbi_error&#39;) IS NOT NULL 
-               DROP DATABASE dbi_error&quot;)</code></pre>
-<pre><code>## [1] 0</code></pre>
-<pre class="r"><code># Create the test database
-DBI::dbExecute(con, &quot;CREATE DATABASE dbi_error&quot;)</code></pre>
-<pre><code>## [1] 0</code></pre>
-<pre class="r"><code># Verify it was created
-DBI::dbGetQuery(con,
-                &quot;SELECT name, size, size*1.0/128 AS [Size in MBs]
-                FROM sys.master_files WHERE name = N&#39;dbi_error&#39;&quot;)</code></pre>
-<pre><code>##        name size Size in MBs
-## 1 dbi_error 1024           8</code></pre>
-<pre class="r"><code>DBI::dbDisconnect(con)</code></pre>
-<p>Next, I’ll write two different sets of data:</p>
-<ol style="list-style-type: decimal">
-<li>A table, “problem_data,” with, “long” columns that are not the last columns in the table.</li>
-<li>A table, “working_data,” with the same data, only this time with the, “long,” column at the end of the table.</li>
-</ol>
-<pre class="r"><code>con &lt;- DBI::dbConnect(
-      odbc::odbc(),
-      Driver = &quot;SQL Server&quot;,
-      Server = &quot;testsqlserver&quot;,
-      UID = user_name,
-      Database = &quot;dbi_error&quot;,
-      PWD = keyring::key_get(&quot;dbi_test&quot;, user_name)
-   )
-
-dplyr::copy_to(con,
-               tibble(a = 1:3, 
-                      b = blob::blob(raw(1)), #blob data NOT at end of table
-                      c = 1
-                      ),
-               &quot;problem_data&quot;, # will expose problem
-               temporary = FALSE
-               )
-
-dplyr::copy_to(con,
-               tibble(a = 1:3,
-                      c = 1,
-                      b = blob::blob(raw(1)) # blob data at end of table
-                      ),
-               &quot;working_data&quot;, # will not expose problem
-               temporary = FALSE
-               )</code></pre>
-<p>Here the problem occurs - because the column with, “long,” data is NOT the the last column in the table.</p>
-<pre class="r"><code>dplyr::tbl(con,&quot;problem_data&quot;)</code></pre>
-<pre><code>## Error in result_fetch(res@ptr, n): nanodbc/nanodbc.cpp:3186: 07009: [Microsoft][ODBC SQL Server Driver]Invalid Descriptor Index</code></pre>
-<p>Here the problem does not occur - because the column with “long” data is the last column in the table.</p>
-<pre class="r"><code>dplyr::tbl(con, &quot;working_data&quot;) %&gt;% 
-  collect()</code></pre>
-<pre><code>## # A tibble: 3 x 3
-##       a     c         b
-##   &lt;int&gt; &lt;dbl&gt;    &lt;blob&gt;
-## 1     1     1 &lt;raw 1 B&gt;
-## 2     2     1 &lt;raw 1 B&gt;
-## 3     3     1 &lt;raw 1 B&gt;</code></pre>
-<p>SOURCE: <a href="https://github.com/r-dbi/odbc/issues/309#issue-507726267" class="uri">https://github.com/r-dbi/odbc/issues/309#issue-507726267</a></p>
-</div>
 <div id="debugging-the-error" class="section level1">
 <h1>Debugging the error</h1>
 <p>One of the primary motivations for this post is to force me to advance my debugging skills.</p>
@@ -118,10 +37,9 @@ dplyr::copy_to(con,
 <h2>Debugging Step 1: Google it!</h2>
 <p>I started out by Googling a portion of the error string, “<code>[Microsoft][ODBC SQL Server Driver]Invalid Descriptor Index</code>,” which yielded quite a few relevant hits, including a surprising amount of duplicate GitHub issues raised in the odbc project.</p>
 <p>Based on Hadley’s recommendation in the book I decided to check out the <a href="https://github.com/r-assist/errorist">errorist package</a> which gave me much more target hits because it included the entire text of the error message in the search string. It was also automatic, saving me a second or two of copying and pasting. I’ll be incorporating this package into my debugging work-flow going forward!</p>
-<p>I’ve captured a list of relevant issues, and the Stack Overflow thread I found most helpful in the <a href="#issues">Appendix</a>.</p>
 <p>Here is what I gleaned:</p>
 <ol style="list-style-type: decimal">
-<li><p>Judging by the sheer frequency, and recency, of this issue being reported, I don’t believe this is a corner case affecting a small minority of R users.</p></li>
+<li><p>Judging by the sheer frequency, and recency, of this issue being reported, I don’t believe this is a corner case affecting a small minority of R users. I’ve captured a list of relevant issues, and the Stack Overflow thread I found most helpful in <a href="#issues">Appendix: Some Reports of, and references to, this issue</a>.</p></li>
 <li><p>This is caused by a ODBC (the Microsoft C interface - not the R odbc package) constraint:</p>
 <ul>
 <li>Called out as a limitation of <code>SQLGetData()</code> citing this portion of the documentation:</li>
@@ -155,6 +73,112 @@ that RODBC is simply truncating the long data.</li>
 </ul></li>
 </ol>
 </div>
+<div id="debugging-step-2-make-it-repeatable" class="section level2">
+<h2>Debugging Step 2: Make it repeatable</h2>
+<p>This is a little more complex than the standard reprex because it requires
+that you have access to a SQL Server database which has problematic data, and
+ideally that you can modify data in order to test theories.</p>
+<div id="create-the-test-database" class="section level3">
+<h3>Create the test database</h3>
+<p><a href="https://docs.microsoft.com/en-us/sql/t-sql/statements/create-database-transact-sql?view=sql-server-ver15#a-creating-a-database-without-specifying-files">Simple steps based on instructions from Microsoft</a>.</p>
+<pre class="r"><code>library(tidyverse)
+
+user_name &lt;-
+  keyring::key_list(&quot;dbi_test&quot;)$username
+
+con &lt;- DBI::dbConnect(
+      odbc::odbc(),
+      Driver = &quot;SQL Server&quot;,
+      Server = &quot;testsqlserver&quot;,
+      UID = user_name,
+      PWD = keyring::key_get(&quot;dbi_test&quot;, user_name)
+   )
+
+# kill any connections before trying to drop database
+DBI::dbExecute(con,
+               &quot;IF DB_ID (N&#39;dbi_error&#39;) IS NOT NULL 
+               ALTER DATABASE [dbi_error] set single_user
+               with rollback immediate&quot;)</code></pre>
+<pre><code>## [1] 0</code></pre>
+<pre class="r"><code># Delete the test database if it already exists
+DBI::dbExecute(con,
+               &quot;IF DB_ID (N&#39;dbi_error&#39;) IS NOT NULL 
+               DROP DATABASE dbi_error&quot;)</code></pre>
+<pre><code>## [1] 0</code></pre>
+<pre class="r"><code># Create the test database
+DBI::dbExecute(con, &quot;CREATE DATABASE dbi_error&quot;)</code></pre>
+<pre><code>## [1] 0</code></pre>
+<pre class="r"><code># Verify it was created
+DBI::dbGetQuery(con,
+                &quot;SELECT name, size, size*1.0/128 AS [Size in MBs]
+                FROM sys.master_files WHERE name = N&#39;dbi_error&#39;&quot;)</code></pre>
+<pre><code>##        name size Size in MBs
+## 1 dbi_error 1024           8</code></pre>
+<pre class="r"><code>DBI::dbDisconnect(con)</code></pre>
+</div>
+<div id="write-test-data" class="section level3">
+<h3>Write test data</h3>
+<p>Create working and non-working data:</p>
+<ol style="list-style-type: decimal">
+<li>A table, “problem_data,” with, “long” columns that are not the last columns in the table.</li>
+<li>A table, “working_data,” with the same data, only this time with the, “long,” column at the end of the table.</li>
+</ol>
+<pre class="r"><code>con &lt;- DBI::dbConnect(
+      odbc::odbc(),
+      Driver = &quot;SQL Server&quot;,
+      Server = &quot;testsqlserver&quot;,
+      UID = user_name,
+      Database = &quot;dbi_error&quot;,
+      PWD = keyring::key_get(&quot;dbi_test&quot;, user_name)
+   )
+
+dplyr::copy_to(con,
+               tibble(a = 1:3, 
+                      b = blob::blob(raw(1)), #blob data NOT at
+                      # end of table
+                      c = 1
+                      ),
+               &quot;problem_data&quot;, # will expose problem
+               temporary = FALSE
+               )
+
+dplyr::copy_to(con,
+               tibble(a = 1:3,
+                      c = 1,
+                      b = blob::blob(raw(1)) # blob data at end
+                      # of table
+                      ),
+               &quot;working_data&quot;, # will not expose problem
+               temporary = FALSE
+               )</code></pre>
+</div>
+<div id="reproduce-the-error" class="section level3">
+<h3>Reproduce the error</h3>
+<p>Here the problem occurs - because the column with, “long,” data is NOT the the last column in the table.</p>
+<pre class="r"><code>dplyr::tbl(con,&quot;problem_data&quot;) %&gt;% 
+  collect()</code></pre>
+<pre><code>## Error in result_fetch(res@ptr, n): nanodbc/nanodbc.cpp:3186: 07009: [Microsoft][ODBC SQL Server Driver]Invalid Descriptor Index</code></pre>
+<p>Here the problem does not occur - because the column with “long” data is the last column in the table.</p>
+<pre class="r"><code>dplyr::tbl(con, &quot;working_data&quot;) %&gt;% 
+  collect()</code></pre>
+<pre><code>## # A tibble: 3 x 3
+##       a     c         b
+##   &lt;int&gt; &lt;dbl&gt;    &lt;blob&gt;
+## 1     1     1 &lt;raw 1 B&gt;
+## 2     2     1 &lt;raw 1 B&gt;
+## 3     3     1 &lt;raw 1 B&gt;</code></pre>
+<p>SOURCE: <a href="https://github.com/r-dbi/odbc/issues/309#issue-507726267" class="uri">https://github.com/r-dbi/odbc/issues/309#issue-507726267</a></p>
+</div>
+</div>
+<div id="debugging-step-3-figure-out-where-it-is-the-error" class="section level2">
+<h2>Debugging Step 3: Figure out where it is (the error)</h2>
+<pre class="r"><code>dplyr::tbl(con,&quot;problem_data&quot;) %&gt;% 
+  collect()</code></pre>
+<pre><code>## Error in result_fetch(res@ptr, n): nanodbc/nanodbc.cpp:3186: 07009: [Microsoft][ODBC SQL Server Driver]Invalid Descriptor Index</code></pre>
+<pre class="r"><code>traceback()</code></pre>
+<pre><code>## No traceback available</code></pre>
+<p>TODO: how am I going to display the output of traceback() from rmarkdown?</p>
+</div>
 </div>
 <div id="issues" class="section level1">
 <h1>Appendix: Some Reports of, and references to, this issue</h1>
@@ -170,7 +194,8 @@ that RODBC is simply truncating the long data.</li>
 </ul>
 <p>Pull request in odbc:</p>
 <ul>
-<li><a href="https://github.com/r-dbi/odbc/pull/359" class="uri">https://github.com/r-dbi/odbc/pull/359</a> &lt;- looks like it adds better error messaging (tremendously valuable!) vs. fully addressing the problem</li>
+<li><a href="https://github.com/r-dbi/odbc/pull/359">looks like it adds better error messaging (tremendously valuable!) vs. fully
+addressing the problem</a></li>
 </ul>
 <p>Issues logged against DBI R package:</p>
 <ul>
@@ -181,10 +206,7 @@ that RODBC is simply truncating the long data.</li>
 <li><a href="https://github.com/nanodbc/nanodbc/issues/149" class="uri">https://github.com/nanodbc/nanodbc/issues/149</a></li>
 <li><a href="https://github.com/nanodbc/nanodbc/issues/228" class="uri">https://github.com/nanodbc/nanodbc/issues/228</a></li>
 </ul>
-<p>Most Helpful (to me) Stack Overflow thread:</p>
-<ul>
-<li><a href="https://stackoverflow.com/questions/45001152/r-dbi-odbc-error-nanodbc-nanodbc-cpp3110-07009-microsoftodbc-driver-13-fo" class="uri">https://stackoverflow.com/questions/45001152/r-dbi-odbc-error-nanodbc-nanodbc-cpp3110-07009-microsoftodbc-driver-13-fo</a></li>
-</ul>
+<p><a href="https://stackoverflow.com/questions/45001152/r-dbi-odbc-error-nanodbc-nanodbc-cpp3110-07009-microsoftodbc-driver-13-fo">Most Helpful (to me) Stack Overflow thread</a></p>
 </div>
 <div id="move_long_data" class="section level1">
 <h1>Appendix: Methods to move “long” data to end of query</h1>
@@ -328,10 +350,9 @@ dplyr::tbl(con_freetds,&quot;problem_data&quot;) %&gt;%
 <p>It works!</p>
 <p>A few NOTES:</p>
 <ul>
-<li><p>I think there may be an implication for extended (longer than 8-bit)
-character data when setting character set to 8-bit. I don’t know what that is.</p></li>
-<li><p>TODO: I am not <em>yet</em> sure if FreeTDS will work in a Windows domain joined
-environment. Will test this tomorrow.</p></li>
+<li><p>It’s possible there may be an implication for extended (longer than 8-bit)
+character data when setting character set to 8-bit. I haven’t evaluated that.</p></li>
+<li><p>I also tested FreeTDS in a Windows domain joined environment and it worked!</p></li>
 </ul>
 <p>SOURCE: <a href="https://github.com/r-dbi/DBI/issues/315#issuecomment-639984938">Bill Even’s GitHub Issue post where he shares solution</a></p>
 <p>SOURCE: <a href="https://lists.ibiblio.org/pipermail/freetds/2016q3/029980.html">Setting up FreeTDS to work with ODBC Data Source Administrator on Windows 7</a></p>
