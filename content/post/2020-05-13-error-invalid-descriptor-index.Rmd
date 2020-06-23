@@ -180,15 +180,26 @@ SOURCE: https://github.com/r-dbi/odbc/issues/309#issue-507726267
 
 ## Debugging Step 3: Figure out where it is (the error)
 
-```{r, error=TRUE, warning = FALSE}
+```{r error=TRUE, warning=FALSE}
 dplyr::tbl(con,"problem_data") %>% 
   collect()
 ```
-```{r}
-traceback()
-```
 
-TODO: how am I going to display the output of traceback() from rmarkdown?
+Executing `traceback()` yields
+
+![](/post/2020-05-13-error-invalid-descriptor-index_files/traceback_1.png)
+
+Recalling that stack track reads from bottom to top I can see it progresses from `dplyr::tbl()` through the final `stop()` and that there are some database related functions along the way, for example `dbFetch`.
+
+What I cannot see is what packages export these functions and where in the package code these functions are located.
+
+Hadley does mention this..
+
+> If you’re calling code that you source()d into R, the traceback will also display the location of the function, in the form filename.r#linenumber. These are clickable in RStudio, and will take you to the corresponding line of code in the editor.
+
+Unfortunately off the top of my head I don't know what code I need.
+
+TODO: find a way to further isolate this to a package and source file.
 
 # Appendix: Some Reports of, and references to, this issue {#issues}
 

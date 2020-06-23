@@ -175,9 +175,16 @@ dplyr::copy_to(con,
 <pre class="r"><code>dplyr::tbl(con,&quot;problem_data&quot;) %&gt;% 
   collect()</code></pre>
 <pre><code>## Error in result_fetch(res@ptr, n): nanodbc/nanodbc.cpp:3186: 07009: [Microsoft][ODBC SQL Server Driver]Invalid Descriptor Index</code></pre>
-<pre class="r"><code>traceback()</code></pre>
-<pre><code>## No traceback available</code></pre>
-<p>TODO: how am I going to display the output of traceback() from rmarkdown?</p>
+<p>Executing <code>traceback()</code> yields</p>
+<p><img src="/post/2020-05-13-error-invalid-descriptor-index_files/traceback_1.png" /></p>
+<p>Recalling that stack track reads from bottom to top I can see it progresses from <code>dplyr::tbl()</code> through the final <code>stop()</code> and that there are some database related functions along the way, for example <code>dbFetch</code>.</p>
+<p>What I cannot see is what packages export these functions and where in the package code these functions are located.</p>
+<p>Hadley does mention this..</p>
+<blockquote>
+<p>If you’re calling code that you source()d into R, the traceback will also display the location of the function, in the form filename.r#linenumber. These are clickable in RStudio, and will take you to the corresponding line of code in the editor.</p>
+</blockquote>
+<p>Unfortunately off the top of my head I don’t know what code I need.</p>
+<p>TODO: find a way to further isolate this to a package and source file.</p>
 </div>
 </div>
 <div id="issues" class="section level1">
