@@ -199,7 +199,17 @@ Hadley does mention this..
 
 Unfortunately off the top of my head I don't know what code I need.
 
-TODO: find a way to further isolate this to a package and source file.
+I will try to build the packages, and source the files from those packages that export the following functions:
+
+* `dplyr::tbl()`
+* `collect()`
+* `db_collect()`
+* `dbFetch()`
+* `result_fetch()`
+
+With the exception of dplyr, I am not sure what packages export these functions so I will have to search to find the packages.
+
+TODO: find the packages that export these functions. First update R and all packages.
 
 # Appendix: Some Reports of, and references to, this issue {#issues}
 

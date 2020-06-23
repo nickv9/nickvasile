@@ -184,7 +184,16 @@ dplyr::copy_to(con,
 <p>If you’re calling code that you source()d into R, the traceback will also display the location of the function, in the form filename.r#linenumber. These are clickable in RStudio, and will take you to the corresponding line of code in the editor.</p>
 </blockquote>
 <p>Unfortunately off the top of my head I don’t know what code I need.</p>
-<p>TODO: find a way to further isolate this to a package and source file.</p>
+<p>I will try to build the packages, and source the files from those packages that export the following functions:</p>
+<ul>
+<li><code>dplyr::tbl()</code></li>
+<li><code>collect()</code></li>
+<li><code>db_collect()</code></li>
+<li><code>dbFetch()</code></li>
+<li><code>result_fetch()</code></li>
+</ul>
+<p>With the exception of dplyr, I am not sure what packages export these functions so I will have to search to find the packages.</p>
+<p>TODO: find the packages that export these functions. First update R and all packages.</p>
 </div>
 </div>
 <div id="issues" class="section level1">
