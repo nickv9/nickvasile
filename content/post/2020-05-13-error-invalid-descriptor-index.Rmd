@@ -14,7 +14,7 @@ tags: []
 I use the dbplyr, dplyr, DBI and odbc R packages to extract data held in Microsoft SQL on a daily basis. 
 
 I used to run into the, "Invalid Descriptor Index," error documented [here](https://github.com/r-dbi/odbc/issues/309) constantly. It was awful! I spent so much time trying to find the, "problem," columns in tables that often had over 100 columns. The time I spent trying to get my queries to work severely reduced the time I had available to clean, transform and analyze my data.
-
+.lib
 Through the work of many great people sharing their expertise on GitHub, I was able to identify [a workaround that worked well for me](https://github.com/r-dbi/odbc/issues/309#issuecomment-615255613).
 
 The workaround helped *me* continue my daily work but did nothing to *prevent* *others* from encountering the same issue in the future. One of the great things about R is the community and I would like to do my part to help. That might involve making a code change in a package or in another component involved.
