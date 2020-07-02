@@ -14,7 +14,7 @@ tags: []
 I use the dbplyr, dplyr, DBI and odbc R packages to extract data held in Microsoft SQL on a daily basis. 
 
 I used to run into the, "Invalid Descriptor Index," error documented [here](https://github.com/r-dbi/odbc/issues/309) constantly. It was awful! I spent so much time trying to find the, "problem," columns in tables that often had over 100 columns. The time I spent trying to get my queries to work severely reduced the time I had available to clean, transform and analyze my data.
-.lib
+
 Through the work of many great people sharing their expertise on GitHub, I was able to identify [a workaround that worked well for me](https://github.com/r-dbi/odbc/issues/309#issuecomment-615255613).
 
 The workaround helped *me* continue my daily work but did nothing to *prevent* *others* from encountering the same issue in the future. One of the great things about R is the community and I would like to do my part to help. That might involve making a code change in a package or in another component involved.
@@ -44,13 +44,13 @@ I decided to start with [the debugging chapter from Hadley Wickham's Advanced R 
 
 I started out by Googling a portion of the error string, "`[Microsoft][ODBC SQL Server Driver]Invalid Descriptor Index`," which yielded quite a few relevant hits, including a surprising amount of duplicate GitHub issues raised in the odbc project.
 
-Based on Hadley's recommendation in the book I decided to check out the [errorist package](https://github.com/r-assist/errorist) which gave me much more target hits because it included the entire text of the error message in the search string. It was also automatic, saving me a second or two of copying and pasting. I'll be incorporating this package into my debugging work-flow going forward!
+Based on Hadley's recommendation in the book I decided to check out the [errorist package](https://github.com/r-assist/errorist) which gave me much more targeted hits because it included the entire text of the error message in the search string. It was also automatic, saving me a second or two of copying and pasting. I'll be incorporating this package into my debugging work-flow going forward!
 
 Here is what I gleaned:
 
 1. Judging by the sheer frequency, and recency, of this issue being reported, I don't believe this is a corner case affecting a small minority of R users. I've captured a list of relevant issues, and the Stack Overflow thread I found most helpful in [Appendix: Some Reports of, and references to, this issue](#issues).
 
-2. This is  caused by a ODBC (the Microsoft C interface - not the R odbc package) constraint:
+2. This is  caused by an ODBC (the Microsoft C interface - not the R odbc package) constraint:
 
    + Called out as a limitation of `SQLGetData()` citing this portion of the documentation:
 
@@ -72,7 +72,7 @@ options to do this.
     [Reported in this GitHub issue](https://github.com/r-dbi/odbc/issues/256#issue-411385255),
     although Jim Hester reported [here](https://github.com/r-dbi/odbc/issues/86#issuecomment-558199954)
     that RODBC is simply truncating the long data.
-    + FreeTDS drivers SOURCE: [Bill Evans comment on GitHub](https://github.com/r-dbi/DBI/issues/315#issuecomment-639984938) See [Appendix: Installing and using the FreeTDS driver on Windows](#freeTDS). Note that this is an evolving approach and Bill Evans notes some cons to using FreeTDS:
+    + FreeTDS drivers SOURCE: [Bill Evans comment on GitHub](https://github.com/r-dbi/DBI/issues/315#issuecomment-639984938) See [Appendix: Installing and using the FreeTDS driver on Windows](#freeTDS). Note that this is an evolving approach and Bill Evans lists some potential cons to using FreeTDS:
       + Might be slower than Microsoft drivers
       + `pool` package doesn't reconnect after disconnects
       + Hasn't been able to identify a way to use SSL for the database connections
@@ -85,7 +85,7 @@ ideally that you can modify data in order to test theories.
 
 ### Create the test database 
 
-[Simple steps based on instructions from Microsoft](https://docs.microsoft.com/en-us/sql/t-sql/statements/create-database-transact-sql?view=sql-server-ver15#a-creating-a-database-without-specifying-files).
+Simple steps [based on instructions from Microsoft](https://docs.microsoft.com/en-us/sql/t-sql/statements/create-database-transact-sql?view=sql-server-ver15#a-creating-a-database-without-specifying-files).
 
 ```{r, warning=FALSE, message=FALSE}
 library(tidyverse)
@@ -191,25 +191,33 @@ Executing `traceback()` yields
 
 Recalling that stack track reads from bottom to top I can see it progresses from `dplyr::tbl()` through the final `stop()` and that there are some database related functions along the way, for example `dbFetch`.
 
-What I cannot see is what packages export these functions and where in the package code these functions are located.
+What I cannot see is what packages export these functions and where in the package code (.r file and line #) these functions are located.
 
 Hadley does mention this..
 
 > If you’re calling code that you source()d into R, the traceback will also display the location of the function, in the form filename.r#linenumber. These are clickable in RStudio, and will take you to the corresponding line of code in the editor.
 
-Unfortunately off the top of my head I don't know what code I need.
+Based on what on my previous learnings about [how the dplyr, dbplyr, DBI and odbc packages work together to bring data stored in Microsoft SQL Server databases into R](https://www.nickvasile.com/2020/04/16/dplyr-and-microsoft-sql-server/), I decided to start by building the following packages from source:
 
-I will try to build the packages, and source the files from those packages that export the following functions:
+* dpyr
+* dbplyr
+* DBI
+* odbc
 
-* `dplyr::tbl()`
-* `collect()`
-* `db_collect()`
-* `dbFetch()`
-* `result_fetch()`
+See [Appendix: Building a package from source using RStudio](#build_source) for my short notes on how to build a package from source using RStudio.
 
-With the exception of dplyr, I am not sure what packages export these functions so I will have to search to find the packages.
+I then sourced all the .R files for each of these packages....
 
-TODO: find the packages that export these functions. First update R and all packages.
+```{r, eval = FALSE}
+# TODO: show this process
+```
+
+And then set breakpoints in some of the functions listed in the output of `traceback()`
+
+```{r}
+#TODO
+```
+
 
 # Appendix: Some Reports of, and references to, this issue {#issues}
 
@@ -395,3 +403,13 @@ A:
 > DBMSs define long data as any character or binary data over a certain size, such as 255 characters
 TODO
 SOURCE: [Microsoft documentation on Getting Long Data](https://docs.microsoft.com/en-us/sql/odbc/reference/develop-app/getting-long-data?view=sql-server-ver15)
+
+# Appendix: Building a package from source using RStudio {#build_source}
+
+1. Install the [latest version of rtools](https://cran.r-project.org/bin/windows/Rtools/)
+2. Follow these instructions from [Jenny Bryan](https://happygitwithr.com/new-github-first.html#new-rstudio-project-via-git-clone) to clone the project using RStudio.
+3. Open the project file for the package
+4. Build -> Install and Restart
+![](/post/2020-05-13-error-invalid-descriptor-index_files/build_restart.png)
+
+

@@ -13,9 +13,8 @@ tags: []
 <div id="motivation" class="section level1">
 <h1>Motivation</h1>
 <p>I use the dbplyr, dplyr, DBI and odbc R packages to extract data held in Microsoft SQL on a daily basis.</p>
-<p>I used to run into the, “Invalid Descriptor Index,” error documented <a href="https://github.com/r-dbi/odbc/issues/309">here</a> constantly. It was awful! I spent so much time trying to find the, “problem,” columns in tables that often had over 100 columns. The time I spent trying to get my queries to work severely reduced the time I had available to clean, transform and analyze my data.
-.lib
-Through the work of many great people sharing their expertise on GitHub, I was able to identify <a href="https://github.com/r-dbi/odbc/issues/309#issuecomment-615255613">a workaround that worked well for me</a>.</p>
+<p>I used to run into the, “Invalid Descriptor Index,” error documented <a href="https://github.com/r-dbi/odbc/issues/309">here</a> constantly. It was awful! I spent so much time trying to find the, “problem,” columns in tables that often had over 100 columns. The time I spent trying to get my queries to work severely reduced the time I had available to clean, transform and analyze my data.</p>
+<p>Through the work of many great people sharing their expertise on GitHub, I was able to identify <a href="https://github.com/r-dbi/odbc/issues/309#issuecomment-615255613">a workaround that worked well for me</a>.</p>
 <p>The workaround helped <em>me</em> continue my daily work but did nothing to <em>prevent</em> <em>others</em> from encountering the same issue in the future. One of the great things about R is the community and I would like to do my part to help. That might involve making a code change in a package or in another component involved.</p>
 <p>I don’t yet have a firm grasp on what, from a technical standpoint, leads to the failure but I do know many things are involved - specifically multiple R packages, ODBC drivers and Microsoft SQL Server.</p>
 <p>I am comfortable as an R user and debugging C++ code individually but have not spent much time debugging multi-component issues in R.</p>
@@ -37,11 +36,11 @@ Through the work of many great people sharing their expertise on GitHub, I was a
 <div id="debugging-step-1-google-it" class="section level2">
 <h2>Debugging Step 1: Google it!</h2>
 <p>I started out by Googling a portion of the error string, “<code>[Microsoft][ODBC SQL Server Driver]Invalid Descriptor Index</code>,” which yielded quite a few relevant hits, including a surprising amount of duplicate GitHub issues raised in the odbc project.</p>
-<p>Based on Hadley’s recommendation in the book I decided to check out the <a href="https://github.com/r-assist/errorist">errorist package</a> which gave me much more target hits because it included the entire text of the error message in the search string. It was also automatic, saving me a second or two of copying and pasting. I’ll be incorporating this package into my debugging work-flow going forward!</p>
+<p>Based on Hadley’s recommendation in the book I decided to check out the <a href="https://github.com/r-assist/errorist">errorist package</a> which gave me much more targeted hits because it included the entire text of the error message in the search string. It was also automatic, saving me a second or two of copying and pasting. I’ll be incorporating this package into my debugging work-flow going forward!</p>
 <p>Here is what I gleaned:</p>
 <ol style="list-style-type: decimal">
 <li><p>Judging by the sheer frequency, and recency, of this issue being reported, I don’t believe this is a corner case affecting a small minority of R users. I’ve captured a list of relevant issues, and the Stack Overflow thread I found most helpful in <a href="#issues">Appendix: Some Reports of, and references to, this issue</a>.</p></li>
-<li><p>This is caused by a ODBC (the Microsoft C interface - not the R odbc package) constraint:</p>
+<li><p>This is caused by an ODBC (the Microsoft C interface - not the R odbc package) constraint:</p>
 <ul>
 <li>Called out as a limitation of <code>SQLGetData()</code> citing this portion of the documentation:</li>
 </ul></li>
@@ -65,7 +64,7 @@ options to do this.</p></li>
 <a href="https://github.com/r-dbi/odbc/issues/256#issue-411385255">Reported in this GitHub issue</a>,
 although Jim Hester reported <a href="https://github.com/r-dbi/odbc/issues/86#issuecomment-558199954">here</a>
 that RODBC is simply truncating the long data.</li>
-<li>FreeTDS drivers SOURCE: <a href="https://github.com/r-dbi/DBI/issues/315#issuecomment-639984938">Bill Evans comment on GitHub</a> See <a href="#freeTDS">Appendix: Installing and using the FreeTDS driver on Windows</a>. Note that this is an evolving approach and Bill Evans notes some cons to using FreeTDS:
+<li>FreeTDS drivers SOURCE: <a href="https://github.com/r-dbi/DBI/issues/315#issuecomment-639984938">Bill Evans comment on GitHub</a> See <a href="#freeTDS">Appendix: Installing and using the FreeTDS driver on Windows</a>. Note that this is an evolving approach and Bill Evans lists some potential cons to using FreeTDS:
 <ul>
 <li>Might be slower than Microsoft drivers</li>
 <li><code>pool</code> package doesn’t reconnect after disconnects</li>
@@ -81,7 +80,7 @@ that you have access to a SQL Server database which has problematic data, and
 ideally that you can modify data in order to test theories.</p>
 <div id="create-the-test-database" class="section level3">
 <h3>Create the test database</h3>
-<p><a href="https://docs.microsoft.com/en-us/sql/t-sql/statements/create-database-transact-sql?view=sql-server-ver15#a-creating-a-database-without-specifying-files">Simple steps based on instructions from Microsoft</a>.</p>
+<p>Simple steps <a href="https://docs.microsoft.com/en-us/sql/t-sql/statements/create-database-transact-sql?view=sql-server-ver15#a-creating-a-database-without-specifying-files">based on instructions from Microsoft</a>.</p>
 <pre class="r"><code>library(tidyverse)
 
 user_name &lt;-
@@ -179,22 +178,23 @@ dplyr::copy_to(con,
 <p>Executing <code>traceback()</code> yields</p>
 <p><img src="/post/2020-05-13-error-invalid-descriptor-index_files/traceback_1.png" /></p>
 <p>Recalling that stack track reads from bottom to top I can see it progresses from <code>dplyr::tbl()</code> through the final <code>stop()</code> and that there are some database related functions along the way, for example <code>dbFetch</code>.</p>
-<p>What I cannot see is what packages export these functions and where in the package code these functions are located.</p>
+<p>What I cannot see is what packages export these functions and where in the package code (.r file and line #) these functions are located.</p>
 <p>Hadley does mention this..</p>
 <blockquote>
 <p>If you’re calling code that you source()d into R, the traceback will also display the location of the function, in the form filename.r#linenumber. These are clickable in RStudio, and will take you to the corresponding line of code in the editor.</p>
 </blockquote>
-<p>Unfortunately off the top of my head I don’t know what code I need.</p>
-<p>I will try to build the packages, and source the files from those packages that export the following functions:</p>
+<p>Based on what on my previous learnings about <a href="https://www.nickvasile.com/2020/04/16/dplyr-and-microsoft-sql-server/">how the dplyr, dbplyr, DBI and odbc packages work together to bring data stored in Microsoft SQL Server databases into R</a>, I decided to start by building the following packages from source:</p>
 <ul>
-<li><code>dplyr::tbl()</code></li>
-<li><code>collect()</code></li>
-<li><code>db_collect()</code></li>
-<li><code>dbFetch()</code></li>
-<li><code>result_fetch()</code></li>
+<li>dpyr</li>
+<li>dbplyr</li>
+<li>DBI</li>
+<li>odbc</li>
 </ul>
-<p>With the exception of dplyr, I am not sure what packages export these functions so I will have to search to find the packages.</p>
-<p>TODO: find the packages that export these functions. First update R and all packages.</p>
+<p>See <a href="#build_source">Appendix: Building a package from source using RStudio</a> for my short notes on how to build a package from source using RStudio.</p>
+<p>I then sourced all the .R files for each of these packages….</p>
+<pre class="r"><code># TODO: show this process</code></pre>
+<p>And then set breakpoints in some of the functions listed in the output of <code>traceback()</code></p>
+<pre class="r"><code>#TODO</code></pre>
 </div>
 </div>
 <div id="issues" class="section level1">
@@ -384,4 +384,14 @@ character data when setting character set to 8-bit. I haven’t evaluated that.<
 TODO
 SOURCE: <a href="https://docs.microsoft.com/en-us/sql/odbc/reference/develop-app/getting-long-data?view=sql-server-ver15">Microsoft documentation on Getting Long Data</a></p>
 </blockquote>
+</div>
+<div id="build_source" class="section level1">
+<h1>Appendix: Building a package from source using RStudio</h1>
+<ol style="list-style-type: decimal">
+<li>Install the <a href="https://cran.r-project.org/bin/windows/Rtools/">latest version of rtools</a></li>
+<li>Follow these instructions from <a href="https://happygitwithr.com/new-github-first.html#new-rstudio-project-via-git-clone">Jenny Bryan</a> to clone the project using RStudio.</li>
+<li>Open the project file for the package</li>
+<li>Build -&gt; Install and Restart
+<img src="/post/2020-05-13-error-invalid-descriptor-index_files/build_restart.png" /></li>
+</ol>
 </div>
