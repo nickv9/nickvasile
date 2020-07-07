@@ -162,7 +162,7 @@ dplyr::copy_to(con,
 ```
 
 ### Reproduce the error 
-Here the problem occurs - because the column with, "long," data is NOT the the last column in the table.
+Here the problem occurs - because the column with, "long," data is NOT the last column in the table.
 
 ```{r error=TRUE, warning=FALSE}
 dplyr::tbl(con,"problem_data") %>% 
@@ -206,18 +206,68 @@ Based on what on my previous learnings about [how the dplyr, dbplyr, DBI and odb
 
 See [Appendix: Building a package from source using RStudio](#build_source) for my short notes on how to build a package from source using RStudio.
 
-I then sourced all the .R files for each of these packages....
+I then sourced all the .R files for each of these packages. I received errors regarding not being able to locate certain functions unless I sourced the files containing those functions before others.
+
+There is probably an easier way to do this.
 
 ```{r, eval = FALSE}
-# TODO: show this process
+library(rlang)
+library(R6)
+library(assertthat)
+library(DBI)
+library(odbc)
+
+map(list.files("C:\\r_projects\\dplyr\\R", full.names = TRUE),
+    source)
+
+source("C:\\r_projects\\dbplyr\\R\\translate-sql-helpers.R")
+source("C:\\r_projects\\dbplyr\\R\\translate-sql-conditional.R")
+source("C:\\r_projects\\dbplyr\\R\\translate-sql-paste.R")
+source("C:\\r_projects\\dbplyr\\R\\translate-sql-string.R")
+source("C:\\r_projects\\dbplyr\\R\\translate-sql-quantile.R")
+source("C:\\r_projects\\dbplyr\\R\\translate-sql-window.R")
+
+map(list.files("C:\\r_projects\\dbplyr\\R", full.names = TRUE),
+    source)
+map(list.files("C:\\r_projects\\DBI\\R", full.names = TRUE),
+    source)
+
+source("C:\\r_projects\\odbc\\R\\Driver.R")
+map(list.files("C:\\r_projects\\odbc\\R", full.names = TRUE),
+    source)
 ```
 
-And then set breakpoints in some of the functions listed in the output of `traceback()`
+I then set breakpoints in `result_fetch()` because according to the output of `traceback()`, that is the last call in the call stack before `stop()` is called.
 
-```{r}
-#TODO
+![](/post/2020-05-13-error-invalid-descriptor-index_files/traceback_1-highlights.png)
+
+```{r, eval = FALSE}
+debugonce("result_fetch")
 ```
 
+That didn't change behavior - the breakpoint didn't trigger a browser as expected.
+
+I went further "up" the stack and set a breakpoint on `dbFetch()`
+
+```{r, eval = FALSE}
+debugonce("dbFetch")
+```
+
+Now reproducing the error breaks into the browser and displays the Traceback window.
+
+NOTE: I had to expand the Traceback window to display it.
+
+```{r, eval = FALSE}
+dplyr::tbl(con,"problem_data")
+```
+
+![](/post/2020-05-13-error-invalid-descriptor-index_files/dbFetch_breakpoint.png)
+
+from this output I can see that `dbFetch()` is being invoked from line 583 of `backend-.R`
+
+Note that I checked the box to, "Show Internals," which revealed `dplyr::tbl()` as the first function executed.
+
+A search of the file system revealed that `backend-.R` is a file in the R direction of the dbplyr package.
 
 # Appendix: Some Reports of, and references to, this issue {#issues}
 

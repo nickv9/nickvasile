@@ -154,7 +154,7 @@ dplyr::copy_to(con,
 </div>
 <div id="reproduce-the-error" class="section level3">
 <h3>Reproduce the error</h3>
-<p>Here the problem occurs - because the column with, “long,” data is NOT the the last column in the table.</p>
+<p>Here the problem occurs - because the column with, “long,” data is NOT the last column in the table.</p>
 <pre class="r"><code>dplyr::tbl(con,&quot;problem_data&quot;) %&gt;% 
   collect()</code></pre>
 <pre><code>## Error in result_fetch(res@ptr, n): nanodbc/nanodbc.cpp:3186: 07009: [Microsoft][ODBC SQL Server Driver]Invalid Descriptor Index</code></pre>
@@ -191,10 +191,45 @@ dplyr::copy_to(con,
 <li>odbc</li>
 </ul>
 <p>See <a href="#build_source">Appendix: Building a package from source using RStudio</a> for my short notes on how to build a package from source using RStudio.</p>
-<p>I then sourced all the .R files for each of these packages….</p>
-<pre class="r"><code># TODO: show this process</code></pre>
-<p>And then set breakpoints in some of the functions listed in the output of <code>traceback()</code></p>
-<pre class="r"><code>#TODO</code></pre>
+<p>I then sourced all the .R files for each of these packages. I received errors regarding not being able to locate certain functions unless I sourced the files containing those functions before others.</p>
+<p>There is probably an easier way to do this.</p>
+<pre class="r"><code>library(rlang)
+library(R6)
+library(assertthat)
+library(DBI)
+library(odbc)
+
+map(list.files(&quot;C:\\r_projects\\dplyr\\R&quot;, full.names = TRUE),
+    source)
+
+source(&quot;C:\\r_projects\\dbplyr\\R\\translate-sql-helpers.R&quot;)
+source(&quot;C:\\r_projects\\dbplyr\\R\\translate-sql-conditional.R&quot;)
+source(&quot;C:\\r_projects\\dbplyr\\R\\translate-sql-paste.R&quot;)
+source(&quot;C:\\r_projects\\dbplyr\\R\\translate-sql-string.R&quot;)
+source(&quot;C:\\r_projects\\dbplyr\\R\\translate-sql-quantile.R&quot;)
+source(&quot;C:\\r_projects\\dbplyr\\R\\translate-sql-window.R&quot;)
+
+map(list.files(&quot;C:\\r_projects\\dbplyr\\R&quot;, full.names = TRUE),
+    source)
+map(list.files(&quot;C:\\r_projects\\DBI\\R&quot;, full.names = TRUE),
+    source)
+
+source(&quot;C:\\r_projects\\odbc\\R\\Driver.R&quot;)
+map(list.files(&quot;C:\\r_projects\\odbc\\R&quot;, full.names = TRUE),
+    source)</code></pre>
+<p>I then set breakpoints in <code>result_fetch()</code> because according to the output of <code>traceback()</code>, that is the last call in the call stack before <code>stop()</code> is called.</p>
+<p><img src="/post/2020-05-13-error-invalid-descriptor-index_files/traceback_1-highlights.png" /></p>
+<pre class="r"><code>debugonce(&quot;result_fetch&quot;)</code></pre>
+<p>That didn’t change behavior - the breakpoint didn’t trigger a browser as expected.</p>
+<p>I went further “up” the stack and set a breakpoint on <code>dbFetch()</code></p>
+<pre class="r"><code>debugonce(&quot;dbFetch&quot;)</code></pre>
+<p>Now reproducing the error breaks into the browser and displays the Traceback window.</p>
+<p>NOTE: I had to expand the Traceback window to display it.</p>
+<pre class="r"><code>dplyr::tbl(con,&quot;problem_data&quot;)</code></pre>
+<p><img src="/post/2020-05-13-error-invalid-descriptor-index_files/dbFetch_breakpoint.png" /></p>
+<p>from this output I can see that <code>dbFetch()</code> is being invoked from line 583 of <code>backend-.R</code></p>
+<p>Note that I checked the box to, “Show Internals,” which revealed <code>dplyr::tbl()</code> as the first function executed.</p>
+<p>A search of the file system revealed that <code>backend-.R</code> is a file in the R direction of the dbplyr package.</p>
 </div>
 </div>
 <div id="issues" class="section level1">
