@@ -251,23 +251,102 @@ I went further "up" the stack and set a breakpoint on `dbFetch()`
 
 ```{r, eval = FALSE}
 debugonce("dbFetch")
+dplyr::tbl(con,"problem_data")
 ```
 
 Now reproducing the error breaks into the browser and displays the Traceback window.
 
 NOTE: I had to expand the Traceback window to display it.
 
+![](/post/2020-05-13-error-invalid-descriptor-index_files/expand_traceback.png)
+
+Note that I still did not see line numbers in the traceback!
+
+![](/post/2020-05-13-error-invalid-descriptor-index_files/debug_traceback1.png)
+
+Along the way of randomly trying things I found that using `debug()` instead of `debugonce()` resulted in line numbers being displayed.
+
 ```{r, eval = FALSE}
+debug("dbFetch")
 dplyr::tbl(con,"problem_data")
 ```
 
-![](/post/2020-05-13-error-invalid-descriptor-index_files/dbFetch_breakpoint.png)
+![](/post/2020-05-13-error-invalid-descriptor-index_files/debug_traceback_1_source.png)
 
-from this output I can see that `dbFetch()` is being invoked from line 583 of `backend-.R`
+What I found interesting was that the output of `traceback()` did not match the output of `traceback() after reproducing the error.
 
-Note that I checked the box to, "Show Internals," which revealed `dplyr::tbl()` as the first function executed.
+My suspicion was that `dbFetch()` is called multiple times as a result of my call to `dplyr::tbl()`.
 
-A search of the file system revealed that `backend-.R` is a file in the R direction of the dbplyr package.
+To test that hypothesis, I clicked, "continue," in the debugger and sure enough the breakpoint was hit again. This time the call stack looked similar to the output of `traceback()` when the error occurred.
+
+Note that for some reason the output of the Traceback window in RStudio stopped displaying line numbers. It works for the first attempt after running `debug()` and then stops displaying line numbers for subsequent attempts. Weird!
+
+![](/post/2020-05-13-error-invalid-descriptor-index_files/traceback_2nd_bp.png)
+
+I then clicked the, "next," button in Rstudio to execute the statement. The output of RStudio's Traceback window did not change, but a running `where` in the Browser terminal yielded additional detail.
+
+![](/post/2020-05-13-error-invalid-descriptor-index_files/where_output_2nd_bp.png)
+
+**A big benefit of adding `where()` to my debugging work flow is that it provided the complete path to each source file, whereas Traceback only gave the file name.**
+
+We can see that `dbFetch()` is about to be called from line 123 of verb-compute.R from inside the `db_collect.DBIConnection` function.
+
+![](/post/2020-05-13-error-invalid-descriptor-index_files/db_collect_code.png)
+
+Unfortunately, trying to step further into the code with the next or step into debugger function resulted in the error being returned and execution stopping.
+
+I still was not able to figure out where `dbFetch()` was defined.
+
+I decided to change approaches so I set the RStudio option to break into the code on error.
+
+![](/post/2020-05-13-error-invalid-descriptor-index_files/option_break_in.png)
+
+I also stopped debugging `dbFetch()`
+
+```{r, eval = FALSE}
+undebug("dbFetch")
+```
+
+Reproducing the error now broke into the Browser, and executing `where()` shed some additional light.
+
+![](/post/2020-05-13-error-invalid-descriptor-index_files/where_more.png)
+
+I could see that `dbFetch()` was resulting in a call into `odbc::result_fetch()` and then that ends up with a `stop()` message from a file called `RcppExports.R`
+
+![](/post/2020-05-13-error-invalid-descriptor-index_files/dbFetch_def.png)
+
+Looking at the help for the `setMethod()` function I can see that it defines what code gets run when `dbFetch()` is called, in this case `result_fetch()`. 
+
+Still not entirely clear where the definition for `result_fetch()` is but moving up the callstack I can see that `stop()` is called from `RcppExports.R`, line 81 so I took a peek at that code. By the way, the fact that the file contains, "Rcpp," indicated to me that this had something to do with C++ code.
+
+![](/post/2020-05-13-error-invalid-descriptor-index_files/result_fetch_definition.png)
+
+Well sure enough there was a call to `.Call()`, which according to the help provides, "Modern Interfaces to C/C++ code."
+
+Searching my file system for files with the string "_odbc_result_fetch" yielded hits odbc C++ source files.
+
+![](/post/2020-05-13-error-invalid-descriptor-index_files/result_fetch_search.png)
+
+At the same position in the call stack there is a string, "message = "nanodbc/nanodbc.cpp:3186..."
+
+I opened `r_projects/odbc/src/nanodbc/nanodbc.cpp` and took a look at the code around line 3186.
+
+![](/post/2020-05-13-error-invalid-descriptor-index_files/nanodbc_code.png)
+
+This code is inside a function `result::result_impl::get_ref_impl` and specifically inside a case statement that is executed when a column is of type `SQL_C_BINARY`.
+
+The error itself results from a call to `NANODBC_CALL_RC` which is a wrapper to ODBC functions. The ODBC function being called is `SQLGetData()`, which according to [the documentation](https://docs.microsoft.com/en-us/sql/odbc/reference/syntax/sqlgetdata-function?view=sql-server-ver15), "retrieves data for a single column in the result set or for a single parameter after SQLParamData returns SQL_PARAM_DATA_AVAILABLE. It can be called multiple times to retrieve variable-length data in parts."
+
+Recalling what I read in the other Github issues, I referred back to the [Microsoft documentation on getting long data](https://docs.microsoft.com/en-us/sql/odbc/reference/develop-app/getting-long-data?view=sql-server-ver15) and found this statement.
+
+> Because such data cannot be stored in a single buffer, it is retrieved from the driver in parts with SQLGetData after the other data in the row has been fetched.
+
+So my hypothesis is that `SQLGetData()` is being called on a "long" column before all other "non-long" columns have been retrieved. This echo's other comments on some of the issues, and also my testing where moving the "long" column to the end of the select statement.
+
+TODO: 
+
+* Review issues again to confirm others have this hypothesis.
+* Review dbplyr code and past issues- is it explicately requesting data for one column at a time or is this done at a lower level (odbc or nandobc)?
 
 # Appendix: Some Reports of, and references to, this issue {#issues}
 
@@ -293,7 +372,7 @@ Issues logged against DBI R package:
 Issues logged against nanodbc:
 
 * https://github.com/nanodbc/nanodbc/issues/149 
-* https://github.com/nanodbc/nanodbc/issues/228 
+* https://github.com/nanodbc/nanodbc/issues/228  <- this discusses a potential fix in nanodbc
 
 [Most Helpful (to me) Stack Overflow thread](https://stackoverflow.com/questions/45001152/r-dbi-odbc-error-nanodbc-nanodbc-cpp3110-07009-microsoftodbc-driver-13-fo) 
 
@@ -338,7 +417,7 @@ tbl_long_cols_2 <- function(con, table) {
 
 tbl_long_cols_2(con, "problem_data") %>% 
   dplyr::collect() %>% 
-  dplyr::select(a,b,c) #can move the "long" cols back after retrievel from db
+  dplyr::select(a,b,c) #can move the "long" cols back after retrieval from db
 ```
 
 ## Method 3: Move certain data types to the end

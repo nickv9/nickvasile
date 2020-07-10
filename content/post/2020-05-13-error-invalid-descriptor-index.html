@@ -222,14 +222,58 @@ map(list.files(&quot;C:\\r_projects\\odbc\\R&quot;, full.names = TRUE),
 <pre class="r"><code>debugonce(&quot;result_fetch&quot;)</code></pre>
 <p>That didn’t change behavior - the breakpoint didn’t trigger a browser as expected.</p>
 <p>I went further “up” the stack and set a breakpoint on <code>dbFetch()</code></p>
-<pre class="r"><code>debugonce(&quot;dbFetch&quot;)</code></pre>
+<pre class="r"><code>debugonce(&quot;dbFetch&quot;)
+dplyr::tbl(con,&quot;problem_data&quot;)</code></pre>
 <p>Now reproducing the error breaks into the browser and displays the Traceback window.</p>
 <p>NOTE: I had to expand the Traceback window to display it.</p>
-<pre class="r"><code>dplyr::tbl(con,&quot;problem_data&quot;)</code></pre>
-<p><img src="/post/2020-05-13-error-invalid-descriptor-index_files/dbFetch_breakpoint.png" /></p>
-<p>from this output I can see that <code>dbFetch()</code> is being invoked from line 583 of <code>backend-.R</code></p>
-<p>Note that I checked the box to, “Show Internals,” which revealed <code>dplyr::tbl()</code> as the first function executed.</p>
-<p>A search of the file system revealed that <code>backend-.R</code> is a file in the R direction of the dbplyr package.</p>
+<p><img src="/post/2020-05-13-error-invalid-descriptor-index_files/expand_traceback.png" /></p>
+<p>Note that I still did not see line numbers in the traceback!</p>
+<p><img src="/post/2020-05-13-error-invalid-descriptor-index_files/debug_traceback1.png" /></p>
+<p>Along the way of randomly trying things I found that using <code>debug()</code> instead of <code>debugonce()</code> resulted in line numbers being displayed.</p>
+<pre class="r"><code>debug(&quot;dbFetch&quot;)
+dplyr::tbl(con,&quot;problem_data&quot;)</code></pre>
+<p><img src="/post/2020-05-13-error-invalid-descriptor-index_files/debug_traceback_1_source.png" /></p>
+<p>What I found interesting was that the output of <code>traceback()</code> did not match the output of `traceback() after reproducing the error.</p>
+<p>My suspicion was that <code>dbFetch()</code> is called multiple times as a result of my call to <code>dplyr::tbl()</code>.</p>
+<p>To test that hypothesis, I clicked, “continue,” in the debugger and sure enough the breakpoint was hit again. This time the call stack looked similar to the output of <code>traceback()</code> when the error occurred.</p>
+<p>Note that for some reason the output of the Traceback window in RStudio stopped displaying line numbers. It works for the first attempt after running <code>debug()</code> and then stops displaying line numbers for subsequent attempts. Weird!</p>
+<p><img src="/post/2020-05-13-error-invalid-descriptor-index_files/traceback_2nd_bp.png" /></p>
+<p>I then clicked the, “next,” button in Rstudio to execute the statement. The output of RStudio’s Traceback window did not change, but a running <code>where</code> in the Browser terminal yielded additional detail.</p>
+<p><img src="/post/2020-05-13-error-invalid-descriptor-index_files/where_output_2nd_bp.png" /></p>
+<p><strong>A big benefit of adding <code>where()</code> to my debugging work flow is that it provided the complete path to each source file, whereas Traceback only gave the file name.</strong></p>
+<p>We can see that <code>dbFetch()</code> is about to be called from line 123 of verb-compute.R from inside the <code>db_collect.DBIConnection</code> function.</p>
+<p><img src="/post/2020-05-13-error-invalid-descriptor-index_files/db_collect_code.png" /></p>
+<p>Unfortunately, trying to step further into the code with the next or step into debugger function resulted in the error being returned and execution stopping.</p>
+<p>I still was not able to figure out where <code>dbFetch()</code> was defined.</p>
+<p>I decided to change approaches so I set the RStudio option to break into the code on error.</p>
+<p><img src="/post/2020-05-13-error-invalid-descriptor-index_files/option_break_in.png" /></p>
+<p>I also stopped debugging <code>dbFetch()</code></p>
+<pre class="r"><code>undebug(&quot;dbFetch&quot;)</code></pre>
+<p>Reproducing the error now broke into the Browser, and executing <code>where()</code> shed some additional light.</p>
+<p><img src="/post/2020-05-13-error-invalid-descriptor-index_files/where_more.png" /></p>
+<p>I could see that <code>dbFetch()</code> was resulting in a call into <code>odbc::result_fetch()</code> and then that ends up with a <code>stop()</code> message from a file called <code>RcppExports.R</code></p>
+<p><img src="/post/2020-05-13-error-invalid-descriptor-index_files/dbFetch_def.png" /></p>
+<p>Looking at the help for the <code>setMethod()</code> function I can see that it defines what code gets run when <code>dbFetch()</code> is called, in this case <code>result_fetch()</code>.</p>
+<p>Still not entirely clear where the definition for <code>result_fetch()</code> is but moving up the callstack I can see that <code>stop()</code> is called from <code>RcppExports.R</code>, line 81 so I took a peek at that code. By the way, the fact that the file contains, “Rcpp,” indicated to me that this had something to do with C++ code.</p>
+<p><img src="/post/2020-05-13-error-invalid-descriptor-index_files/result_fetch_definition.png" /></p>
+<p>Well sure enough there was a call to <code>.Call()</code>, which according to the help provides, “Modern Interfaces to C/C++ code.”</p>
+<p>Searching my file system for files with the string "_odbc_result_fetch" yielded hits odbc C++ source files.</p>
+<p><img src="/post/2020-05-13-error-invalid-descriptor-index_files/result_fetch_search.png" /></p>
+<p>At the same position in the call stack there is a string, “message =”nanodbc/nanodbc.cpp:3186…"</p>
+<p>I opened <code>r_projects/odbc/src/nanodbc/nanodbc.cpp</code> and took a look at the code around line 3186.</p>
+<p><img src="/post/2020-05-13-error-invalid-descriptor-index_files/nanodbc_code.png" /></p>
+<p>This code is inside a function <code>result::result_impl::get_ref_impl</code> and specifically inside a case statement that is executed when a column is of type <code>SQL_C_BINARY</code>.</p>
+<p>The error itself results from a call to <code>NANODBC_CALL_RC</code> which is a wrapper to ODBC functions. The ODBC function being called is <code>SQLGetData()</code>, which according to <a href="https://docs.microsoft.com/en-us/sql/odbc/reference/syntax/sqlgetdata-function?view=sql-server-ver15">the documentation</a>, “retrieves data for a single column in the result set or for a single parameter after SQLParamData returns SQL_PARAM_DATA_AVAILABLE. It can be called multiple times to retrieve variable-length data in parts.”</p>
+<p>Recalling what I read in the other Github issues, I referred back to the <a href="https://docs.microsoft.com/en-us/sql/odbc/reference/develop-app/getting-long-data?view=sql-server-ver15">Microsoft documentation on getting long data</a> and found this statement.</p>
+<blockquote>
+<p>Because such data cannot be stored in a single buffer, it is retrieved from the driver in parts with SQLGetData after the other data in the row has been fetched.</p>
+</blockquote>
+<p>So my hypothesis is that <code>SQLGetData()</code> is being called on a “long” column before all other “non-long” columns have been retrieved. This echo’s other comments on some of the issues, and also my testing where moving the “long” column to the end of the select statement.</p>
+<p>TODO:</p>
+<ul>
+<li>Review issues again to confirm others have this hypothesis.</li>
+<li>Review dbplyr code and past issues- is it explicately requesting data for one column at a time or is this done at a lower level (odbc or nandobc)?</li>
+</ul>
 </div>
 </div>
 <div id="issues" class="section level1">
@@ -256,7 +300,7 @@ addressing the problem</a></li>
 <p>Issues logged against nanodbc:</p>
 <ul>
 <li><a href="https://github.com/nanodbc/nanodbc/issues/149" class="uri">https://github.com/nanodbc/nanodbc/issues/149</a></li>
-<li><a href="https://github.com/nanodbc/nanodbc/issues/228" class="uri">https://github.com/nanodbc/nanodbc/issues/228</a></li>
+<li><a href="https://github.com/nanodbc/nanodbc/issues/228" class="uri">https://github.com/nanodbc/nanodbc/issues/228</a> &lt;- this discusses a potential fix in nanodbc</li>
 </ul>
 <p><a href="https://stackoverflow.com/questions/45001152/r-dbi-odbc-error-nanodbc-nanodbc-cpp3110-07009-microsoftodbc-driver-13-fo">Most Helpful (to me) Stack Overflow thread</a></p>
 </div>
@@ -302,7 +346,7 @@ the data has been retrieved from the database.</p>
 
 tbl_long_cols_2(con, &quot;problem_data&quot;) %&gt;% 
   dplyr::collect() %&gt;% 
-  dplyr::select(a,b,c) #can move the &quot;long&quot; cols back after retrievel from db</code></pre>
+  dplyr::select(a,b,c) #can move the &quot;long&quot; cols back after retrieval from db</code></pre>
 <pre><code>## # A tibble: 3 x 3
 ##       a         b     c
 ##   &lt;int&gt;    &lt;blob&gt; &lt;dbl&gt;
@@ -362,7 +406,7 @@ tbl_long_cols_3(con, &quot;problem_data&quot;) %&gt;%
 <pre class="r"><code>odbc::odbcListDrivers() %&gt;% 
   dplyr::filter(name == &quot;FreeTDS&quot;)</code></pre>
 <pre><code>##      name        attribute value
-## 1 FreeTDS       UsageCount     1
+## 1 FreeTDS       UsageCount     2
 ## 2 FreeTDS         APILevel     2
 ## 3 FreeTDS ConnectFunctions   YYN
 ## 4 FreeTDS    DriverODBCVer 03.00
