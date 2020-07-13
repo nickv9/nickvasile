@@ -7,8 +7,6 @@ categories: []
 tags: []
 ---
 
-**This post is a work in progress**
-
 # Motivation
 
 I use the dbplyr, dplyr, DBI and odbc R packages to extract data held in Microsoft SQL on a daily basis. 
@@ -40,7 +38,7 @@ One of the primary motivations for this post is to force me to advance my debugg
 
 I decided to start with [the debugging chapter from Hadley Wickham's Advanced R book](https://adv-r.hadley.nz/debugging.html).
 
-## Debugging Step 1: Google it!
+## Debugging Step 1: Google it! {#google}
 
 I started out by Googling a portion of the error string, "`[Microsoft][ODBC SQL Server Driver]Invalid Descriptor Index`," which yielded quite a few relevant hits, including a surprising amount of duplicate GitHub issues raised in the odbc project.
 
@@ -283,7 +281,7 @@ Note that for some reason the output of the Traceback window in RStudio stopped 
 
 ![](/post/2020-05-13-error-invalid-descriptor-index_files/traceback_2nd_bp.png)
 
-I then clicked the, "next," button in Rstudio to execute the statement. The output of RStudio's Traceback window did not change, but a running `where` in the Browser terminal yielded additional detail.
+I then clicked the, "next," button in Rstudio to execute the statement. The output of RStudio's Traceback window did not change, but running `where()` in the Browser terminal yielded additional detail.
 
 ![](/post/2020-05-13-error-invalid-descriptor-index_files/where_output_2nd_bp.png)
 
@@ -343,10 +341,29 @@ Recalling what I read in the other Github issues, I referred back to the [Micros
 
 So my hypothesis is that `SQLGetData()` is being called on a "long" column before all other "non-long" columns have been retrieved. This echo's other comments on some of the issues, and also my testing where moving the "long" column to the end of the select statement.
 
-TODO: 
+Taking a broader look at this nanodbc code I can see that `SQLGetData()` is being called inside a case statement.
 
-* Review issues again to confirm others have this hypothesis.
-* Review dbplyr code and past issues- is it explicately requesting data for one column at a time or is this done at a lower level (odbc or nandobc)?
+![](/post/2020-05-13-error-invalid-descriptor-index_files/case_stmt.png)
+
+I suspect that this second part of the case statement is being run for "non-long" columns and `SQLGetData()` is being called when the column comes back as binary.
+
+I could confirm this by setting up C++ debugging of this nanodbc code but after looking at what it would take for my Windows config I decided not to take the time to do that.
+
+In conclusion, I can see the error is being returned inside nanodbc C++ code and that nanodbc is used by the odbc package.
+
+## Debugging Step 4: Fix it and test it
+
+Other than the workarounds detailed in the [Debugging Step 1: Google it!](#google) section, I believe reading all columns with `SQLGetData()` might a suitable option based on the [Microsoft Documentation on reading long data](https://docs.microsoft.com/en-us/sql/odbc/reference/develop-app/getting-long-data?view=sql-server-ver15)
+
+> An application can actually retrieve any type of data with SQLGetData, not just long data, although only character and binary data can be retrieved in parts.
+
+The documentation does indicate that this is more complex. I have also come across some comments that this approach could impact performance. I am not aware of whether this a significant concern in practice.
+
+For now, I've added a function resembling the first method in [Appendix: Methods to move "long" data to end of query](#move_long_data) to my personal suite of functions. I use it after receiving the, "Invalid descriptor index," error on a table.
+
+I am optimistics that this will eventually be resolved so R users don't encounter this issue in the future. I am following this particular PR in nanodbc.
+
+[Optional binding to support out-of-order retrival of unbound columns with SQLGetData](https://github.com/nanodbc/nanodbc/pull/236)
 
 # Appendix: Some Reports of, and references to, this issue {#issues}
 
@@ -522,16 +539,6 @@ SOURCE: [Bill Even's GitHub Issue post where he shares solution](https://github.
 SOURCE: [Setting up FreeTDS to work with ODBC Data Source Administrator on Windows 7](https://lists.ibiblio.org/pipermail/freetds/2016q3/029980.html)
 
 SOURCE: [FreeTDS user guide](https://www.freetds.org/userguide/osissues.html#Windows)
-
-# Q&A
-
-Q: How "long" data be identified?
-
-A: 
-
-> DBMSs define long data as any character or binary data over a certain size, such as 255 characters
-TODO
-SOURCE: [Microsoft documentation on Getting Long Data](https://docs.microsoft.com/en-us/sql/odbc/reference/develop-app/getting-long-data?view=sql-server-ver15)
 
 # Appendix: Building a package from source using RStudio {#build_source}
 
