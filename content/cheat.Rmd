@@ -659,3 +659,15 @@ odbc::odbcListColumns(con, table = "table_name")
 DBI::dbListFields(con, "table_name")
 ```
 
+## Table of contents for rmarkdown document
+
+Add this to the document header.
+
+```{r, eval = FALSE}
+output: 
+    html_document:
+        toc: true
+        toc_depth: 6
+        toc_float: true
+```
+

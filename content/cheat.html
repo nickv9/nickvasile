@@ -1,7 +1,7 @@
 ---
 title: "Nick's R Cheat Sheet"
 author: "Nicholas Vasile"
-date: "2020-05-28"
+date: "2020-07-16"
 output: 
   blogdown::html_page:
     toc: true
@@ -63,6 +63,7 @@ vignette: >
 <li><a href="#get-detailed-information-for-each-column-in-a-database-table">Get detailed information for each column in a database table</a></li>
 <li><a href="#get-just-the-columns-and-datatypes-for-each-column-in-a-database-table">Get just the columns and datatypes for each column in a database table</a></li>
 <li><a href="#get-just-the-column-names">Get just the column names</a></li>
+<li><a href="#table-of-contents-for-rmarkdown-document">Table of contents for rmarkdown document</a></li>
 </ul>
 </div>
 
@@ -334,12 +335,10 @@ read.csv(file = &quot;my_file.csv&quot;, fileEncoding = &quot;UTF-8-BOM&quot;)</
 #&gt;  4  6  8 
 #&gt; 11  7 14
 dplyr::count(mtcars, cyl)
-#&gt; # A tibble: 3 x 2
-#&gt;     cyl     n
-#&gt;   &lt;dbl&gt; &lt;int&gt;
-#&gt; 1     4    11
-#&gt; 2     6     7
-#&gt; 3     8    14
+#&gt;   cyl  n
+#&gt; 1   4 11
+#&gt; 2   6  7
+#&gt; 3   8 14
 as.data.frame(table(mtcars$cyl))
 #&gt;   Var1 Freq
 #&gt; 1    4   11
@@ -347,17 +346,15 @@ as.data.frame(table(mtcars$cyl))
 #&gt; 3    8   14
 
 dplyr::count(mtcars, cyl, gear)
-#&gt; # A tibble: 8 x 3
-#&gt;     cyl  gear     n
-#&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt;
-#&gt; 1     4     3     1
-#&gt; 2     4     4     8
-#&gt; 3     4     5     2
-#&gt; 4     6     3     2
-#&gt; 5     6     4     4
-#&gt; 6     6     5     1
-#&gt; 7     8     3    12
-#&gt; 8     8     5     2
+#&gt;   cyl gear  n
+#&gt; 1   4    3  1
+#&gt; 2   4    4  8
+#&gt; 3   4    5  2
+#&gt; 4   6    3  2
+#&gt; 5   6    4  4
+#&gt; 6   6    5  1
+#&gt; 7   8    3 12
+#&gt; 8   8    5  2
 xtabs(~cyl + gear, mtcars)
 #&gt;    gear
 #&gt; cyl  3  4  5
@@ -500,7 +497,7 @@ nycflights13::weather %&gt;%
     dplyr::vars(dplyr::contains(&#39;_&#39;)), dplyr::funs(stringr::str_replace(., &quot;_&quot;, &quot;\\.&quot;))
     ) %&gt;% 
   names()
-#&gt; Warning: funs() is soft deprecated as of dplyr 0.8.0
+#&gt; Warning: `funs()` is deprecated as of dplyr 0.8.0.
 #&gt; Please use a list of either functions or lambdas: 
 #&gt; 
 #&gt;   # Simple named list: 
@@ -511,7 +508,8 @@ nycflights13::weather %&gt;%
 #&gt; 
 #&gt;   # Using lambdas
 #&gt;   list(~ mean(., trim = .2), ~ median(., na.rm = TRUE))
-#&gt; This warning is displayed once per session.
+#&gt; This warning is displayed once every 8 hours.
+#&gt; Call `lifecycle::last_warnings()` to see where this warning was generated.
 #&gt;  [1] &quot;origin&quot;     &quot;year&quot;       &quot;month&quot;      &quot;day&quot;        &quot;hour&quot;      
 #&gt;  [6] &quot;temp&quot;       &quot;dewp&quot;       &quot;humid&quot;      &quot;wind.dir&quot;   &quot;wind.speed&quot;
 #&gt; [11] &quot;wind.gust&quot;  &quot;precip&quot;     &quot;pressure&quot;   &quot;visib&quot;      &quot;time.hour&quot;</code></pre>
@@ -625,9 +623,9 @@ OlsonNames() %&gt;% head()
 <pre class="r"><code>library(lubridate)
 #&gt; 
 #&gt; Attaching package: &#39;lubridate&#39;
-#&gt; The following object is masked from &#39;package:base&#39;:
+#&gt; The following objects are masked from &#39;package:base&#39;:
 #&gt; 
-#&gt;     date
+#&gt;     date, intersect, setdiff, union
 ymd_hms(&quot;2018-10-25 12:00:00&quot;) %--% ymd_hms(&quot;2018-10-25 13:00:00&quot;) / dminutes(1)
 #&gt; [1] 60</code></pre>
 </div>
@@ -782,6 +780,7 @@ purrr::map_df(my_list, magrittr::extract)
 <pre class="r"><code>avg_delay_by_carrier &lt;- nycflights13::flights %&gt;% 
   dplyr::group_by(carrier) %&gt;% 
   dplyr::summarize(mean_delay = mean(dep_delay, na.rm = TRUE))
+#&gt; `summarise()` ungrouping output (override with `.groups` argument)
 
 avg_delay_by_carrier %&gt;% 
   ggplot2::ggplot(ggplot2::aes(x=reorder(carrier, -mean_delay),
@@ -793,6 +792,7 @@ avg_delay_by_carrier %&gt;%
   nycflights13::flights %&gt;% 
   dplyr::group_by(carrier) %&gt;% 
   dplyr::summarize(mean_delay = mean(dep_delay, na.rm = TRUE))
+#&gt; `summarise()` ungrouping output (override with `.groups` argument)
 
 avg_delay_by_carrier %&gt;% 
   ggplot2::ggplot(ggplot2::aes(x=reorder(carrier, mean_delay),
@@ -912,7 +912,8 @@ soybean %&gt;%
     ggplot2::ggplot(ggplot2::aes(x=Class, y = mean_na_rate, fill = Class)) +
     ggplot2::geom_bar(stat = &quot;identity&quot;) +
     ggplot2::coord_flip() +
-    ggplot2::theme(legend.position = &quot;none&quot;)</code></pre>
+    ggplot2::theme(legend.position = &quot;none&quot;)
+#&gt; `summarise()` ungrouping output (override with `.groups` argument)</code></pre>
 <p><img src="/cheat_files/figure-html/unnamed-chunk-41-1.png" width="672" /></p>
 </div>
 <div id="plot-the-pecentage-of-rows-that-has-at-least-1-na-attribute-by-outcome" class="section level3">
@@ -931,7 +932,8 @@ soybean %&gt;%
     ggplot2::ggplot(ggplot2::aes(x=Class, y = mean_has_nas, fill = Class)) +
     ggplot2::geom_bar(stat = &quot;identity&quot;) +
     ggplot2::coord_flip() +
-    ggplot2::theme(legend.position = &quot;none&quot;)</code></pre>
+    ggplot2::theme(legend.position = &quot;none&quot;)
+#&gt; `summarise()` ungrouping output (override with `.groups` argument)</code></pre>
 <p><img src="/cheat_files/figure-html/unnamed-chunk-42-1.png" width="672" /></p>
 </div>
 <div id="plot-the-attributes-predictors-that-are-most-likely-to-be-missing" class="section level2">
@@ -964,7 +966,8 @@ soybean_l %&gt;% dplyr::group_by(Class, predictor) %&gt;%
   ggplot2::geom_bar(stat = &quot;identity&quot;) +
   ggplot2::coord_flip() +
   ggplot2::facet_wrap(~Class, scales = &quot;free&quot;) +
-  ggplot2::theme(legend.position = &quot;none&quot;)</code></pre>
+  ggplot2::theme(legend.position = &quot;none&quot;)
+#&gt; `summarise()` regrouping output by &#39;Class&#39; (override with `.groups` argument)</code></pre>
 <p><img src="/cheat_files/figure-html/unnamed-chunk-44-1.png" width="672" /></p>
 </div>
 <div id="create-a-matrix-that-shows-whether-or-not-a-particular-combination-of-values-is-in-the-data" class="section level2">
@@ -1044,7 +1047,7 @@ n_mtcars
 <pre class="r"><code>names(n_mtcars$data) &lt;- stringr::str_c(n_mtcars$cyl,&quot;_cyl&quot;)
 str(n_mtcars$data)
 #&gt; List of 3
-#&gt;  $ 6_cyl:Classes &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;:   7 obs. of  10 variables:
+#&gt;  $ 6_cyl: tibble [7 x 10] (S3: tbl_df/tbl/data.frame)
 #&gt;   ..$ mpg : num [1:7] 21 21 21.4 18.1 19.2 17.8 19.7
 #&gt;   ..$ disp: num [1:7] 160 160 258 225 168 ...
 #&gt;   ..$ hp  : num [1:7] 110 110 110 105 123 123 175
@@ -1055,7 +1058,7 @@ str(n_mtcars$data)
 #&gt;   ..$ am  : num [1:7] 1 1 0 0 0 0 1
 #&gt;   ..$ gear: num [1:7] 4 4 3 3 4 4 5
 #&gt;   ..$ carb: num [1:7] 4 4 1 1 4 4 6
-#&gt;  $ 4_cyl:Classes &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;:   11 obs. of  10 variables:
+#&gt;  $ 4_cyl: tibble [11 x 10] (S3: tbl_df/tbl/data.frame)
 #&gt;   ..$ mpg : num [1:11] 22.8 24.4 22.8 32.4 30.4 33.9 21.5 27.3 26 30.4 ...
 #&gt;   ..$ disp: num [1:11] 108 146.7 140.8 78.7 75.7 ...
 #&gt;   ..$ hp  : num [1:11] 93 62 95 66 52 65 97 66 91 113 ...
@@ -1066,7 +1069,7 @@ str(n_mtcars$data)
 #&gt;   ..$ am  : num [1:11] 1 0 0 1 1 1 0 1 1 1 ...
 #&gt;   ..$ gear: num [1:11] 4 4 4 4 4 4 3 4 5 5 ...
 #&gt;   ..$ carb: num [1:11] 1 2 2 1 2 1 1 1 2 2 ...
-#&gt;  $ 8_cyl:Classes &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;:   14 obs. of  10 variables:
+#&gt;  $ 8_cyl: tibble [14 x 10] (S3: tbl_df/tbl/data.frame)
 #&gt;   ..$ mpg : num [1:14] 18.7 14.3 16.4 17.3 15.2 10.4 10.4 14.7 15.5 15.2 ...
 #&gt;   ..$ disp: num [1:14] 360 360 276 276 276 ...
 #&gt;   ..$ hp  : num [1:14] 175 245 180 180 180 205 215 230 150 150 ...
@@ -1119,4 +1122,13 @@ str(n_mtcars$data)
 <div id="get-just-the-column-names" class="section level2">
 <h2>Get just the column names</h2>
 <pre class="r"><code>DBI::dbListFields(con, &quot;table_name&quot;)</code></pre>
+</div>
+<div id="table-of-contents-for-rmarkdown-document" class="section level2">
+<h2>Table of contents for rmarkdown document</h2>
+<p>Add this to the document header.</p>
+<pre class="r"><code>output: 
+    html_document:
+        toc: true
+        toc_depth: 6
+        toc_float: true</code></pre>
 </div>
