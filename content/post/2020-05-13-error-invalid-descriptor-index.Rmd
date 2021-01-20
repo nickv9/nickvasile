@@ -7,6 +7,45 @@ categories: []
 tags: []
 ---
 
+# Spoiler Alert: A fix has been released!
+
+A solution was released after I wrote this post. 
+
+```{r echo=FALSE}
+blogdown::shortcode('tweet', '1321456834260193285')
+```
+
+Here are the steps that worked for me:
+
+1. Update to the latest released version of `odbc`
+
+```{r, eval = FALSE}
+install.packages("odbc")
+```
+
+2. Update to the latest version of the Microsoft Driver for SQL Server. I suggest Googling, "odbc driver for sql server," to find the latest version.
+
+3. Specify the ODBC driver you downloaded in step 2 when connecting to your database.
+
+```{r, eval = FALSE}
+con <- DBI::dbConnect(
+      odbc::odbc(),
+      Driver = "ODBC Driver 17 for SQL Server",
+      Server = "testsqlserver",
+      UID = user_name,
+      Database = "dbi_error",
+      PWD = keyring::key_get("dbi_test", user_name)
+   )
+```
+
+To determine what to specify in the `Driver = "ODBC Driver 17 for SQL Server"` line, I used the following command to get the name of drivers installed on my system...
+
+```{r}
+stringr::str_subset(
+  unique(odbc::odbcListDrivers()$name),
+  "SQL Server")
+```
+
 # Motivation
 
 I use the dbplyr, dplyr, DBI and odbc R packages to extract data held in Microsoft SQL on a daily basis. 

@@ -7,8 +7,37 @@ categories: []
 tags: []
 ---
 
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
 
 
+<div id="spoiler-alert-a-fix-has-been-released" class="section level1">
+<h1>Spoiler Alert: A fix has been released!</h1>
+<p>A solution was released after I wrote this post.</p>
+<p>{{% tweet "1321456834260193285" %}}</p>
+<p>Here are the steps that worked for me:</p>
+<ol style="list-style-type: decimal">
+<li>Update to the latest released version of <code>odbc</code></li>
+</ol>
+<pre class="r"><code>install.packages(&quot;odbc&quot;)</code></pre>
+<ol start="2" style="list-style-type: decimal">
+<li><p>Update to the latest version of the Microsoft Driver for SQL Server. I suggest Googling, “odbc driver for sql server,” to find the latest version.</p></li>
+<li><p>Specify the ODBC driver you downloaded in step 2 when connecting to your database.</p></li>
+</ol>
+<pre class="r"><code>con &lt;- DBI::dbConnect(
+      odbc::odbc(),
+      Driver = &quot;ODBC Driver 17 for SQL Server&quot;,
+      Server = &quot;testsqlserver&quot;,
+      UID = user_name,
+      Database = &quot;dbi_error&quot;,
+      PWD = keyring::key_get(&quot;dbi_test&quot;, user_name)
+   )</code></pre>
+<p>To determine what to specify in the <code>Driver = "ODBC Driver 17 for SQL Server"</code> line, I used the following command to get the name of drivers installed on my system…</p>
+<pre class="r"><code>stringr::str_subset(
+  unique(odbc::odbcListDrivers()$name),
+  &quot;SQL Server&quot;)</code></pre>
+<pre><code>## [1] &quot;SQL Server&quot;                    &quot;SQL Server Native Client 11.0&quot;
+## [3] &quot;ODBC Driver 17 for SQL Server&quot;</code></pre>
+</div>
 <div id="motivation" class="section level1">
 <h1>Motivation</h1>
 <p>I use the dbplyr, dplyr, DBI and odbc R packages to extract data held in Microsoft SQL on a daily basis.</p>
@@ -156,7 +185,7 @@ dplyr::copy_to(con,
 <p>Here the problem occurs - because the column with, “long,” data is NOT the last column in the table.</p>
 <pre class="r"><code>dplyr::tbl(con,&quot;problem_data&quot;) %&gt;% 
   collect()</code></pre>
-<pre><code>## Error in result_fetch(res@ptr, n): nanodbc/nanodbc.cpp:3186: 07009: [Microsoft][ODBC SQL Server Driver]Invalid Descriptor Index</code></pre>
+<pre><code>## Error in result_fetch(res@ptr, n): nanodbc/nanodbc.cpp:3280: 07009: [Microsoft][ODBC SQL Server Driver]Invalid Descriptor Index</code></pre>
 <p>Here the problem does not occur - because the column with “long” data is the last column in the table.</p>
 <pre class="r"><code>dplyr::tbl(con, &quot;working_data&quot;) %&gt;% 
   collect()</code></pre>
@@ -173,7 +202,7 @@ dplyr::copy_to(con,
 <h2>Debugging Step 3: Figure out where it is (the error)</h2>
 <pre class="r"><code>dplyr::tbl(con,&quot;problem_data&quot;) %&gt;% 
   collect()</code></pre>
-<pre><code>## Error in result_fetch(res@ptr, n): nanodbc/nanodbc.cpp:3186: 07009: [Microsoft][ODBC SQL Server Driver]Invalid Descriptor Index</code></pre>
+<pre><code>## Error in result_fetch(res@ptr, n): nanodbc/nanodbc.cpp:3280: 07009: [Microsoft][ODBC SQL Server Driver]Invalid Descriptor Index</code></pre>
 <p>Executing <code>traceback()</code> yields</p>
 <p><img src="/post/2020-05-13-error-invalid-descriptor-index_files/traceback_1.png" /></p>
 <p>Recalling that stack track reads from bottom to top I can see it progresses from <code>dplyr::tbl()</code> through the final <code>stop()</code> and that there are some database related functions along the way, for example <code>dbFetch</code>.</p>
