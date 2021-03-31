@@ -90,6 +90,22 @@ mtcars[which(mtcars$cyl == 4), "mpg"]
 subset(mtcars$mpg, mtcars$cyl == 4)
 ```
 
+
+### Filtering for rows where at least one column is missing
+
+```{r}
+dplyr::starwars %>% 
+  dplyr::filter(dplyr::if_any(dplyr::everything(), ~is.na(.x)))
+```
+
+### Filtering for rows where all columns have values
+
+```{r}
+dplyr::starwars %>% 
+  tidyr::drop_na()
+```
+
+
 ### Exploring data
 ```{r}
 #summary stats from pastecs package
