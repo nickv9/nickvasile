@@ -687,3 +687,10 @@ output:
         toc_float: true
 ```
 
+## Get unique values from all non-numeric columns
+```{r}
+dplyr::starwars %>% 
+  dplyr::select(!where(is.numeric)) %>% 
+  purrr::map(unique)
+```
+
