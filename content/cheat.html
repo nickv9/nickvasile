@@ -69,6 +69,7 @@ vignette: >
 <li><a href="#table-of-contents-for-rmarkdown-document">Table of contents for rmarkdown document</a></li>
 <li><a href="#get-unique-values-from-all-non-numeric-columns">Get unique values from all non-numeric columns</a></li>
 <li><a href="#get-count-and-proportion-of-all-non-numeric-columns">Get count and proportion of all non-numeric columns</a></li>
+<li><a href="#get-number-of-unique-values-for-numeric-columns">Get number of unique values for numeric columns</a></li>
 </ul>
 </div>
 
@@ -1576,4 +1577,27 @@ str(n_mtcars$data)
 #&gt;     0.01204819     0.02409639     0.01204819     0.02409639     0.01204819 
 #&gt; Yoda&#39;s species         Zabrak 
 #&gt;     0.01204819     0.02409639</code></pre>
+</div>
+<div id="get-number-of-unique-values-for-numeric-columns" class="section level2">
+<h2>Get number of unique values for numeric columns</h2>
+<p>A good way to identify categorical data within numeric columns….</p>
+<pre class="r"><code>mtcars %&gt;% 
+  dplyr::select(where(is.numeric)) %&gt;% 
+  purrr::map_df(~ unique(.) %&gt;% length()) %&gt;% 
+  tidyr::pivot_longer(everything()) %&gt;% 
+  dplyr::arrange(value)
+#&gt; # A tibble: 11 x 2
+#&gt;    name  value
+#&gt;    &lt;chr&gt; &lt;int&gt;
+#&gt;  1 vs        2
+#&gt;  2 am        2
+#&gt;  3 cyl       3
+#&gt;  4 gear      3
+#&gt;  5 carb      6
+#&gt;  6 hp       22
+#&gt;  7 drat     22
+#&gt;  8 mpg      25
+#&gt;  9 disp     27
+#&gt; 10 wt       29
+#&gt; 11 qsec     30</code></pre>
 </div>

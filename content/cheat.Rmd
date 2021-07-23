@@ -719,3 +719,16 @@ dplyr::starwars %>%
   purrr::map(~ table(.) %>% prop.table())
 ```
 
+
+## Get number of unique values for numeric columns
+
+A good way to identify categorical data within numeric columns....
+
+```{r}
+mtcars %>% 
+  dplyr::select(where(is.numeric)) %>% 
+  purrr::map_df(~ unique(.) %>% length()) %>% 
+  tidyr::pivot_longer(everything()) %>% 
+  dplyr::arrange(value)
+```
+
