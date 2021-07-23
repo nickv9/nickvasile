@@ -68,6 +68,7 @@ vignette: >
 <li><a href="#get-just-the-column-names">Get just the column names</a></li>
 <li><a href="#table-of-contents-for-rmarkdown-document">Table of contents for rmarkdown document</a></li>
 <li><a href="#get-unique-values-from-all-non-numeric-columns">Get unique values from all non-numeric columns</a></li>
+<li><a href="#get-count-and-proportion-of-all-non-numeric-columns">Get count and proportion of all non-numeric columns</a></li>
 </ul>
 </div>
 
@@ -1262,4 +1263,317 @@ str(n_mtcars$data)
 #&gt; [29] &quot;Mirialan&quot;       &quot;Clawdite&quot;       &quot;Besalisk&quot;       &quot;Kaminoan&quot;      
 #&gt; [33] &quot;Aleena&quot;         &quot;Skakoan&quot;        &quot;Muun&quot;           &quot;Togruta&quot;       
 #&gt; [37] &quot;Kaleesh&quot;        &quot;Pau&#39;an&quot;</code></pre>
+</div>
+<div id="get-count-and-proportion-of-all-non-numeric-columns" class="section level2">
+<h2>Get count and proportion of all non-numeric columns</h2>
+<p>Counts…</p>
+<pre class="r"><code>dplyr::starwars %&gt;% 
+  # this works for list, but removing them to make the example output
+  # more concise
+  dplyr::select(!where(is.numeric) &amp; !where(is.list)) %&gt;% 
+  purrr::map(~ table(.))
+#&gt; $name
+#&gt; .
+#&gt;                Ackbar            Adi Gallia      Anakin Skywalker 
+#&gt;                     1                     1                     1 
+#&gt;          Arvel Crynyd           Ayla Secura   Bail Prestor Organa 
+#&gt;                     1                     1                     1 
+#&gt;         Barriss Offee                   BB8        Ben Quadinaros 
+#&gt;                     1                     1                     1 
+#&gt;    Beru Whitesun lars           Bib Fortuna     Biggs Darklighter 
+#&gt;                     1                     1                     1 
+#&gt;             Boba Fett                 Bossk                 C-3PO 
+#&gt;                     1                     1                     1 
+#&gt;        Captain Phasma             Chewbacca           Cliegg Lars 
+#&gt;                     1                     1                     1 
+#&gt;                 Cordé            Darth Maul           Darth Vader 
+#&gt;                     1                     1                     1 
+#&gt;       Dexter Jettster                 Dooku                 Dormé 
+#&gt;                     1                     1                     1 
+#&gt;              Dud Bolt             Eeth Koth         Finis Valorum 
+#&gt;                     1                     1                     1 
+#&gt;                  Finn               Gasgano                Greedo 
+#&gt;                     1                     1                     1 
+#&gt;          Gregar Typho              Grievous              Han Solo 
+#&gt;                     1                     1                     1 
+#&gt;                 IG-88 Jabba Desilijic Tiure            Jango Fett 
+#&gt;                     1                     1                     1 
+#&gt;         Jar Jar Binks      Jek Tono Porkins            Jocasta Nu 
+#&gt;                     1                     1                     1 
+#&gt;          Ki-Adi-Mundi             Kit Fisto               Lama Su 
+#&gt;                     1                     1                     1 
+#&gt;      Lando Calrissian           Leia Organa                 Lobot 
+#&gt;                     1                     1                     1 
+#&gt;        Luke Skywalker       Luminara Unduli            Mace Windu 
+#&gt;                     1                     1                     1 
+#&gt;            Mas Amedda            Mon Mothma             Nien Nunb 
+#&gt;                     1                     1                     1 
+#&gt;           Nute Gunray        Obi-Wan Kenobi             Owen Lars 
+#&gt;                     1                     1                     1 
+#&gt;         Padmé Amidala             Palpatine              Plo Koon 
+#&gt;                     1                     1                     1 
+#&gt;           Poe Dameron     Poggle the Lesser         Quarsh Panaka 
+#&gt;                     1                     1                     1 
+#&gt;          Qui-Gon Jinn                 R2-D2                R4-P17 
+#&gt;                     1                     1                     1 
+#&gt;                 R5-D4         Ratts Tyerell       Raymus Antilles 
+#&gt;                     1                     1                     1 
+#&gt;                   Rey              Ric Olié          Roos Tarpals 
+#&gt;                     1                     1                     1 
+#&gt;            Rugor Nass           Saesee Tiin              San Hill 
+#&gt;                     1                     1                     1 
+#&gt;               Sebulba              Shaak Ti        Shmi Skywalker 
+#&gt;                     1                     1                     1 
+#&gt;             Sly Moore               Tarfful               Taun We 
+#&gt;                     1                     1                     1 
+#&gt;            Tion Medon            Wat Tambor                 Watto 
+#&gt;                     1                     1                     1 
+#&gt;        Wedge Antilles Wicket Systri Warrick        Wilhuff Tarkin 
+#&gt;                     1                     1                     1 
+#&gt;           Yarael Poof                  Yoda            Zam Wesell 
+#&gt;                     1                     1                     1 
+#&gt; 
+#&gt; $hair_color
+#&gt; .
+#&gt;        auburn  auburn, grey auburn, white         black         blond 
+#&gt;             1             1             1            13             3 
+#&gt;        blonde         brown   brown, grey          grey          none 
+#&gt;             1            18             1             1            37 
+#&gt;       unknown         white 
+#&gt;             1             4 
+#&gt; 
+#&gt; $skin_color
+#&gt; .
+#&gt;                blue          blue, grey               brown        brown mottle 
+#&gt;                   2                   2                   4                   1 
+#&gt;        brown, white                dark                fair fair, green, yellow 
+#&gt;                   1                   6                  17                   1 
+#&gt;                gold               green    green-tan, brown         green, grey 
+#&gt;                   1                   6                   1                   1 
+#&gt;                grey          grey, blue grey, green, yellow           grey, red 
+#&gt;                   6                   1                   1                   1 
+#&gt;               light               metal       mottled green                none 
+#&gt;                  11                   1                   1                   1 
+#&gt;              orange                pale                 red    red, blue, white 
+#&gt;                   2                   5                   1                   1 
+#&gt;         silver, red                 tan             unknown               white 
+#&gt;                   1                   2                   2                   2 
+#&gt;         white, blue          white, red              yellow 
+#&gt;                   2                   1                   2 
+#&gt; 
+#&gt; $eye_color
+#&gt; .
+#&gt;         black          blue     blue-gray         brown          dark 
+#&gt;            10            19             1            21             1 
+#&gt;          gold green, yellow         hazel        orange          pink 
+#&gt;             1             1             3             8             1 
+#&gt;           red     red, blue       unknown         white        yellow 
+#&gt;             5             1             3             1            11 
+#&gt; 
+#&gt; $sex
+#&gt; .
+#&gt;         female hermaphroditic           male           none 
+#&gt;             16              1             60              6 
+#&gt; 
+#&gt; $gender
+#&gt; .
+#&gt;  feminine masculine 
+#&gt;        17        66 
+#&gt; 
+#&gt; $homeworld
+#&gt; .
+#&gt;       Alderaan    Aleen Minor         Bespin     Bestine IV Cato Neimoidia 
+#&gt;              3              1              1              1              1 
+#&gt;          Cerea       Champala      Chandrila   Concord Dawn       Corellia 
+#&gt;              1              1              1              1              2 
+#&gt;      Coruscant       Dathomir          Dorin          Endor         Eriadu 
+#&gt;              3              1              1              1              1 
+#&gt;       Geonosis    Glee Anselm     Haruun Kal        Iktotch       Iridonia 
+#&gt;              1              1              1              1              1 
+#&gt;          Kalee         Kamino       Kashyyyk      Malastare         Mirial 
+#&gt;              1              3              2              1              2 
+#&gt;       Mon Cala     Muunilinst          Naboo      Nal Hutta           Ojom 
+#&gt;              1              1             11              1              1 
+#&gt;        Quermia          Rodia         Ryloth        Serenno          Shili 
+#&gt;              1              1              2              1              1 
+#&gt;          Skako        Socorro        Stewjon        Sullust       Tatooine 
+#&gt;              1              1              1              1             10 
+#&gt;       Toydaria      Trandosha        Troiken           Tund         Umbara 
+#&gt;              1              1              1              1              1 
+#&gt;         Utapau        Vulpter          Zolan 
+#&gt;              1              1              1 
+#&gt; 
+#&gt; $species
+#&gt; .
+#&gt;         Aleena       Besalisk         Cerean       Chagrian       Clawdite 
+#&gt;              1              1              1              1              1 
+#&gt;          Droid            Dug           Ewok      Geonosian         Gungan 
+#&gt;              6              1              1              1              3 
+#&gt;          Human           Hutt       Iktotchi        Kaleesh       Kaminoan 
+#&gt;             35              1              1              1              2 
+#&gt;        Kel Dor       Mirialan   Mon Calamari           Muun       Nautolan 
+#&gt;              1              2              1              1              1 
+#&gt;      Neimodian         Pau&#39;an       Quermian         Rodian        Skakoan 
+#&gt;              1              1              1              1              1 
+#&gt;      Sullustan     Tholothian        Togruta          Toong      Toydarian 
+#&gt;              1              1              1              1              1 
+#&gt;     Trandoshan        Twi&#39;lek     Vulptereen        Wookiee          Xexto 
+#&gt;              1              2              1              2              1 
+#&gt; Yoda&#39;s species         Zabrak 
+#&gt;              1              2</code></pre>
+<p>Proportions…</p>
+<pre class="r"><code>dplyr::starwars %&gt;% 
+  # this works for list, but removing them to make the example output
+  # more concise
+  dplyr::select(!where(is.numeric) &amp; !where(is.list)) %&gt;% 
+  purrr::map(~ table(.) %&gt;% prop.table())
+#&gt; $name
+#&gt; .
+#&gt;                Ackbar            Adi Gallia      Anakin Skywalker 
+#&gt;            0.01149425            0.01149425            0.01149425 
+#&gt;          Arvel Crynyd           Ayla Secura   Bail Prestor Organa 
+#&gt;            0.01149425            0.01149425            0.01149425 
+#&gt;         Barriss Offee                   BB8        Ben Quadinaros 
+#&gt;            0.01149425            0.01149425            0.01149425 
+#&gt;    Beru Whitesun lars           Bib Fortuna     Biggs Darklighter 
+#&gt;            0.01149425            0.01149425            0.01149425 
+#&gt;             Boba Fett                 Bossk                 C-3PO 
+#&gt;            0.01149425            0.01149425            0.01149425 
+#&gt;        Captain Phasma             Chewbacca           Cliegg Lars 
+#&gt;            0.01149425            0.01149425            0.01149425 
+#&gt;                 Cordé            Darth Maul           Darth Vader 
+#&gt;            0.01149425            0.01149425            0.01149425 
+#&gt;       Dexter Jettster                 Dooku                 Dormé 
+#&gt;            0.01149425            0.01149425            0.01149425 
+#&gt;              Dud Bolt             Eeth Koth         Finis Valorum 
+#&gt;            0.01149425            0.01149425            0.01149425 
+#&gt;                  Finn               Gasgano                Greedo 
+#&gt;            0.01149425            0.01149425            0.01149425 
+#&gt;          Gregar Typho              Grievous              Han Solo 
+#&gt;            0.01149425            0.01149425            0.01149425 
+#&gt;                 IG-88 Jabba Desilijic Tiure            Jango Fett 
+#&gt;            0.01149425            0.01149425            0.01149425 
+#&gt;         Jar Jar Binks      Jek Tono Porkins            Jocasta Nu 
+#&gt;            0.01149425            0.01149425            0.01149425 
+#&gt;          Ki-Adi-Mundi             Kit Fisto               Lama Su 
+#&gt;            0.01149425            0.01149425            0.01149425 
+#&gt;      Lando Calrissian           Leia Organa                 Lobot 
+#&gt;            0.01149425            0.01149425            0.01149425 
+#&gt;        Luke Skywalker       Luminara Unduli            Mace Windu 
+#&gt;            0.01149425            0.01149425            0.01149425 
+#&gt;            Mas Amedda            Mon Mothma             Nien Nunb 
+#&gt;            0.01149425            0.01149425            0.01149425 
+#&gt;           Nute Gunray        Obi-Wan Kenobi             Owen Lars 
+#&gt;            0.01149425            0.01149425            0.01149425 
+#&gt;         Padmé Amidala             Palpatine              Plo Koon 
+#&gt;            0.01149425            0.01149425            0.01149425 
+#&gt;           Poe Dameron     Poggle the Lesser         Quarsh Panaka 
+#&gt;            0.01149425            0.01149425            0.01149425 
+#&gt;          Qui-Gon Jinn                 R2-D2                R4-P17 
+#&gt;            0.01149425            0.01149425            0.01149425 
+#&gt;                 R5-D4         Ratts Tyerell       Raymus Antilles 
+#&gt;            0.01149425            0.01149425            0.01149425 
+#&gt;                   Rey              Ric Olié          Roos Tarpals 
+#&gt;            0.01149425            0.01149425            0.01149425 
+#&gt;            Rugor Nass           Saesee Tiin              San Hill 
+#&gt;            0.01149425            0.01149425            0.01149425 
+#&gt;               Sebulba              Shaak Ti        Shmi Skywalker 
+#&gt;            0.01149425            0.01149425            0.01149425 
+#&gt;             Sly Moore               Tarfful               Taun We 
+#&gt;            0.01149425            0.01149425            0.01149425 
+#&gt;            Tion Medon            Wat Tambor                 Watto 
+#&gt;            0.01149425            0.01149425            0.01149425 
+#&gt;        Wedge Antilles Wicket Systri Warrick        Wilhuff Tarkin 
+#&gt;            0.01149425            0.01149425            0.01149425 
+#&gt;           Yarael Poof                  Yoda            Zam Wesell 
+#&gt;            0.01149425            0.01149425            0.01149425 
+#&gt; 
+#&gt; $hair_color
+#&gt; .
+#&gt;        auburn  auburn, grey auburn, white         black         blond 
+#&gt;    0.01219512    0.01219512    0.01219512    0.15853659    0.03658537 
+#&gt;        blonde         brown   brown, grey          grey          none 
+#&gt;    0.01219512    0.21951220    0.01219512    0.01219512    0.45121951 
+#&gt;       unknown         white 
+#&gt;    0.01219512    0.04878049 
+#&gt; 
+#&gt; $skin_color
+#&gt; .
+#&gt;                blue          blue, grey               brown        brown mottle 
+#&gt;          0.02298851          0.02298851          0.04597701          0.01149425 
+#&gt;        brown, white                dark                fair fair, green, yellow 
+#&gt;          0.01149425          0.06896552          0.19540230          0.01149425 
+#&gt;                gold               green    green-tan, brown         green, grey 
+#&gt;          0.01149425          0.06896552          0.01149425          0.01149425 
+#&gt;                grey          grey, blue grey, green, yellow           grey, red 
+#&gt;          0.06896552          0.01149425          0.01149425          0.01149425 
+#&gt;               light               metal       mottled green                none 
+#&gt;          0.12643678          0.01149425          0.01149425          0.01149425 
+#&gt;              orange                pale                 red    red, blue, white 
+#&gt;          0.02298851          0.05747126          0.01149425          0.01149425 
+#&gt;         silver, red                 tan             unknown               white 
+#&gt;          0.01149425          0.02298851          0.02298851          0.02298851 
+#&gt;         white, blue          white, red              yellow 
+#&gt;          0.02298851          0.01149425          0.02298851 
+#&gt; 
+#&gt; $eye_color
+#&gt; .
+#&gt;         black          blue     blue-gray         brown          dark 
+#&gt;    0.11494253    0.21839080    0.01149425    0.24137931    0.01149425 
+#&gt;          gold green, yellow         hazel        orange          pink 
+#&gt;    0.01149425    0.01149425    0.03448276    0.09195402    0.01149425 
+#&gt;           red     red, blue       unknown         white        yellow 
+#&gt;    0.05747126    0.01149425    0.03448276    0.01149425    0.12643678 
+#&gt; 
+#&gt; $sex
+#&gt; .
+#&gt;         female hermaphroditic           male           none 
+#&gt;     0.19277108     0.01204819     0.72289157     0.07228916 
+#&gt; 
+#&gt; $gender
+#&gt; .
+#&gt;  feminine masculine 
+#&gt; 0.2048193 0.7951807 
+#&gt; 
+#&gt; $homeworld
+#&gt; .
+#&gt;       Alderaan    Aleen Minor         Bespin     Bestine IV Cato Neimoidia 
+#&gt;     0.03896104     0.01298701     0.01298701     0.01298701     0.01298701 
+#&gt;          Cerea       Champala      Chandrila   Concord Dawn       Corellia 
+#&gt;     0.01298701     0.01298701     0.01298701     0.01298701     0.02597403 
+#&gt;      Coruscant       Dathomir          Dorin          Endor         Eriadu 
+#&gt;     0.03896104     0.01298701     0.01298701     0.01298701     0.01298701 
+#&gt;       Geonosis    Glee Anselm     Haruun Kal        Iktotch       Iridonia 
+#&gt;     0.01298701     0.01298701     0.01298701     0.01298701     0.01298701 
+#&gt;          Kalee         Kamino       Kashyyyk      Malastare         Mirial 
+#&gt;     0.01298701     0.03896104     0.02597403     0.01298701     0.02597403 
+#&gt;       Mon Cala     Muunilinst          Naboo      Nal Hutta           Ojom 
+#&gt;     0.01298701     0.01298701     0.14285714     0.01298701     0.01298701 
+#&gt;        Quermia          Rodia         Ryloth        Serenno          Shili 
+#&gt;     0.01298701     0.01298701     0.02597403     0.01298701     0.01298701 
+#&gt;          Skako        Socorro        Stewjon        Sullust       Tatooine 
+#&gt;     0.01298701     0.01298701     0.01298701     0.01298701     0.12987013 
+#&gt;       Toydaria      Trandosha        Troiken           Tund         Umbara 
+#&gt;     0.01298701     0.01298701     0.01298701     0.01298701     0.01298701 
+#&gt;         Utapau        Vulpter          Zolan 
+#&gt;     0.01298701     0.01298701     0.01298701 
+#&gt; 
+#&gt; $species
+#&gt; .
+#&gt;         Aleena       Besalisk         Cerean       Chagrian       Clawdite 
+#&gt;     0.01204819     0.01204819     0.01204819     0.01204819     0.01204819 
+#&gt;          Droid            Dug           Ewok      Geonosian         Gungan 
+#&gt;     0.07228916     0.01204819     0.01204819     0.01204819     0.03614458 
+#&gt;          Human           Hutt       Iktotchi        Kaleesh       Kaminoan 
+#&gt;     0.42168675     0.01204819     0.01204819     0.01204819     0.02409639 
+#&gt;        Kel Dor       Mirialan   Mon Calamari           Muun       Nautolan 
+#&gt;     0.01204819     0.02409639     0.01204819     0.01204819     0.01204819 
+#&gt;      Neimodian         Pau&#39;an       Quermian         Rodian        Skakoan 
+#&gt;     0.01204819     0.01204819     0.01204819     0.01204819     0.01204819 
+#&gt;      Sullustan     Tholothian        Togruta          Toong      Toydarian 
+#&gt;     0.01204819     0.01204819     0.01204819     0.01204819     0.01204819 
+#&gt;     Trandoshan        Twi&#39;lek     Vulptereen        Wookiee          Xexto 
+#&gt;     0.01204819     0.02409639     0.01204819     0.02409639     0.01204819 
+#&gt; Yoda&#39;s species         Zabrak 
+#&gt;     0.01204819     0.02409639</code></pre>
 </div>

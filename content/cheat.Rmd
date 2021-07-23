@@ -697,3 +697,25 @@ dplyr::starwars %>%
   purrr::map(unique)
 ```
 
+## Get count and proportion of all non-numeric columns
+
+Counts...
+
+```{r}
+dplyr::starwars %>% 
+  # this works for list, but removing them to make the example output
+  # more concise
+  dplyr::select(!where(is.numeric) & !where(is.list)) %>% 
+  purrr::map(~ table(.))
+```
+
+Proportions...
+
+```{r}
+dplyr::starwars %>% 
+  # this works for list, but removing them to make the example output
+  # more concise
+  dplyr::select(!where(is.numeric) & !where(is.list)) %>% 
+  purrr::map(~ table(.) %>% prop.table())
+```
+
