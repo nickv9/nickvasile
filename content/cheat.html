@@ -1,7 +1,7 @@
 ---
 title: "Nick's R Cheat Sheet"
 author: "Nicholas Vasile"
-date: "2021-03-31"
+date: "2021-07-23"
 output: 
   blogdown::html_page:
     toc: true
@@ -67,6 +67,7 @@ vignette: >
 <li><a href="#get-just-the-columns-and-datatypes-for-each-column-in-a-database-table">Get just the columns and datatypes for each column in a database table</a></li>
 <li><a href="#get-just-the-column-names">Get just the column names</a></li>
 <li><a href="#table-of-contents-for-rmarkdown-document">Table of contents for rmarkdown document</a></li>
+<li><a href="#get-unique-values-from-all-non-numeric-columns">Get unique values from all non-numeric columns</a></li>
 </ul>
 </div>
 
@@ -503,16 +504,16 @@ ggplot2::diamonds %&gt;%
 #&gt; # A tibble: 53,940 x 5
 #&gt;    carat cut       color clarity price
 #&gt;    &lt;dbl&gt; &lt;ord&gt;     &lt;ord&gt; &lt;ord&gt;   &lt;int&gt;
-#&gt;  1 0.23  Ideal     E     SI2       326
-#&gt;  2 0.21  Premium   E     SI1       326
-#&gt;  3 0.23  Good      E     VS1       327
-#&gt;  4 0.290 Premium   I     VS2       334
-#&gt;  5 0.31  Good      J     SI2       335
-#&gt;  6 0.24  Very Good J     VVS2      336
-#&gt;  7 0.24  Very Good I     VVS1      336
-#&gt;  8 0.26  Very Good H     SI1       337
-#&gt;  9 0.22  Fair      E     VS2       337
-#&gt; 10 0.23  Very Good H     VS1       338
+#&gt;  1  0.23 Ideal     E     SI2       326
+#&gt;  2  0.21 Premium   E     SI1       326
+#&gt;  3  0.23 Good      E     VS1       327
+#&gt;  4  0.29 Premium   I     VS2       334
+#&gt;  5  0.31 Good      J     SI2       335
+#&gt;  6  0.24 Very Good J     VVS2      336
+#&gt;  7  0.24 Very Good I     VVS1      336
+#&gt;  8  0.26 Very Good H     SI1       337
+#&gt;  9  0.22 Fair      E     VS2       337
+#&gt; 10  0.23 Very Good H     VS1       338
 #&gt; # ... with 53,930 more rows
 
 #filter where attribute value starts with a string
@@ -565,7 +566,7 @@ dplyr::tbl(con, &quot;airports&quot;) %&gt;%
   dplyr::filter(name %like% &quot;%Island%&quot;) %&gt;% 
   head(5)
 #&gt; # Source:   lazy query [?? x 8]
-#&gt; # Database: sqlite 3.35.2 []
+#&gt; # Database: sqlite 3.35.5 []
 #&gt;   faa   name                          lat    lon   alt    tz dst   tzone        
 #&gt;   &lt;chr&gt; &lt;chr&gt;                       &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;        
 #&gt; 1 09J   Jekyll Island Airport        31.1  -81.4    11    -5 A     America/New_~
@@ -658,7 +659,6 @@ OlsonNames() %&gt;% head()
 <div id="calculate-minutes-between-two-times" class="section level3">
 <h3>Calculate minutes between two times</h3>
 <pre class="r"><code>library(lubridate)
-#&gt; Warning: package &#39;lubridate&#39; was built under R version 4.0.4
 #&gt; 
 #&gt; Attaching package: &#39;lubridate&#39;
 #&gt; The following objects are masked from &#39;package:base&#39;:
@@ -1072,16 +1072,16 @@ all groups.</p>
 n_mtcars
 #&gt; # A tibble: 3 x 2
 #&gt; # Groups:   cyl [3]
-#&gt;     cyl data                   
-#&gt;   &lt;dbl&gt; &lt;list&gt;                 
-#&gt; 1     6 &lt;tibble[,10] [7 x 10]&gt; 
-#&gt; 2     4 &lt;tibble[,10] [11 x 10]&gt;
-#&gt; 3     8 &lt;tibble[,10] [14 x 10]&gt;</code></pre>
+#&gt;     cyl data              
+#&gt;   &lt;dbl&gt; &lt;list&gt;            
+#&gt; 1     6 &lt;tibble [7 x 10]&gt; 
+#&gt; 2     4 &lt;tibble [11 x 10]&gt;
+#&gt; 3     8 &lt;tibble [14 x 10]&gt;</code></pre>
 <p>Step 2: give the list members names</p>
 <pre class="r"><code>names(n_mtcars$data) &lt;- stringr::str_c(n_mtcars$cyl,&quot;_cyl&quot;)
 str(n_mtcars$data)
 #&gt; List of 3
-#&gt;  $ 6_cyl: tibble[,10] [7 x 10] (S3: tbl_df/tbl/data.frame)
+#&gt;  $ 6_cyl: tibble [7 x 10] (S3: tbl_df/tbl/data.frame)
 #&gt;   ..$ mpg : num [1:7] 21 21 21.4 18.1 19.2 17.8 19.7
 #&gt;   ..$ disp: num [1:7] 160 160 258 225 168 ...
 #&gt;   ..$ hp  : num [1:7] 110 110 110 105 123 123 175
@@ -1092,7 +1092,7 @@ str(n_mtcars$data)
 #&gt;   ..$ am  : num [1:7] 1 1 0 0 0 0 1
 #&gt;   ..$ gear: num [1:7] 4 4 3 3 4 4 5
 #&gt;   ..$ carb: num [1:7] 4 4 1 1 4 4 6
-#&gt;  $ 4_cyl: tibble[,10] [11 x 10] (S3: tbl_df/tbl/data.frame)
+#&gt;  $ 4_cyl: tibble [11 x 10] (S3: tbl_df/tbl/data.frame)
 #&gt;   ..$ mpg : num [1:11] 22.8 24.4 22.8 32.4 30.4 33.9 21.5 27.3 26 30.4 ...
 #&gt;   ..$ disp: num [1:11] 108 146.7 140.8 78.7 75.7 ...
 #&gt;   ..$ hp  : num [1:11] 93 62 95 66 52 65 97 66 91 113 ...
@@ -1103,7 +1103,7 @@ str(n_mtcars$data)
 #&gt;   ..$ am  : num [1:11] 1 0 0 1 1 1 0 1 1 1 ...
 #&gt;   ..$ gear: num [1:11] 4 4 4 4 4 4 3 4 5 5 ...
 #&gt;   ..$ carb: num [1:11] 1 2 2 1 2 1 1 1 2 2 ...
-#&gt;  $ 8_cyl: tibble[,10] [14 x 10] (S3: tbl_df/tbl/data.frame)
+#&gt;  $ 8_cyl: tibble [14 x 10] (S3: tbl_df/tbl/data.frame)
 #&gt;   ..$ mpg : num [1:14] 18.7 14.3 16.4 17.3 15.2 10.4 10.4 14.7 15.5 15.2 ...
 #&gt;   ..$ disp: num [1:14] 360 360 276 276 276 ...
 #&gt;   ..$ hp  : num [1:14] 175 245 180 180 180 205 215 230 150 150 ...
@@ -1165,4 +1165,101 @@ str(n_mtcars$data)
         toc: true
         toc_depth: 6
         toc_float: true</code></pre>
+</div>
+<div id="get-unique-values-from-all-non-numeric-columns" class="section level2">
+<h2>Get unique values from all non-numeric columns</h2>
+<pre class="r"><code>dplyr::starwars %&gt;% 
+  # this works for list, but removing them to make the example output
+  # more concise
+  dplyr::select(!where(is.numeric) &amp; !where(is.list)) %&gt;% 
+  purrr::map(unique)
+#&gt; $name
+#&gt;  [1] &quot;Luke Skywalker&quot;        &quot;C-3PO&quot;                 &quot;R2-D2&quot;                
+#&gt;  [4] &quot;Darth Vader&quot;           &quot;Leia Organa&quot;           &quot;Owen Lars&quot;            
+#&gt;  [7] &quot;Beru Whitesun lars&quot;    &quot;R5-D4&quot;                 &quot;Biggs Darklighter&quot;    
+#&gt; [10] &quot;Obi-Wan Kenobi&quot;        &quot;Anakin Skywalker&quot;      &quot;Wilhuff Tarkin&quot;       
+#&gt; [13] &quot;Chewbacca&quot;             &quot;Han Solo&quot;              &quot;Greedo&quot;               
+#&gt; [16] &quot;Jabba Desilijic Tiure&quot; &quot;Wedge Antilles&quot;        &quot;Jek Tono Porkins&quot;     
+#&gt; [19] &quot;Yoda&quot;                  &quot;Palpatine&quot;             &quot;Boba Fett&quot;            
+#&gt; [22] &quot;IG-88&quot;                 &quot;Bossk&quot;                 &quot;Lando Calrissian&quot;     
+#&gt; [25] &quot;Lobot&quot;                 &quot;Ackbar&quot;                &quot;Mon Mothma&quot;           
+#&gt; [28] &quot;Arvel Crynyd&quot;          &quot;Wicket Systri Warrick&quot; &quot;Nien Nunb&quot;            
+#&gt; [31] &quot;Qui-Gon Jinn&quot;          &quot;Nute Gunray&quot;           &quot;Finis Valorum&quot;        
+#&gt; [34] &quot;Jar Jar Binks&quot;         &quot;Roos Tarpals&quot;          &quot;Rugor Nass&quot;           
+#&gt; [37] &quot;Ric Olié&quot;              &quot;Watto&quot;                 &quot;Sebulba&quot;              
+#&gt; [40] &quot;Quarsh Panaka&quot;         &quot;Shmi Skywalker&quot;        &quot;Darth Maul&quot;           
+#&gt; [43] &quot;Bib Fortuna&quot;           &quot;Ayla Secura&quot;           &quot;Dud Bolt&quot;             
+#&gt; [46] &quot;Gasgano&quot;               &quot;Ben Quadinaros&quot;        &quot;Mace Windu&quot;           
+#&gt; [49] &quot;Ki-Adi-Mundi&quot;          &quot;Kit Fisto&quot;             &quot;Eeth Koth&quot;            
+#&gt; [52] &quot;Adi Gallia&quot;            &quot;Saesee Tiin&quot;           &quot;Yarael Poof&quot;          
+#&gt; [55] &quot;Plo Koon&quot;              &quot;Mas Amedda&quot;            &quot;Gregar Typho&quot;         
+#&gt; [58] &quot;Cordé&quot;                 &quot;Cliegg Lars&quot;           &quot;Poggle the Lesser&quot;    
+#&gt; [61] &quot;Luminara Unduli&quot;       &quot;Barriss Offee&quot;         &quot;Dormé&quot;                
+#&gt; [64] &quot;Dooku&quot;                 &quot;Bail Prestor Organa&quot;   &quot;Jango Fett&quot;           
+#&gt; [67] &quot;Zam Wesell&quot;            &quot;Dexter Jettster&quot;       &quot;Lama Su&quot;              
+#&gt; [70] &quot;Taun We&quot;               &quot;Jocasta Nu&quot;            &quot;Ratts Tyerell&quot;        
+#&gt; [73] &quot;R4-P17&quot;                &quot;Wat Tambor&quot;            &quot;San Hill&quot;             
+#&gt; [76] &quot;Shaak Ti&quot;              &quot;Grievous&quot;              &quot;Tarfful&quot;              
+#&gt; [79] &quot;Raymus Antilles&quot;       &quot;Sly Moore&quot;             &quot;Tion Medon&quot;           
+#&gt; [82] &quot;Finn&quot;                  &quot;Rey&quot;                   &quot;Poe Dameron&quot;          
+#&gt; [85] &quot;BB8&quot;                   &quot;Captain Phasma&quot;        &quot;Padmé Amidala&quot;        
+#&gt; 
+#&gt; $hair_color
+#&gt;  [1] &quot;blond&quot;         NA              &quot;none&quot;          &quot;brown&quot;        
+#&gt;  [5] &quot;brown, grey&quot;   &quot;black&quot;         &quot;auburn, white&quot; &quot;auburn, grey&quot; 
+#&gt;  [9] &quot;white&quot;         &quot;grey&quot;          &quot;auburn&quot;        &quot;blonde&quot;       
+#&gt; [13] &quot;unknown&quot;      
+#&gt; 
+#&gt; $skin_color
+#&gt;  [1] &quot;fair&quot;                &quot;gold&quot;                &quot;white, blue&quot;        
+#&gt;  [4] &quot;white&quot;               &quot;light&quot;               &quot;white, red&quot;         
+#&gt;  [7] &quot;unknown&quot;             &quot;green&quot;               &quot;green-tan, brown&quot;   
+#&gt; [10] &quot;pale&quot;                &quot;metal&quot;               &quot;dark&quot;               
+#&gt; [13] &quot;brown mottle&quot;        &quot;brown&quot;               &quot;grey&quot;               
+#&gt; [16] &quot;mottled green&quot;       &quot;orange&quot;              &quot;blue, grey&quot;         
+#&gt; [19] &quot;grey, red&quot;           &quot;red&quot;                 &quot;blue&quot;               
+#&gt; [22] &quot;grey, green, yellow&quot; &quot;yellow&quot;              &quot;tan&quot;                
+#&gt; [25] &quot;fair, green, yellow&quot; &quot;grey, blue&quot;          &quot;silver, red&quot;        
+#&gt; [28] &quot;green, grey&quot;         &quot;red, blue, white&quot;    &quot;brown, white&quot;       
+#&gt; [31] &quot;none&quot;               
+#&gt; 
+#&gt; $eye_color
+#&gt;  [1] &quot;blue&quot;          &quot;yellow&quot;        &quot;red&quot;           &quot;brown&quot;        
+#&gt;  [5] &quot;blue-gray&quot;     &quot;black&quot;         &quot;orange&quot;        &quot;hazel&quot;        
+#&gt;  [9] &quot;pink&quot;          &quot;unknown&quot;       &quot;red, blue&quot;     &quot;gold&quot;         
+#&gt; [13] &quot;green, yellow&quot; &quot;white&quot;         &quot;dark&quot;         
+#&gt; 
+#&gt; $sex
+#&gt; [1] &quot;male&quot;           &quot;none&quot;           &quot;female&quot;         &quot;hermaphroditic&quot;
+#&gt; [5] NA              
+#&gt; 
+#&gt; $gender
+#&gt; [1] &quot;masculine&quot; &quot;feminine&quot;  NA         
+#&gt; 
+#&gt; $homeworld
+#&gt;  [1] &quot;Tatooine&quot;       &quot;Naboo&quot;          &quot;Alderaan&quot;       &quot;Stewjon&quot;       
+#&gt;  [5] &quot;Eriadu&quot;         &quot;Kashyyyk&quot;       &quot;Corellia&quot;       &quot;Rodia&quot;         
+#&gt;  [9] &quot;Nal Hutta&quot;      &quot;Bestine IV&quot;     NA               &quot;Kamino&quot;        
+#&gt; [13] &quot;Trandosha&quot;      &quot;Socorro&quot;        &quot;Bespin&quot;         &quot;Mon Cala&quot;      
+#&gt; [17] &quot;Chandrila&quot;      &quot;Endor&quot;          &quot;Sullust&quot;        &quot;Cato Neimoidia&quot;
+#&gt; [21] &quot;Coruscant&quot;      &quot;Toydaria&quot;       &quot;Malastare&quot;      &quot;Dathomir&quot;      
+#&gt; [25] &quot;Ryloth&quot;         &quot;Vulpter&quot;        &quot;Troiken&quot;        &quot;Tund&quot;          
+#&gt; [29] &quot;Haruun Kal&quot;     &quot;Cerea&quot;          &quot;Glee Anselm&quot;    &quot;Iridonia&quot;      
+#&gt; [33] &quot;Iktotch&quot;        &quot;Quermia&quot;        &quot;Dorin&quot;          &quot;Champala&quot;      
+#&gt; [37] &quot;Geonosis&quot;       &quot;Mirial&quot;         &quot;Serenno&quot;        &quot;Concord Dawn&quot;  
+#&gt; [41] &quot;Zolan&quot;          &quot;Ojom&quot;           &quot;Aleen Minor&quot;    &quot;Skako&quot;         
+#&gt; [45] &quot;Muunilinst&quot;     &quot;Shili&quot;          &quot;Kalee&quot;          &quot;Umbara&quot;        
+#&gt; [49] &quot;Utapau&quot;        
+#&gt; 
+#&gt; $species
+#&gt;  [1] &quot;Human&quot;          &quot;Droid&quot;          &quot;Wookiee&quot;        &quot;Rodian&quot;        
+#&gt;  [5] &quot;Hutt&quot;           &quot;Yoda&#39;s species&quot; &quot;Trandoshan&quot;     &quot;Mon Calamari&quot;  
+#&gt;  [9] &quot;Ewok&quot;           &quot;Sullustan&quot;      &quot;Neimodian&quot;      &quot;Gungan&quot;        
+#&gt; [13] NA               &quot;Toydarian&quot;      &quot;Dug&quot;            &quot;Zabrak&quot;        
+#&gt; [17] &quot;Twi&#39;lek&quot;        &quot;Vulptereen&quot;     &quot;Xexto&quot;          &quot;Toong&quot;         
+#&gt; [21] &quot;Cerean&quot;         &quot;Nautolan&quot;       &quot;Tholothian&quot;     &quot;Iktotchi&quot;      
+#&gt; [25] &quot;Quermian&quot;       &quot;Kel Dor&quot;        &quot;Chagrian&quot;       &quot;Geonosian&quot;     
+#&gt; [29] &quot;Mirialan&quot;       &quot;Clawdite&quot;       &quot;Besalisk&quot;       &quot;Kaminoan&quot;      
+#&gt; [33] &quot;Aleena&quot;         &quot;Skakoan&quot;        &quot;Muun&quot;           &quot;Togruta&quot;       
+#&gt; [37] &quot;Kaleesh&quot;        &quot;Pau&#39;an&quot;</code></pre>
 </div>

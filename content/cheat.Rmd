@@ -688,9 +688,12 @@ output:
 ```
 
 ## Get unique values from all non-numeric columns
+
 ```{r}
 dplyr::starwars %>% 
-  dplyr::select(!where(is.numeric)) %>% 
+  # this works for list, but removing them to make the example output
+  # more concise
+  dplyr::select(!where(is.numeric) & !where(is.list)) %>% 
   purrr::map(unique)
 ```
 
